@@ -2,6 +2,7 @@
 #include <glfw3.h>
 #include <glm.hpp>
 #include <iostream>
+#include "objects/shader.h"
 #include "objects/grid.h"
 #include "objects/axis.h"
 
@@ -45,8 +46,13 @@ int main(void)
 
     unsigned int VBO = 0, VAO = 0;
 
+	Shader *basicShader = new Shader("src/shaders/shader.vs", "src/shaders/shader.fs");
+	Shader *cameraShader = new Shader("src/shaders/camera.vs", "src/shaders/shader.fs");
+
 	Grid *grid = new Grid(100);
 	Axis *axis = new Axis(5);
+
+	glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)WINDOW_LENGTH / (float)WINDOW_WIDTH, 0.1f, 100.0f);
 
     while (!glfwWindowShouldClose(window))
     {
@@ -55,14 +61,22 @@ int main(void)
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-		grid->draw();
-		axis->draw();
+		cameraShader->setMat4("projection", projection);
+
+		glm::mat4 view = glm::mat4(1.0f);
+		view = glm::lookAt(glm::vec3(0.0f, 5.0f, 20.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		cameraShader->setMat4("view", view);
+
+		grid->draw(cameraShader);
+		axis->draw(cameraShader);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
 
 	delete grid;
+	delete basicShader;
+	delete cameraShader;
     glfwTerminate();
     return 0;
 }

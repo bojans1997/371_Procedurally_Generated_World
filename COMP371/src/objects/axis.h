@@ -16,10 +16,9 @@ public:
 
 	Axis(int size);
 	~Axis();
-	void draw();
+	void draw(Shader *shader);
 protected:
 	int size;
 	unsigned int VAO, VBO;
-	Shader *shader;
 };
 #endif

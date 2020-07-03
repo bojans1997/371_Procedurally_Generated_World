@@ -4,6 +4,7 @@
 #define GRID_H
 
 #include <glad.h>
+#include <glfw3.h>
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>
 #include <gtc/type_ptr.hpp>
@@ -16,10 +17,9 @@ public:
 
 	Grid(int size);
 	~Grid();
-	void draw();
+	void draw(Shader *shadeer);
 protected:
 	int size;
 	unsigned int VAO, VBO;
-	Shader *shader;
 };
 #endif

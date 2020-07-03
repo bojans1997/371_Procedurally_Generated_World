@@ -2,8 +2,6 @@
 
 Axis::Axis(int size) : size(size), VAO(0), VBO(0)
 {
-	shader = new Shader("src/shaders/shader.vs", "src/shaders/shader.fs");
-
 	float vertices[] = {
 		// position           // color
 		// x-axis
@@ -43,18 +41,51 @@ Axis::~Axis()
 	glDeleteBuffers(1, &VBO);
 }
 
-void Axis::draw()
+void Axis::draw(Shader *shader)
 {
 	shader->use();
 	glBindVertexArray(VAO);
 
+	glLineWidth(5);
+
 	for (int i = 0; i < size; i++) {
+		//glm::mat4 model = glm::mat4(1.0f);
+		//model = glm::translate(model, glm::vec3(i, i, i));
+		//shader->setMat4("model", model);
+
 		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(i, i, i));
+		model = glm::translate(model, glm::vec3(i, 0, 0));
+		//model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.3f, 0.5f));
 		shader->setMat4("model", model);
 
-		glLineWidth(5);
-		glDrawArrays(GL_LINES, 0, 6);
-		glLineWidth(1);
+		glDrawArrays(GL_LINES, 0, 2);
 	}
+
+	for (int i = 0; i < size; i++) {
+		//glm::mat4 model = glm::mat4(1.0f);
+		//model = glm::translate(model, glm::vec3(i, i, i));
+		//shader->setMat4("model", model);
+
+		glm::mat4 model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(0, i, 0));
+		//model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.3f, 0.5f));
+		shader->setMat4("model", model);
+
+		glDrawArrays(GL_LINES, 2, 3);
+	}
+
+	for (int i = 0; i < size; i++) {
+		//glm::mat4 model = glm::mat4(1.0f);
+		//model = glm::translate(model, glm::vec3(i, i, i));
+		//shader->setMat4("model", model);
+
+		glm::mat4 model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(0, 0, i));
+		//model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.3f, 0.5f));
+		shader->setMat4("model", model);
+
+		glDrawArrays(GL_LINES, 4, 6);
+	}
+
+	glLineWidth(1);
 }
