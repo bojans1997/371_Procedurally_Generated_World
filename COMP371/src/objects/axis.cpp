@@ -7,16 +7,16 @@ Axis::Axis(int size) : size(size), VAO(0), VBO(0)
 	float vertices[] = {
 		// position           // color
 		// x-axis
-		 0.0f, 0.01f,  0.0f,  1.0f, 0.0f, 0.0f,
-		 1.0f, 0.01f,  0.0f,  1.0f, 0.0f, 0.0f,
+		 0.0f,  0.0f,  0.0f,  1.0f, 0.0f, 0.0f,
+		 1.0f,  0.0f,  0.0f,  1.0f, 0.0f, 0.0f,
 
 		// y-axis
 		 0.0f,  0.0f,  0.0f,  0.0f, 1.0f, 0.0f,
 		 0.0f,  1.0f,  0.0f,  0.0f, 1.0f, 0.0f,
 
 		// z-axis
-		 0.0f, 0.01f,  0.0f,  0.0f, 0.0f, 1.0f,
-		 0.0f, 0.01f,  1.0f,  0.0f, 0.0f, 1.0f,
+		 0.0f,  0.0f,  0.0f,  0.0f, 0.0f, 1.0f,
+		 0.0f,  0.0f,  1.0f,  0.0f, 0.0f, 1.0f,
 	};
 
 	glGenVertexArrays(1, &VAO);
@@ -53,6 +53,8 @@ void Axis::draw()
 		model = glm::translate(model, glm::vec3(i, i, i));
 		shader->setMat4("model", model);
 
+		glLineWidth(5);
 		glDrawArrays(GL_LINES, 0, 6);
+		glLineWidth(1);
 	}
 }
