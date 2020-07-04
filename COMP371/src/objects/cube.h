@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef GRID_H
-#define GRID_H
+#ifndef CUBE_H
+#define CUBE_H
 
 #include <glad.h>
 #include <glfw3.h>
@@ -10,16 +10,15 @@
 #include <gtc/type_ptr.hpp>
 #include "shader.h"
 
-class Grid
+class Cube
 {
 public:
 	unsigned int ID;
 
-	Grid(int size);
-	~Grid();
-	void draw(Shader *shader);
+	Cube();
+	~Cube();
+	void draw(Shader *shader, unsigned int modelRenderMode);
 protected:
-	int size;
 	unsigned int VAO, VBO;
 };
 #endif

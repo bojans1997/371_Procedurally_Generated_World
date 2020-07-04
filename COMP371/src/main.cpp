@@ -5,16 +5,26 @@
 #include "objects/shader.h"
 #include "objects/grid.h"
 #include "objects/axis.h"
+#include "objects/cube.h"
 
 const int WINDOW_LENGTH = 1024;
 const int WINDOW_WIDTH = 768;
 
 GLFWwindow* window;
 
+unsigned int modelRenderMode = GL_TRIANGLES;
+
 void processInput(GLFWwindow* window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+
+	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
+		modelRenderMode = GL_POINTS;
+	if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS)
+		modelRenderMode = GL_TRIANGLES;
+	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
+		modelRenderMode = GL_LINES;
 }
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height)
@@ -51,6 +61,7 @@ int main(void)
 
 	Grid *grid = new Grid(100);
 	Axis *axis = new Axis(5);
+	Cube *cube = new Cube();
 
 	glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)WINDOW_LENGTH / (float)WINDOW_WIDTH, 0.1f, 100.0f);
 
@@ -69,6 +80,7 @@ int main(void)
 
 		grid->draw(cameraShader);
 		axis->draw(cameraShader);
+		cube->draw(cameraShader, modelRenderMode);
 
         glfwSwapBuffers(window);
         glfwPollEvents();

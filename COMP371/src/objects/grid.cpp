@@ -26,8 +26,6 @@ Grid::Grid(int size) : size(size), VAO(0), VBO(0)
 	glEnableVertexAttribArray(1);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 }
 
 Grid::~Grid()
@@ -40,6 +38,8 @@ void Grid::draw(Shader *shader)
 {
 	shader->use();
 	glBindVertexArray(VAO);
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	for (int i = -size/2; i <= size/2; i++) {
 		for (int j = size/2; j >= -size/2; j--) {
@@ -55,4 +55,6 @@ void Grid::draw(Shader *shader)
 			glDrawArrays(GL_QUADS, 0, 4);
 		}
 	}
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
