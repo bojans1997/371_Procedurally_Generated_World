@@ -90,9 +90,42 @@ int main(void)
 		new Cube(5, 4, 0)
 	};
 
+	Cube *E0Cubes[] = {
+		// Draw E
+		new Cube(-45, 0, -45),
+		new Cube(-45, 1, -45),
+		new Cube(-45, 2, -45),
+		new Cube(-45, 3, -45),
+		new Cube(-45, 4, -45),
+		new Cube(-44, 0, -45),
+		new Cube(-43, 0, -45),
+		new Cube(-42, 0, -45),
+		new Cube(-44, 2, -45),
+		new Cube(-43, 2, -45),
+		new Cube(-42, 2, -45),
+		new Cube(-44, 4, -45),
+		new Cube(-43, 4, -45),
+		new Cube(-42, 4, -45),
+		// Draw 0
+		new Cube(-35, 0, -45),
+		new Cube(-35, 1, -45),
+		new Cube(-35, 2, -45),
+		new Cube(-35, 3, -45),
+		new Cube(-35, 4, -45),
+		new Cube(-38, 0, -45),
+		new Cube(-38, 1, -45),
+		new Cube(-38, 2, -45),
+		new Cube(-38, 3, -45),
+		new Cube(-38, 4, -45),
+		new Cube(-36, 4, -45),
+		new Cube(-37, 4, -45),
+		new Cube(-36, 0, -45),
+		new Cube(-37, 0, -45)
+	};
+
 	glEnable(GL_DEPTH_TEST);
 
-	glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)WINDOW_LENGTH / (float)WINDOW_WIDTH, 0.1f, 100.0f);
+	glm::mat4 projection = glm::perspective(glm::radians(60.0f), (float)WINDOW_LENGTH / (float)WINDOW_WIDTH, 0.1f, 100.0f);
 
     while (!glfwWindowShouldClose(window))
     {
@@ -112,6 +145,10 @@ int main(void)
 		
 		for (int i = 0; i < 22; i++) {
 			U4Cubes[i]->draw(cameraShader, modelRenderMode);
+		}
+
+		for (int i = 0; i < 28; i++) {
+			E0Cubes[i]->draw(cameraShader, modelRenderMode);
 		}
 
         glfwSwapBuffers(window);
