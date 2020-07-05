@@ -89,7 +89,7 @@ int main(void)
 		new Cube(5, 3, 0),
 		new Cube(5, 4, 0)
 	};
-
+	//Letter E and digit 0 for Alexis Laurens-Renner
 	Cube *E0Cubes[] = {
 		// Draw E
 		new Cube(-45, 0, -45),
