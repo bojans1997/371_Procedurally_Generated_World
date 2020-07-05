@@ -15,10 +15,11 @@ class Cube
 public:
 	unsigned int ID;
 
-	Cube();
+	Cube(int x, int y, int z);
 	~Cube();
 	void draw(Shader *shader, unsigned int modelRenderMode);
 protected:
+	int x, y, z;
 	unsigned int VAO, VBO;
 };
 #endif

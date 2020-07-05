@@ -61,7 +61,36 @@ int main(void)
 
 	Grid *grid = new Grid(100);
 	Axis *axis = new Axis(5);
-	Cube *cube = new Cube();
+
+	// Ryze/themilanfan - U 4
+	// To replicate in another corner copy the same process but offset
+	// the x & z to place in corner
+	Cube *U4Cubes[] = {
+		new Cube(-5, 0, 0),
+		new Cube(-5, 1, 0),
+		new Cube(-5, 2, 0),
+		new Cube(-5, 3, 0),
+		new Cube(-5, 4, 0),
+		new Cube(-4, 0, 0),
+		new Cube(-3, 0, 0),
+		new Cube(-2, 0, 0),
+		new Cube(-2, 1, 0),
+		new Cube(-2, 2, 0),
+		new Cube(-2, 3, 0),
+		new Cube(-2, 4, 0),
+		new Cube(2, 2, 0),
+		new Cube(2, 3, 0),
+		new Cube(2, 4, 0),
+		new Cube(3, 2, 0),
+		new Cube(4, 2, 0),
+		new Cube(5, 0, 0),
+		new Cube(5, 1, 0),
+		new Cube(5, 2, 0),
+		new Cube(5, 3, 0),
+		new Cube(5, 4, 0)
+	};
+
+	glEnable(GL_DEPTH_TEST);
 
 	glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)WINDOW_LENGTH / (float)WINDOW_WIDTH, 0.1f, 100.0f);
 
@@ -70,7 +99,7 @@ int main(void)
         processInput(window);
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		cameraShader->setMat4("projection", projection);
 
@@ -80,7 +109,10 @@ int main(void)
 
 		grid->draw(cameraShader);
 		axis->draw(cameraShader);
-		cube->draw(cameraShader, modelRenderMode);
+		
+		for (int i = 0; i < 22; i++) {
+			U4Cubes[i]->draw(cameraShader, modelRenderMode);
+		}
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -89,6 +121,11 @@ int main(void)
 	delete grid;
 	delete basicShader;
 	delete cameraShader;
+	
+	for (int i = 0; i < 22; i++) {
+		delete U4Cubes[i];
+	}
+
     glfwTerminate();
     return 0;
 }
