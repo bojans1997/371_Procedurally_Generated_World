@@ -162,6 +162,37 @@ int main(void)
 		new Cube(-36, 0, -45),
 		new Cube(-37, 0, -45)
 	};
+	//Letter J and digit 5 for Bojan Srbinoski
+	Cube *J5Cubes[] = {
+		// Draw J
+		new Cube(34, 5, -45),
+		new Cube(33, 5, -45),
+		new Cube(32, 5, -45),
+		new Cube(33, 4, -45),
+		new Cube(33, 3, -45),
+		new Cube(33, 2, -45),
+		new Cube(33, 1, -45),
+		new Cube(33, 0, -45),
+		new Cube(32, 0, -45),
+		new Cube(31, 0, -45),
+		new Cube(31, 1, -45),
+		// Draw 5
+		new Cube(41, 5, -45),
+		new Cube(40, 5, -45),
+		new Cube(39, 5, -45),
+		new Cube(38, 5, -45),
+		new Cube(38, 4, -45),
+		new Cube(38, 3, -45),
+		new Cube(39, 3, -45),
+		new Cube(40, 3, -45),
+		new Cube(41, 3, -45),
+		new Cube(41, 2, -45),
+		new Cube(41, 1, -45),
+		new Cube(41, 0, -45),
+		new Cube(40, 0, -45),
+		new Cube(39, 0, -45),
+		new Cube(38, 0, -45),
+	};
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -187,12 +218,16 @@ int main(void)
 		grid->draw(cameraShader);
 		axis->draw(cameraShader);
 		
-		for (int i = 0; i < 22; i++) {
+		for (int i = 0; i < sizeof(U4Cubes) / sizeof(U4Cubes[0]); i++) {
 			U4Cubes[i]->draw(cameraShader, modelRenderMode);
 		}
 
-		for (int i = 0; i < 28; i++) {
+		for (int i = 0; i < sizeof(E0Cubes) / sizeof(E0Cubes[0]); i++) {
 			E0Cubes[i]->draw(cameraShader, modelRenderMode);
+		}
+
+		for (int i = 0; i < sizeof(J5Cubes) / sizeof(J5Cubes[0]); i++) {
+			J5Cubes[i]->draw(cameraShader, modelRenderMode);
 		}
 
         glfwSwapBuffers(window);
