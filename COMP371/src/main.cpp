@@ -13,6 +13,16 @@ const int WINDOW_WIDTH = 768;
 GLFWwindow* window;
 
 unsigned int modelRenderMode = GL_TRIANGLES;
+glm::vec3 cameraPos = glm::vec3(0.0f, 5.0f, 20.0f);
+glm::vec3 cameraFront = glm::vec3(0.0f, 1.0f, 0.0f);
+glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+float camX = 0;
+float camZ = 0;
+float camY = 0;
+
+
+
+
 
 void processInput(GLFWwindow* window)
 {
@@ -25,7 +35,35 @@ void processInput(GLFWwindow* window)
 		modelRenderMode = GL_TRIANGLES;
 	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
 		modelRenderMode = GL_LINES;
+	if (glfwGetKey(window, GLFW_KEY_HOME) == GLFW_PRESS)
+		cameraPos = glm::vec3(0.0f, 5.0f, 20.0f);
+	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+		cameraPos = glm::vec3(sin(camX)*20.0f, cameraPos.y, cos(camZ)*20.0f);
+		camX += 0.1f;
+		camZ += 0.1f;
+	}
+	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
+		cameraPos = glm::vec3(sin(camX)*20.0f, cameraPos.y, cos(camZ)*20.0f);
+		camX -= 0.1f;
+		camZ -= 0.1f;
+	}
+	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+		cameraPos = glm::vec3(cameraPos.x, abs(sin(camY)*20.0f), cos(camZ)*20.0f);
+		camY += 0.1f;
+		camZ += 0.1f;
+	}
+	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+		cameraPos = glm::vec3(cameraPos.x, abs(sin(camY)*20.0f), cos(camZ)*20.0f);
+		camY -= 0.1f;
+		camZ -= 0.1f;
+	}
+	
+	
 }
+
+
+
+
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
@@ -53,6 +91,8 @@ int main(void)
         std::cout << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
+
+
 
     unsigned int VBO = 0, VAO = 0;
 
@@ -125,20 +165,24 @@ int main(void)
 
 	glEnable(GL_DEPTH_TEST);
 
-	glm::mat4 projection = glm::perspective(glm::radians(60.0f), (float)WINDOW_LENGTH / (float)WINDOW_WIDTH, 0.1f, 100.0f);
-
+	
+	
+	
+	
+	
     while (!glfwWindowShouldClose(window))
     {
         processInput(window);
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		
+		glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)WINDOW_LENGTH / (float)WINDOW_WIDTH, 0.1f, 100.0f);
+		glm::mat4 view = glm::lookAt(cameraPos, cameraFront, cameraUp);
 
 		cameraShader->setMat4("projection", projection);
-
-		glm::mat4 view = glm::mat4(1.0f);
-		view = glm::lookAt(glm::vec3(0.0f, 5.0f, 20.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		cameraShader->setMat4("view", view);
+		
 
 		grid->draw(cameraShader);
 		axis->draw(cameraShader);
