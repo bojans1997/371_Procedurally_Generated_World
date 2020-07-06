@@ -16,14 +16,89 @@ unsigned int modelRenderMode = GL_TRIANGLES;
 glm::vec3 cameraPos = glm::vec3(0.0f, 5.0f, 20.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 1.0f, 0.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+float distance = 20.0f;
 float camX = 0;
 float camZ = 0;
 float camY = 0;
 
+void mouse_callback_horizontal(GLFWwindow* window, double xpos, double ypos);
+void mouse_callback_vertical(GLFWwindow* window, double xpos, double ypos);
+void mouse_callback_zoom(GLFWwindow* window, double xpos, double ypos);
+
+bool firstMouse = true;
+float yaw = -90.0f;	// yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we initially rotate a bit to the left.
+float pitch = 0.0f;
+float lastX = WINDOW_LENGTH/ 2.0;
+float lastY = WINDOW_WIDTH / 2.0;
+float fov = 45.0f;
 
 
+void mouse_callback_horizontal(GLFWwindow* window, double xpos, double ypos)
+{
+	if (firstMouse)
+	{
+		lastX = xpos;
+		lastY = ypos;
+		firstMouse = false;
+	}
 
+	float xoffset = xpos - lastX;
+	float yoffset = lastY - ypos;
+	lastX = xpos;
+	lastY = ypos;
 
+	float sensitivity = 0.1f;
+	xoffset *= sensitivity;
+	yoffset *= sensitivity;
+
+	yaw += xoffset;
+	pitch += yoffset;
+
+	if (pitch > 89.0f)
+		pitch = 89.0f;
+	if (pitch < -89.0f)
+		pitch = -89.0f;
+
+	glm::vec3 direction;
+	direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+	direction.y = sin(glm::radians(pitch));
+	direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+	cameraFront.x += direction.x*2.0;
+}
+/*
+void mouse_callback_vertical(GLFWwindow* window, double xpos, double ypos)
+{
+	if (firstMouse)
+	{
+		lastX = xpos;
+		lastY = ypos;
+		firstMouse = false;
+	}
+
+	float xoffset = xpos - lastX;
+	float yoffset = lastY - ypos;
+	lastX = xpos;
+	lastY = ypos;
+
+	float sensitivity = 0.1f;
+	xoffset *= sensitivity;
+	yoffset *= sensitivity;
+
+	yaw += xoffset;
+	pitch += yoffset;
+
+	if (pitch > 89.0f)
+		pitch = 89.0f;
+	if (pitch < -89.0f)
+		pitch = -89.0f;
+
+	glm::vec3 direction;
+	direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+	direction.y = sin(glm::radians(pitch));
+	direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+	cameraFront.y += direction.y;
+}
+*/
 void processInput(GLFWwindow* window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -35,29 +110,47 @@ void processInput(GLFWwindow* window)
 		modelRenderMode = GL_TRIANGLES;
 	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
 		modelRenderMode = GL_LINES;
-	if (glfwGetKey(window, GLFW_KEY_HOME) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_HOME) == GLFW_PRESS) {
 		cameraPos = glm::vec3(0.0f, 5.0f, 20.0f);
+		cameraFront = glm::vec3(0.0f, 1.0f, 0.0f);
+	}
 	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
-		cameraPos = glm::vec3(sin(camX)*20.0f, cameraPos.y, cos(camZ)*20.0f);
+		cameraPos = glm::vec3(sin(camX)*distance, cameraPos.y, cos(camZ)*distance);
 		camX += 0.1f;
 		camZ += 0.1f;
 	}
 	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
-		cameraPos = glm::vec3(sin(camX)*20.0f, cameraPos.y, cos(camZ)*20.0f);
+		cameraPos = glm::vec3(sin(camX)*distance, cameraPos.y, cos(camZ)*distance);
 		camX -= 0.1f;
 		camZ -= 0.1f;
 	}
 	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
-		cameraPos = glm::vec3(cameraPos.x, abs(sin(camY)*20.0f), cos(camZ)*20.0f);
+		cameraPos = glm::vec3(cameraPos.x, abs(sin(camY)*distance), cos(camZ)*distance);
 		camY += 0.1f;
 		camZ += 0.1f;
 	}
 	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
-		cameraPos = glm::vec3(cameraPos.x, abs(sin(camY)*20.0f), cos(camZ)*20.0f);
+		cameraPos = glm::vec3(cameraPos.x, abs(sin(camY)*distance), cos(camZ)*distance);
 		camY -= 0.1f;
 		camZ -= 0.1f;
 	}
-	
+	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+		glfwSetCursorPosCallback(window, mouse_callback_horizontal);
+		
+	}
+	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_RELEASE) {
+		glfwSetInputMode(window, GLFW_STICKY_KEYS, GLFW_FALSE);
+		glfwSetCursorPosCallback(window, NULL);
+	}/*
+	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS) {
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+		glfwSetCursorPosCallback(window, mouse_callback_vertical);
+	}
+	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_RELEASE) {
+		glfwSetInputMode(window, GLFW_STICKY_KEYS, GLFW_FALSE);
+		glfwSetCursorPosCallback(window, NULL);
+	}*/
 	
 }
 
@@ -85,13 +178,13 @@ int main(void)
 
     glfwMakeContextCurrent(window);
 	glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
-
+	
+	
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
         std::cout << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
-
 
 
     unsigned int VBO = 0, VAO = 0;
