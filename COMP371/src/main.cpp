@@ -65,7 +65,7 @@ void mouse_callback_horizontal(GLFWwindow* window, double xpos, double ypos)
 	direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
 	cameraFront.x += direction.x*2.0;
 }
-/*
+
 void mouse_callback_vertical(GLFWwindow* window, double xpos, double ypos)
 {
 	if (firstMouse)
@@ -98,7 +98,28 @@ void mouse_callback_vertical(GLFWwindow* window, double xpos, double ypos)
 	direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
 	cameraFront.y += direction.y;
 }
-*/
+
+void mouse_callback_zoom(GLFWwindow* window, double xpos, double ypos) {
+	if (firstMouse)
+	{
+		lastX = xpos;
+		lastY = ypos;
+		firstMouse = false;
+	}
+	float yoffset = lastY - ypos;
+	lastY = ypos;
+
+	float sensitivity = 0.1f;
+	yoffset *= sensitivity;
+
+	fov -= yoffset;
+
+	if (fov <= 1.0f)
+		fov = 1.0f;
+	if (fov >= 45.0f)
+		fov = 45.0f;
+}
+
 void processInput(GLFWwindow* window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -113,6 +134,7 @@ void processInput(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_HOME) == GLFW_PRESS) {
 		cameraPos = glm::vec3(0.0f, 5.0f, 20.0f);
 		cameraFront = glm::vec3(0.0f, 1.0f, 0.0f);
+		fov = 45.0f;
 	}
 	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
 		cameraPos = glm::vec3(sin(camX)*distance, cameraPos.y, cos(camZ)*distance);
@@ -134,27 +156,33 @@ void processInput(GLFWwindow* window)
 		camY -= 0.1f;
 		camZ -= 0.1f;
 	}
-	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
-		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
-		glfwSetCursorPosCallback(window, mouse_callback_horizontal);
-		
-	}
+	
 	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_RELEASE) {
 		glfwSetInputMode(window, GLFW_STICKY_KEYS, GLFW_FALSE);
 		glfwSetCursorPosCallback(window, NULL);
-	}/*
-	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS) {
-		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
-		glfwSetCursorPosCallback(window, mouse_callback_vertical);
 	}
 	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_RELEASE) {
 		glfwSetInputMode(window, GLFW_STICKY_KEYS, GLFW_FALSE);
 		glfwSetCursorPosCallback(window, NULL);
-	}*/
-	
+	}
+	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE) {
+		glfwSetInputMode(window, GLFW_STICKY_KEYS, GLFW_FALSE);
+		glfwSetCursorPosCallback(window, NULL);
+	}
+
+	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+		glfwSetCursorPosCallback(window, mouse_callback_horizontal);
+	}
+	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS) {
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+		glfwSetCursorPosCallback(window, mouse_callback_vertical);
+	}
+	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+		glfwSetCursorPosCallback(window, mouse_callback_zoom);
+	}
 }
-
-
 
 
 
@@ -329,9 +357,6 @@ int main(void)
 
 	
 	
-	
-	
-	
     while (!glfwWindowShouldClose(window))
     {
         processInput(window);
@@ -339,7 +364,7 @@ int main(void)
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
-		glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)WINDOW_LENGTH / (float)WINDOW_WIDTH, 0.1f, 100.0f);
+		glm::mat4 projection = glm::perspective(glm::radians(fov), (float)WINDOW_LENGTH / (float)WINDOW_WIDTH, 0.1f, 100.0f);
 		glm::mat4 view = glm::lookAt(cameraPos, cameraFront, cameraUp);
 
 		cameraShader->setMat4("projection", projection);
