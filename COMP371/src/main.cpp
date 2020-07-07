@@ -287,6 +287,44 @@ int main(void)
 		new Cube(38, 0, -45),
 	};
 
+	//Letter A annd digit 6 for Saad Ahmed
+	Cube *A6Cubes[] = {
+		// Draw A
+		new Cube(31, 5, 45),
+		new Cube(32, 5, 45),
+		new Cube(33, 5, 45),
+		new Cube(34, 5, 45),
+		new Cube(31, 4, 45),
+		new Cube(31, 3, 45),
+		new Cube(31, 2, 45),
+		new Cube(31, 1, 45),
+		new Cube(31, 0, 45),
+		new Cube(34, 4, 45),
+		new Cube(34, 3, 45),
+		new Cube(34, 2, 45),
+		new Cube(34, 1, 45),
+		new Cube(34, 0, 45),
+		new Cube(32, 3, 45),
+		new Cube(33, 3, 45),
+		// Draw 6
+		new Cube(37, 5, 45),
+		new Cube(38, 5, 45),
+		new Cube(39, 5, 45),
+		new Cube(40, 5, 45),
+		new Cube(37, 4, 45),
+		new Cube(37, 3, 45),
+		new Cube(37, 2, 45),
+		new Cube(37, 1, 45),
+		new Cube(37, 0, 45),
+		new Cube(38, 0, 45),
+		new Cube(39, 0, 45),
+		new Cube(40, 0, 45),
+		new Cube(40, 1, 45),
+		new Cube(40, 2, 45),
+		new Cube(39, 2, 45),
+		new Cube(38, 2, 45),
+	};
+
 	glEnable(GL_DEPTH_TEST);
 
 	
@@ -321,6 +359,10 @@ int main(void)
 
 		for (int i = 0; i < sizeof(J5Cubes) / sizeof(J5Cubes[0]); i++) {
 			J5Cubes[i]->draw(cameraShader, modelRenderMode);
+		}
+
+		for (int i = 0; i < sizeof(A6Cubes) / sizeof(A6Cubes[0]); i++) {
+			A6Cubes[i]->draw(cameraShader, modelRenderMode);
 		}
 
         glfwSwapBuffers(window);
