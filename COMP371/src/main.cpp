@@ -43,16 +43,12 @@ void mouse_callback_horizontal(GLFWwindow* window, double xpos, double ypos)
 	}
 
 	float xoffset = xpos - lastX;
-	float yoffset = lastY - ypos;
 	lastX = xpos;
-	lastY = ypos;
 
 	float sensitivity = 0.1f;
 	xoffset *= sensitivity;
-	yoffset *= sensitivity;
 
 	yaw += xoffset;
-	pitch += yoffset;
 
 	if (pitch > 89.0f)
 		pitch = 89.0f;
@@ -60,10 +56,12 @@ void mouse_callback_horizontal(GLFWwindow* window, double xpos, double ypos)
 		pitch = -89.0f;
 
 	glm::vec3 direction;
-	direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-	direction.y = sin(glm::radians(pitch));
-	direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-	cameraFront.x += direction.x*2.0;
+	direction.x = cos(glm::radians(yaw));
+	direction.y = cameraFront.y;
+	direction.z = sin(glm::radians(yaw));
+	cameraFront.x += direction.x;
+	cameraFront.z += direction.z;
+	
 }
 
 void mouse_callback_vertical(GLFWwindow* window, double xpos, double ypos)
