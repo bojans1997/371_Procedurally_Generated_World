@@ -135,6 +135,7 @@ void processInput(GLFWwindow* window)
 		cameraPos = glm::vec3(0.0f, 5.0f, 20.0f);
 		cameraFront = glm::vec3(0.0f, 1.0f, 0.0f);
 		fov = 45.0f;
+		angle, moveX, moveY = 0.0f;
 	}
 	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
 		cameraPos = glm::vec3(sin(camX)*distance, cameraPos.y, cos(camZ)*distance);
@@ -399,94 +400,25 @@ int main(void)
 		
 		glm::mat4 model = glm::mat4(1.0f);
 		model = glm::rotate(model, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
-		model = glm::scale(model, glm::vec3(3.0f, 1.0f, 1.0f));
-		model = glm::translate(model, glm::vec3(-2, 0, 0));
-		model = glm::translate(model, glm::vec3(moveX, 5*moveY, 0.0f));
-		//cameraShader->setMat4("model", model);
-		
-		E1->draw(cameraShader, modelRenderMode, model);
-
-		model = glm::mat4(1.0f);
-		model = glm::rotate(model, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
-		model = glm::scale(model, glm::vec3(1.0f, 5.0f, 1.0f));
-		model = glm::translate(model, glm::vec3(-7, 0, 0));
-		model = glm::translate(model, glm::vec3(3*moveX, moveY, 0.0f));
-		//cameraShader->setMat4("model", model);
-		
-		E2->draw(cameraShader, modelRenderMode, model);
-
-		model = glm::mat4(1.0f);
-		model = glm::rotate(model, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
-		model = glm::scale(model, glm::vec3(3.0f, 1.0f, 1.0f));
-		model = glm::translate(model, glm::vec3(-2,2,0));
-		model = glm::translate(model, glm::vec3(moveX, 5*moveY, 0.0f));
-		//cameraShader->setMat4("model", model);
-		
-		E3->draw(cameraShader, modelRenderMode, model);
-		
-		model = glm::mat4(1.0f);
-		model = glm::rotate(model, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
-		model = glm::scale(model, glm::vec3(3.0f, 1.0f, 1.0f));
-		model = glm::translate(model, glm::vec3(-2, 4, 0));
-		model = glm::translate(model, glm::vec3(moveX, 5*moveY, 0.0f));
-		//cameraShader->setMat4("model", model);
-		
-		E4->draw(cameraShader, modelRenderMode, model);
-
-		model = glm::mat4(1.0f);
-		model = glm::rotate(model, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
-		model = glm::scale(model, glm::vec3(1.0f, 5.0f, 1.0f));
-		model = glm::translate(model, glm::vec3(2, 0, 0));
-		model = glm::translate(model, glm::vec3(2*moveX, moveY, 0.0f));
-		//cameraShader->setMat4("model", model);
-
-		E01->draw(cameraShader, modelRenderMode, model);
-
-		model = glm::mat4(1.0f);
-		model = glm::rotate(model, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
-		model = glm::scale(model, glm::vec3(1.0f, 5.0f, 1.0f));
-		model = glm::translate(model, glm::vec3(5, 0, 0));
-		model = glm::translate(model, glm::vec3(2*moveX, moveY, 0.0f));
-		//cameraShader->setMat4("model", model);
-
-		E02->draw(cameraShader, modelRenderMode, model);
-
-		model = glm::mat4(1.0f);
-		model = glm::rotate(model, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
-		model = glm::scale(model, glm::vec3(2.0f, 1.0f, 1.0f));
-		model = glm::translate(model, glm::vec3(1.5, 0, 0));
-		model = glm::translate(model, glm::vec3(moveX, 5*moveY, 0.0f));
-		//cameraShader->setMat4("model", model);
-
-		E03->draw(cameraShader, modelRenderMode, model);
-
-		model = glm::mat4(1.0f);
-		model = glm::rotate(model, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
-		model = glm::scale(model, glm::vec3(2.0f, 1.0f, 1.0f));
-		model = glm::translate(model, glm::vec3(1.5, 4, 0));
-		model = glm::translate(model, glm::vec3(moveX, 5*moveY, 0.0f));
-		//cameraShader->setMat4("model", model);
-
-		E04->draw(cameraShader, modelRenderMode, model);
-
+		model = glm::translate(model, glm::vec3(moveX, moveY, 0.0f));
 
 		if (angle == 360.0f)
 			angle = 0;
-		/*
+		
 		for (int i = 0; i < sizeof(U4Cubes) / sizeof(U4Cubes[0]); i++) {
-			U4Cubes[i]->draw(cameraShader, modelRenderMode);
-		}*/
+			U4Cubes[i]->draw(cameraShader, modelRenderMode, model);
+		}
 
 		for (int i = 0; i < sizeof(E0Cubes) / sizeof(E0Cubes[0]); i++) {
-			E0Cubes[i]->draw(cameraShader, modelRenderMode);
+			E0Cubes[i]->draw(cameraShader, modelRenderMode, model);
 		}
 
 		for (int i = 0; i < sizeof(J5Cubes) / sizeof(J5Cubes[0]); i++) {
-			J5Cubes[i]->draw(cameraShader, modelRenderMode);
+			J5Cubes[i]->draw(cameraShader, modelRenderMode, model);
 		}
 
 		for (int i = 0; i < sizeof(A6Cubes) / sizeof(A6Cubes[0]); i++) {
-			A6Cubes[i]->draw(cameraShader, modelRenderMode);
+			A6Cubes[i]->draw(cameraShader, modelRenderMode, model);
 		}
 
         glfwSwapBuffers(window);

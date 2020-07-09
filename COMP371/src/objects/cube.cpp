@@ -91,6 +91,7 @@ void Cube::draw(Shader* shader, unsigned int modelRenderMode, glm::mat4 matrix) 
 	shader->use();
 	glBindVertexArray(VAO);
 	
+	matrix = glm::translate(matrix, glm::vec3(x, y, z));
 	shader->setMat4("model", matrix);
 	glDrawArrays(modelRenderMode, 0, 36);
 }
