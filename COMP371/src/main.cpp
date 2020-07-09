@@ -32,6 +32,8 @@ float lastX = WINDOW_LENGTH/ 2.0;
 float lastY = WINDOW_WIDTH / 2.0;
 float fov = 45.0f;
 
+float angle = 0.0f;
+float moveX, moveY = 0.0f;
 
 void mouse_callback_horizontal(GLFWwindow* window, double xpos, double ypos)
 {
@@ -154,7 +156,18 @@ void processInput(GLFWwindow* window)
 		camY -= 0.1f;
 		camZ -= 0.1f;
 	}
-	
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+		moveY += 1.0f;
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+		moveY -= 1.0f;
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+		moveX -= 1.0f;
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+		moveX += 1.0f;
+	if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS)
+		angle += 45.0f;
+	if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS)
+		angle -= 45.0f;
 	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_RELEASE) {
 		glfwSetInputMode(window, GLFW_STICKY_KEYS, GLFW_FALSE);
 		glfwSetCursorPosCallback(window, NULL);
@@ -281,6 +294,11 @@ int main(void)
 		new Cube(-36, 0, -45),
 		new Cube(-37, 0, -45)
 	};
+
+	
+
+
+
 	//Letter J and digit 5 for Bojan Srbinoski
 	Cube *J5Cubes[] = {
 		// Draw J
@@ -352,9 +370,16 @@ int main(void)
 	};
 
 	glEnable(GL_DEPTH_TEST);
+	Cube *E1 = new Cube(0, 0, 0);
+	Cube *E2 = new Cube(-6, 0, -10);
+	Cube *E3 = new Cube(-5, 2, -10);
+	Cube *E4 = new Cube(-5, 4, -10);
 
-	
-	
+	Cube *E01 = new Cube(0, 0, 0);
+	Cube *E02 = new Cube(0, 0, 0);
+	Cube *E03 = new Cube(0, 0, 0);
+	Cube *E04 = new Cube(0, 0, 0);
+
     while (!glfwWindowShouldClose(window))
     {
         processInput(window);
@@ -372,9 +397,85 @@ int main(void)
 		grid->draw(cameraShader);
 		axis->draw(cameraShader);
 		
+		glm::mat4 model = glm::mat4(1.0f);
+		model = glm::rotate(model, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
+		model = glm::scale(model, glm::vec3(3.0f, 1.0f, 1.0f));
+		model = glm::translate(model, glm::vec3(-2, 0, 0));
+		model = glm::translate(model, glm::vec3(moveX, 5*moveY, 0.0f));
+		//cameraShader->setMat4("model", model);
+		
+		E1->draw(cameraShader, modelRenderMode, model);
+
+		model = glm::mat4(1.0f);
+		model = glm::rotate(model, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
+		model = glm::scale(model, glm::vec3(1.0f, 5.0f, 1.0f));
+		model = glm::translate(model, glm::vec3(-7, 0, 0));
+		model = glm::translate(model, glm::vec3(3*moveX, moveY, 0.0f));
+		//cameraShader->setMat4("model", model);
+		
+		E2->draw(cameraShader, modelRenderMode, model);
+
+		model = glm::mat4(1.0f);
+		model = glm::rotate(model, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
+		model = glm::scale(model, glm::vec3(3.0f, 1.0f, 1.0f));
+		model = glm::translate(model, glm::vec3(-2,2,0));
+		model = glm::translate(model, glm::vec3(moveX, 5*moveY, 0.0f));
+		//cameraShader->setMat4("model", model);
+		
+		E3->draw(cameraShader, modelRenderMode, model);
+		
+		model = glm::mat4(1.0f);
+		model = glm::rotate(model, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
+		model = glm::scale(model, glm::vec3(3.0f, 1.0f, 1.0f));
+		model = glm::translate(model, glm::vec3(-2, 4, 0));
+		model = glm::translate(model, glm::vec3(moveX, 5*moveY, 0.0f));
+		//cameraShader->setMat4("model", model);
+		
+		E4->draw(cameraShader, modelRenderMode, model);
+
+		model = glm::mat4(1.0f);
+		model = glm::rotate(model, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
+		model = glm::scale(model, glm::vec3(1.0f, 5.0f, 1.0f));
+		model = glm::translate(model, glm::vec3(2, 0, 0));
+		model = glm::translate(model, glm::vec3(2*moveX, moveY, 0.0f));
+		//cameraShader->setMat4("model", model);
+
+		E01->draw(cameraShader, modelRenderMode, model);
+
+		model = glm::mat4(1.0f);
+		model = glm::rotate(model, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
+		model = glm::scale(model, glm::vec3(1.0f, 5.0f, 1.0f));
+		model = glm::translate(model, glm::vec3(5, 0, 0));
+		model = glm::translate(model, glm::vec3(2*moveX, moveY, 0.0f));
+		//cameraShader->setMat4("model", model);
+
+		E02->draw(cameraShader, modelRenderMode, model);
+
+		model = glm::mat4(1.0f);
+		model = glm::rotate(model, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
+		model = glm::scale(model, glm::vec3(2.0f, 1.0f, 1.0f));
+		model = glm::translate(model, glm::vec3(1.5, 0, 0));
+		model = glm::translate(model, glm::vec3(moveX, 5*moveY, 0.0f));
+		//cameraShader->setMat4("model", model);
+
+		E03->draw(cameraShader, modelRenderMode, model);
+
+		model = glm::mat4(1.0f);
+		model = glm::rotate(model, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
+		model = glm::scale(model, glm::vec3(2.0f, 1.0f, 1.0f));
+		model = glm::translate(model, glm::vec3(1.5, 4, 0));
+		model = glm::translate(model, glm::vec3(moveX, 5*moveY, 0.0f));
+		//cameraShader->setMat4("model", model);
+
+		E04->draw(cameraShader, modelRenderMode, model);
+
+
+		if (angle == 360.0f)
+			angle = 0;
+		/*
 		for (int i = 0; i < sizeof(U4Cubes) / sizeof(U4Cubes[0]); i++) {
 			U4Cubes[i]->draw(cameraShader, modelRenderMode);
-		}
+		}*/
 
 		for (int i = 0; i < sizeof(E0Cubes) / sizeof(E0Cubes[0]); i++) {
 			E0Cubes[i]->draw(cameraShader, modelRenderMode);
