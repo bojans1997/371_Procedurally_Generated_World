@@ -42,13 +42,9 @@ void Grid::draw(Shader *shader)
 
 	for (int i = -size/2; i <= size/2; i++) {
 		for (int j = size/2; j >= -size/2; j--) {
-			//glm::mat4 model = glm::mat4(1.0f);
-			//model = glm::translate(model, glm::vec3(i, 0, j));
-			//shader->setMat4("model", model);
 
 			glm::mat4 model = glm::mat4(1.0f);
 			model = glm::translate(model, glm::vec3(i, 0, j));
-			//model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.3f, 0.5f));
 			shader->setMat4("model", model);
 
 			glDrawArrays(GL_QUADS, 0, 4);

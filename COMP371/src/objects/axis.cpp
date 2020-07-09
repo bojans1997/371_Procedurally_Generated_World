@@ -49,39 +49,27 @@ void Axis::draw(Shader *shader)
 	glLineWidth(5);
 
 	for (int i = 0; i < size; i++) {
-		//glm::mat4 model = glm::mat4(1.0f);
-		//model = glm::translate(model, glm::vec3(i, i, i));
-		//shader->setMat4("model", model);
 
 		glm::mat4 model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(i, 0, 0));
-		//model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.3f, 0.5f));
 		shader->setMat4("model", model);
 
 		glDrawArrays(GL_LINES, 0, 2);
 	}
 
 	for (int i = 0; i < size; i++) {
-		//glm::mat4 model = glm::mat4(1.0f);
-		//model = glm::translate(model, glm::vec3(i, i, i));
-		//shader->setMat4("model", model);
 
 		glm::mat4 model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(0, i, 0));
-		//model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.3f, 0.5f));
 		shader->setMat4("model", model);
 
 		glDrawArrays(GL_LINES, 2, 3);
 	}
 
 	for (int i = 0; i < size; i++) {
-		//glm::mat4 model = glm::mat4(1.0f);
-		//model = glm::translate(model, glm::vec3(i, i, i));
-		//shader->setMat4("model", model);
 
 		glm::mat4 model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(0, 0, i));
-		//model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.3f, 0.5f));
 		shader->setMat4("model", model);
 
 		glDrawArrays(GL_LINES, 4, 6);

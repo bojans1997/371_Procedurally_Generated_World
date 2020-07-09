@@ -34,6 +34,7 @@ float fov = 45.0f;
 
 float angle = 0.0f;
 float moveX, moveY = 0.0f;
+float scale = 1.0f;
 
 void mouse_callback_horizontal(GLFWwindow* window, double xpos, double ypos)
 {
@@ -131,12 +132,20 @@ void processInput(GLFWwindow* window)
 		modelRenderMode = GL_TRIANGLES;
 	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
 		modelRenderMode = GL_LINES;
+
+	if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS)
+		scale += 0.1f;
+	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
+		scale -= 0.1f;
+
 	if (glfwGetKey(window, GLFW_KEY_HOME) == GLFW_PRESS) {
 		cameraPos = glm::vec3(0.0f, 5.0f, 20.0f);
 		cameraFront = glm::vec3(0.0f, 1.0f, 0.0f);
 		fov = 45.0f;
 		angle, moveX, moveY = 0.0f;
+		scale = 1.0f;
 	}
+
 	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
 		cameraPos = glm::vec3(sin(camX)*distance, cameraPos.y, cos(camZ)*distance);
 		camX += 0.1f;
@@ -157,6 +166,7 @@ void processInput(GLFWwindow* window)
 		camY -= 0.1f;
 		camZ -= 0.1f;
 	}
+
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 		moveY += 1.0f;
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
@@ -169,6 +179,7 @@ void processInput(GLFWwindow* window)
 		angle += 45.0f;
 	if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS)
 		angle -= 45.0f;
+
 	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_RELEASE) {
 		glfwSetInputMode(window, GLFW_STICKY_KEYS, GLFW_FALSE);
 		glfwSetCursorPosCallback(window, NULL);
@@ -181,7 +192,6 @@ void processInput(GLFWwindow* window)
 		glfwSetInputMode(window, GLFW_STICKY_KEYS, GLFW_FALSE);
 		glfwSetCursorPosCallback(window, NULL);
 	}
-
 	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 		glfwSetCursorPosCallback(window, mouse_callback_horizontal);
@@ -219,13 +229,11 @@ int main(void)
     glfwMakeContextCurrent(window);
 	glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
 	
-	
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
         std::cout << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
-
 
     unsigned int VBO = 0, VAO = 0;
 
@@ -235,10 +243,9 @@ int main(void)
 	Grid *grid = new Grid(100);
 	Axis *axis = new Axis(5);
 
-	// Ryze/themilanfan - U 4
-	// To replicate in another corner copy the same process but offset
-	// the x & z to place in corner
+	// Letter U and digit 4 for Giuseppe Campanelli
 	Cube *U4Cubes[] = {
+		// Draw U
 		new Cube(-5, 0, 0),
 		new Cube(-5, 1, 0),
 		new Cube(-5, 2, 0),
@@ -251,6 +258,7 @@ int main(void)
 		new Cube(-2, 2, 0),
 		new Cube(-2, 3, 0),
 		new Cube(-2, 4, 0),
+		// Draw 4
 		new Cube(2, 2, 0),
 		new Cube(2, 3, 0),
 		new Cube(2, 4, 0),
@@ -262,6 +270,7 @@ int main(void)
 		new Cube(5, 3, 0),
 		new Cube(5, 4, 0)
 	};
+
 	//Letter E and digit 0 for Alexis Laurens-Renner
 	Cube *E0Cubes[] = {
 		// Draw E
@@ -295,10 +304,6 @@ int main(void)
 		new Cube(-36, 0, -45),
 		new Cube(-37, 0, -45)
 	};
-
-	
-
-
 
 	//Letter J and digit 5 for Bojan Srbinoski
 	Cube *J5Cubes[] = {
@@ -371,15 +376,6 @@ int main(void)
 	};
 
 	glEnable(GL_DEPTH_TEST);
-	Cube *E1 = new Cube(0, 0, 0);
-	Cube *E2 = new Cube(-6, 0, -10);
-	Cube *E3 = new Cube(-5, 2, -10);
-	Cube *E4 = new Cube(-5, 4, -10);
-
-	Cube *E01 = new Cube(0, 0, 0);
-	Cube *E02 = new Cube(0, 0, 0);
-	Cube *E03 = new Cube(0, 0, 0);
-	Cube *E04 = new Cube(0, 0, 0);
 
     while (!glfwWindowShouldClose(window))
     {
@@ -394,13 +390,13 @@ int main(void)
 		cameraShader->setMat4("projection", projection);
 		cameraShader->setMat4("view", view);
 		
-
 		grid->draw(cameraShader);
 		axis->draw(cameraShader);
 		
 		glm::mat4 model = glm::mat4(1.0f);
 		model = glm::rotate(model, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
 		model = glm::translate(model, glm::vec3(moveX, moveY, 0.0f));
+		model = glm::scale(model, glm::vec3(scale, scale, scale));
 
 		if (angle == 360.0f)
 			angle = 0;
@@ -428,9 +424,21 @@ int main(void)
 	delete grid;
 	delete basicShader;
 	delete cameraShader;
-	
-	for (int i = 0; i < 22; i++) {
+
+	for (int i = 0; i < sizeof(U4Cubes) / sizeof(U4Cubes[0]); i++) {
 		delete U4Cubes[i];
+	}
+
+	for (int i = 0; i < sizeof(E0Cubes) / sizeof(E0Cubes[0]); i++) {
+		delete E0Cubes[i];
+	}
+
+	for (int i = 0; i < sizeof(J5Cubes) / sizeof(J5Cubes[0]); i++) {
+		delete J5Cubes[i];
+	}
+
+	for (int i = 0; i < sizeof(A6Cubes) / sizeof(A6Cubes[0]); i++) {
+		delete A6Cubes[i];
 	}
 
     glfwTerminate();

@@ -3,7 +3,6 @@
 Cube::Cube(int x, int y, int z) : x(x), y(y), z(z), VAO(0), VBO(0)
 {
 	float vertices[] = {
-		//need to adjust vertices for 0-1 range, not -0.5 to 0.5
 		0.0f, 0.0f, 0.0f,  0.5f, 0.5f, 0.5f,
 		1.0f, 0.0f, 0.0f,  0.5f, 0.5f, 0.5f,
 		1.0f,  1.0f, 0.0f,  0.5f, 0.5f, 0.5f,
@@ -19,9 +18,9 @@ Cube::Cube(int x, int y, int z) : x(x), y(y), z(z), VAO(0), VBO(0)
 		0.0f, 0.0f,  1.0f,  0.5f, 0.5f, 0.5f,
 
 		0.0f, 0.0f, 0.0f,  0.5f, 0.5f, 0.5f,
-		 1.0f, 0.0f, 0.0f,  0.5f, 0.5f, 0.5f,
-		 1.0f, 0.0f,  1.0f,  0.5f, 0.5f, 0.5f,
-		 1.0f, 0.0f,  1.0f,  0.5f, 0.5f, 0.5f,
+		1.0f, 0.0f, 0.0f,  0.5f, 0.5f, 0.5f,
+		1.0f, 0.0f,  1.0f,  0.5f, 0.5f, 0.5f,
+		1.0f, 0.0f,  1.0f,  0.5f, 0.5f, 0.5f,
 		0.0f, 0.0f,  1.0f,  0.5f, 0.5f, 0.5f,
 		0.0f, 0.0f, 0.0f,  0.5f, 0.5f, 0.5f,
 
@@ -32,17 +31,17 @@ Cube::Cube(int x, int y, int z) : x(x), y(y), z(z), VAO(0), VBO(0)
 		0.0f, 0.0f,  1.0f,  0.75f, 0.75f, 0.75f,
 		0.0f,  1.0f,  1.0f,  0.75f, 0.75f, 0.75f,
 
-		 1.0f,  1.0f,  1.0f,  0.75f, 0.75f, 0.75f,
-		 1.0f,  1.0f, 0.0f,  0.75f, 0.75f, 0.75f,
-		 1.0f, 0.0f, 0.0f,  0.75f, 0.75f, 0.75f,
-		 1.0f, 0.0f, 0.0f,  0.75f, 0.75f, 0.75f,
-		 1.0f, 0.0f,  1.0f,  0.75f, 0.75f, 0.75f,
-		 1.0f,  1.0f,  1.0f,  0.75f, 0.75f, 0.75f,
+		1.0f,  1.0f,  1.0f,  0.75f, 0.75f, 0.75f,
+		1.0f,  1.0f, 0.0f,  0.75f, 0.75f, 0.75f,
+		1.0f, 0.0f, 0.0f,  0.75f, 0.75f, 0.75f,
+		1.0f, 0.0f, 0.0f,  0.75f, 0.75f, 0.75f,
+		1.0f, 0.0f,  1.0f,  0.75f, 0.75f, 0.75f,
+		1.0f,  1.0f,  1.0f,  0.75f, 0.75f, 0.75f,
 
 		0.0f,  1.0f, 0.0f,  0.75f, 0.75f, 0.75f,
-		 1.0f,  1.0f, 0.0f,  0.75f, 0.75f, 0.75f,
-		 1.0f,  1.0f,  1.0f,  0.75f, 0.75f, 0.75f,
-		 1.0f,  1.0f,  1.0f,  0.75f, 0.75f, 0.75f,
+		1.0f,  1.0f, 0.0f,  0.75f, 0.75f, 0.75f,
+		1.0f,  1.0f,  1.0f,  0.75f, 0.75f, 0.75f,
+		1.0f,  1.0f,  1.0f,  0.75f, 0.75f, 0.75f,
 		0.0f,  1.0f,  1.0f,  0.75f, 0.75f, 0.75f,
 		0.0f,  1.0f, 0.0f,  0.75f, 0.75f, 0.75f
 
@@ -71,27 +70,12 @@ Cube::~Cube()
 	glDeleteBuffers(1, &VBO);
 }
 
-void Cube::draw(Shader *shader, unsigned int modelRenderMode)
-{
-	shader->use();
-	glBindVertexArray(VAO);
-
-	glm::mat4 model = glm::mat4(1.0f);
-	model = glm::translate(model, glm::vec3(x, y, z));
-	//model = glm::scale(model, glm::vec3(1.5f, 1.5f, 1.5f));
-	//model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-	//model = glm::translate(model, glm::vec3(0.0f,0.0f,0.0f));
-	
-	shader->setMat4("model", model);
-
-	glDrawArrays(modelRenderMode, 0, 36);
-}
-
 void Cube::draw(Shader* shader, unsigned int modelRenderMode, glm::mat4 matrix) {
 	shader->use();
 	glBindVertexArray(VAO);
 	
 	matrix = glm::translate(matrix, glm::vec3(x, y, z));
 	shader->setMat4("model", matrix);
+
 	glDrawArrays(modelRenderMode, 0, 36);
 }

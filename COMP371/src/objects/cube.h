@@ -17,7 +17,6 @@ public:
 
 	Cube(int x, int y, int z);
 	~Cube();
-	void draw(Shader *shader, unsigned int modelRenderMode);
 	void draw(Shader* shader, unsigned int modelRenderMode, glm::mat4 matrix);
 protected:
 	int x, y, z;
