@@ -133,9 +133,9 @@ void processInput(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
 		modelRenderMode = GL_LINES;
 
-	if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS && scale <= 3.0f)
 		scale += 0.1f;
-	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS && scale >= 0.1f)
 		scale -= 0.1f;
 
 	if (glfwGetKey(window, GLFW_KEY_HOME) == GLFW_PRESS) {
