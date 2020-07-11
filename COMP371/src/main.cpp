@@ -208,7 +208,6 @@ void processInput(GLFWwindow* window)
 }
 
 
-
 void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
@@ -238,8 +237,7 @@ int main(void)
 
     unsigned int VBO = 0, VAO = 0;
 
-	Shader *basicShader = new Shader("src/shaders/shader.vs", "src/shaders/shader.fs");
-	Shader *cameraShader = new Shader("src/shaders/camera.vs", "src/shaders/shader.fs");
+	Shader *shader = new Shader("src/shaders/shader.vs", "src/shaders/shader.fs");
 
 	Grid *grid = new Grid(100);
 	Axis *axis = new Axis(5);
@@ -388,11 +386,11 @@ int main(void)
 		glm::mat4 projection = glm::perspective(glm::radians(fov), (float)WINDOW_LENGTH / (float)WINDOW_WIDTH, 0.1f, 100.0f);
 		glm::mat4 view = glm::lookAt(cameraPos, cameraFront, cameraUp);
 
-		cameraShader->setMat4("projection", projection);
-		cameraShader->setMat4("view", view);
+		shader->setMat4("projection", projection);
+		shader->setMat4("view", view);
 		
-		grid->draw(cameraShader);
-		axis->draw(cameraShader);
+		grid->draw(shader);
+		axis->draw(shader);
 		
 		glm::mat4 model = glm::mat4(1.0f);
 		model = glm::rotate(model, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
@@ -403,19 +401,19 @@ int main(void)
 			angle = 0.0f;
 		
 		for (int i = 0; i < sizeof(U4Cubes) / sizeof(U4Cubes[0]); i++) {
-			U4Cubes[i]->draw(cameraShader, modelRenderMode, model);
+			U4Cubes[i]->draw(shader, modelRenderMode, model);
 		}
 
 		for (int i = 0; i < sizeof(E0Cubes) / sizeof(E0Cubes[0]); i++) {
-			E0Cubes[i]->draw(cameraShader, modelRenderMode, model);
+			E0Cubes[i]->draw(shader, modelRenderMode, model);
 		}
 
 		for (int i = 0; i < sizeof(J5Cubes) / sizeof(J5Cubes[0]); i++) {
-			J5Cubes[i]->draw(cameraShader, modelRenderMode, model);
+			J5Cubes[i]->draw(shader, modelRenderMode, model);
 		}
 
 		for (int i = 0; i < sizeof(A6Cubes) / sizeof(A6Cubes[0]); i++) {
-			A6Cubes[i]->draw(cameraShader, modelRenderMode, model);
+			A6Cubes[i]->draw(shader, modelRenderMode, model);
 		}
 
         glfwSwapBuffers(window);
@@ -423,8 +421,7 @@ int main(void)
     }
 
 	delete grid;
-	delete basicShader;
-	delete cameraShader;
+	delete shader;
 
 	for (int i = 0; i < sizeof(U4Cubes) / sizeof(U4Cubes[0]); i++) {
 		delete U4Cubes[i];
