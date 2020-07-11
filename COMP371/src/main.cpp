@@ -176,9 +176,9 @@ void processInput(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		moveX += 1.0f;
 	if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS)
-		angle += 45.0f;
+		angle += 5.0f;
 	if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS)
-		angle -= 45.0f;
+		angle -= 5.0f;
 
 	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_RELEASE) {
 		glfwSetInputMode(window, GLFW_STICKY_KEYS, GLFW_FALSE);
