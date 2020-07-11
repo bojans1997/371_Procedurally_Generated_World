@@ -270,108 +270,135 @@ int main(void)
 		new Cube(5, 4, 0)
 	};
 
+	Cube *U42Cubes[] = {
+		// Draw U
+		new Cube(-5, 0, 0),
+		new Cube(-5, 1, 0),
+		new Cube(-5, 2, 0),
+		new Cube(-5, 3, 0),
+		new Cube(-5, 4, 0),
+		new Cube(-4, 0, 0),
+		new Cube(-3, 0, 0),
+		new Cube(-2, 0, 0),
+		new Cube(-2, 1, 0),
+		new Cube(-2, 2, 0),
+		new Cube(-2, 3, 0),
+		new Cube(-2, 4, 0),
+		// Draw 4
+		new Cube(2, 2, 0),
+		new Cube(2, 3, 0),
+		new Cube(2, 4, 0),
+		new Cube(3, 2, 0),
+		new Cube(4, 2, 0),
+		new Cube(5, 0, 0),
+		new Cube(5, 1, 0),
+		new Cube(5, 2, 0),
+		new Cube(5, 3, 0),
+		new Cube(5, 4, 0)
+	};
+
 	//Letter E and digit 5 for Alexis Laurens-Renner
 	Cube *E5Cubes[] = {
 		// Draw E
-		new Cube(-45, 0, -45),
-		new Cube(-45, 1, -45),
-		new Cube(-45, 2, -45),
-		new Cube(-45, 3, -45),
-		new Cube(-45, 4, -45),
-		new Cube(-44, 0, -45),
-		new Cube(-43, 0, -45),
-		new Cube(-42, 0, -45),
-		new Cube(-44, 2, -45),
-		new Cube(-43, 2, -45),
-		new Cube(-42, 2, -45),
-		new Cube(-44, 4, -45),
-		new Cube(-43, 4, -45),
-		new Cube(-42, 4, -45),
+		new Cube(-5, 0, 0),
+		new Cube(-5, 1, 0),
+		new Cube(-5, 2, 0),
+		new Cube(-5, 3, 0),
+		new Cube(-5, 4, 0),
+		new Cube(-4, 0, 0),
+		new Cube(-3, 0, 0),
+		new Cube(-2, 0, 0),
+		new Cube(-4, 2, 0),
+		new Cube(-3, 2, 0),
+		new Cube(-2, 2, 0),
+		new Cube(-4, 4, 0),
+		new Cube(-3, 4, 0),
+		new Cube(-2, 4, 0),
 		// Draw 5
-		new Cube(-35, 0, -45),
-		new Cube(-35, 1, -45),
-		new Cube(-35, 2, -45),
-		new Cube(-35, 4, -45),
-		new Cube(-38, 0, -45),
-		new Cube(-38, 2, -45),
-		new Cube(-38, 3, -45),
-		new Cube(-38, 4, -45),
-		new Cube(-36, 4, -45),
-		new Cube(-37, 4, -45),
-		new Cube(-36, 0, -45),
-		new Cube(-37, 0, -45),
-		new Cube(-36, 2, -45),
-		new Cube(-37, 2, -45)
+		new Cube(5, 0, 0),
+		new Cube(5, 1, 0),
+		new Cube(5, 2, 0),
+		new Cube(5, 4, 0),
+		new Cube(2, 0, 0),
+		new Cube(2, 2, 0),
+		new Cube(2, 3, 0),
+		new Cube(2, 4, 0),
+		new Cube(4, 4, 0),
+		new Cube(3, 4, 0),
+		new Cube(4, 0, 0),
+		new Cube(3, 0, 0),
+		new Cube(4, 2, 0),
+		new Cube(3, 2, 0)
 	};
 
 	//Letter J and digit 5 for Bojan Srbinoski
 	Cube *J5Cubes[] = {
 		// Draw J
-		new Cube(34, 5, -45),
-		new Cube(33, 5, -45),
-		new Cube(32, 5, -45),
-		new Cube(33, 4, -45),
-		new Cube(33, 3, -45),
-		new Cube(33, 2, -45),
-		new Cube(33, 1, -45),
-		new Cube(33, 0, -45),
-		new Cube(32, 0, -45),
-		new Cube(31, 0, -45),
-		new Cube(31, 1, -45),
+		new Cube(-2, 5, 0),
+		new Cube(-3, 5, 0),
+		new Cube(-4, 5, 0),
+		new Cube(-3, 4, 0),
+		new Cube(-3, 3, 0),
+		new Cube(-3, 2, 0),
+		new Cube(-3, 1, 0),
+		new Cube(-3, 0, 0),
+		new Cube(-4, 0, 0),
+		new Cube(-5, 0, 0),
+		new Cube(-5, 1, 0),
 		// Draw 5
-		new Cube(41, 5, -45),
-		new Cube(40, 5, -45),
-		new Cube(39, 5, -45),
-		new Cube(38, 5, -45),
-		new Cube(38, 4, -45),
-		new Cube(38, 3, -45),
-		new Cube(39, 3, -45),
-		new Cube(40, 3, -45),
-		new Cube(41, 3, -45),
-		new Cube(41, 2, -45),
-		new Cube(41, 1, -45),
-		new Cube(41, 0, -45),
-		new Cube(40, 0, -45),
-		new Cube(39, 0, -45),
-		new Cube(38, 0, -45),
+		new Cube(4, 5, 0),
+		new Cube(3, 5, 0),
+		new Cube(2, 5, 0),
+		new Cube(1, 5, 0),
+		new Cube(1, 4, 0),
+		new Cube(1, 3, 0),
+		new Cube(2, 3, 0),
+		new Cube(3, 3, 0),
+		new Cube(4, 3, 0),
+		new Cube(4, 2, 0),
+		new Cube(4, 1, 0),
+		new Cube(4, 0, 0),
+		new Cube(3, 0, 0),
+		new Cube(2, 0, 0),
+		new Cube(1, 0, 0),
 	};
 
 	//Letter A annd digit 6 for Saad Ahmed
 	Cube *A6Cubes[] = {
 		// Draw A
-		new Cube(31, 5, 45),
-		new Cube(32, 5, 45),
-		new Cube(33, 5, 45),
-		new Cube(34, 5, 45),
-		new Cube(31, 4, 45),
-		new Cube(31, 3, 45),
-		new Cube(31, 2, 45),
-		new Cube(31, 1, 45),
-		new Cube(31, 0, 45),
-		new Cube(34, 4, 45),
-		new Cube(34, 3, 45),
-		new Cube(34, 2, 45),
-		new Cube(34, 1, 45),
-		new Cube(34, 0, 45),
-		new Cube(32, 3, 45),
-		new Cube(33, 3, 45),
+		new Cube(-5, 5, 0),
+		new Cube(-4, 5, 0),
+		new Cube(-3, 5, 0),
+		new Cube(-2, 5, 0),
+		new Cube(-5, 4, 0),
+		new Cube(-5, 3, 0),
+		new Cube(-5, 2, 0),
+		new Cube(-5, 1, 0),
+		new Cube(-5, 0, 0),
+		new Cube(-2, 4, 0),
+		new Cube(-2, 3, 0),
+		new Cube(-2, 2, 0),
+		new Cube(-2, 1, 0),
+		new Cube(-2, 0, 0),
+		new Cube(-4, 3, 0),
+		new Cube(-3, 3, 0),
 		// Draw 6
-		new Cube(37, 5, 45),
-		new Cube(38, 5, 45),
-		new Cube(39, 5, 45),
-		new Cube(40, 5, 45),
-		new Cube(37, 4, 45),
-		new Cube(37, 3, 45),
-		new Cube(37, 2, 45),
-		new Cube(37, 1, 45),
-		new Cube(37, 0, 45),
-		new Cube(38, 0, 45),
-		new Cube(39, 0, 45),
-		new Cube(40, 0, 45),
-		new Cube(40, 1, 45),
-		new Cube(40, 2, 45),
-		new Cube(39, 2, 45),
-		new Cube(38, 2, 45),
+		new Cube(1, 5, 0),
+		new Cube(2, 5, 0),
+		new Cube(3, 5, 0),
+		new Cube(4, 5, 0),
+		new Cube(1, 4, 0),
+		new Cube(1, 3, 0),
+		new Cube(1, 2, 0),
+		new Cube(1, 1, 0),
+		new Cube(1, 0, 0),
+		new Cube(2, 0, 0),
+		new Cube(3, 0, 0),
+		new Cube(4, 0, 0),
+		new Cube(4, 1, 0),
+		new Cube(4, 2, 0),
+		new Cube(3, 2, 0),
+		new Cube(2, 2, 0),
 	};
 
 	glEnable(GL_DEPTH_TEST);
@@ -392,29 +419,45 @@ int main(void)
 		grid->draw(shader);
 		axis->draw(shader);
 		
-		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::rotate(model, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
-		model = glm::translate(model, glm::vec3(moveX, moveY, 0.0f));
-		model = glm::scale(model, glm::vec3(scale, scale, scale));
+		glm::mat4 modelU4 = glm::mat4(1.0f);
+		modelU4 = glm::translate(modelU4, glm::vec3(moveX, moveY, 0.0f));
+		modelU4 = glm::rotate(modelU4, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
+		modelU4 = glm::scale(modelU4, glm::vec3(scale, scale, scale));
+
+		
+		for (int i = 0; i < sizeof(U4Cubes) / sizeof(U4Cubes[0]); i++) {
+			U4Cubes[i]->draw(shader, modelRenderMode, modelU4);
+		}
+
+		glm::mat4 modelE5 = glm::mat4(1.0f);
+		modelE5 = glm::translate(modelE5, glm::vec3(moveX - 40, moveY, 0.0f - 45));
+		modelE5 = glm::rotate(modelE5, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
+		modelE5 = glm::scale(modelE5, glm::vec3(scale, scale, scale));
+
+		for (int i = 0; i < sizeof(E5Cubes) / sizeof(E5Cubes[0]); i++) {
+			E5Cubes[i]->draw(shader, modelRenderMode, modelE5);
+		}
+
+		glm::mat4 modelJ5 = glm::mat4(1.0f);
+		modelJ5 = glm::translate(modelJ5, glm::vec3(moveX + 40, moveY, 0.0f - 45));
+		modelJ5 = glm::rotate(modelJ5, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
+		modelJ5 = glm::scale(modelJ5, glm::vec3(scale, scale, scale));
+
+		for (int i = 0; i < sizeof(J5Cubes) / sizeof(J5Cubes[0]); i++) {
+			J5Cubes[i]->draw(shader, modelRenderMode, modelJ5);
+		}
+
+		glm::mat4 modelA6 = glm::mat4(1.0f);
+		modelA6 = glm::translate(modelA6, glm::vec3(moveX + 40, moveY, 0.0f + 45));
+		modelA6 = glm::rotate(modelA6, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
+		modelA6 = glm::scale(modelA6, glm::vec3(scale, scale, scale));
+
+		for (int i = 0; i < sizeof(A6Cubes) / sizeof(A6Cubes[0]); i++) {
+			A6Cubes[i]->draw(shader, modelRenderMode, modelA6);
+		}
 
 		if (angle == 360.0f)
 			angle = 0.0f;
-		
-		for (int i = 0; i < sizeof(U4Cubes) / sizeof(U4Cubes[0]); i++) {
-			U4Cubes[i]->draw(shader, modelRenderMode, model);
-		}
-
-		for (int i = 0; i < sizeof(E5Cubes) / sizeof(E5Cubes[0]); i++) {
-			E5Cubes[i]->draw(shader, modelRenderMode, model);
-		}
-
-		for (int i = 0; i < sizeof(J5Cubes) / sizeof(J5Cubes[0]); i++) {
-			J5Cubes[i]->draw(shader, modelRenderMode, model);
-		}
-
-		for (int i = 0; i < sizeof(A6Cubes) / sizeof(A6Cubes[0]); i++) {
-			A6Cubes[i]->draw(shader, modelRenderMode, model);
-		}
 
         glfwSwapBuffers(window);
         glfwPollEvents();
