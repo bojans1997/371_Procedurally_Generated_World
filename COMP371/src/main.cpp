@@ -117,8 +117,8 @@ void mouse_callback_zoom(GLFWwindow* window, double xpos, double ypos) {
 
 	if (fov <= 1.0f)
 		fov = 1.0f;
-	if (fov >= 45.0f)
-		fov = 45.0f;
+	if (fov >= 90.0f)
+		fov = 90.0f;
 }
 
 void processInput(GLFWwindow* window)
@@ -133,9 +133,9 @@ void processInput(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
 		modelRenderMode = GL_LINES;
 
-	if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS && scale <= 3.0f)
 		scale += 0.1f;
-	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS && scale >= 0.1f)
 		scale -= 0.1f;
 
 	if (glfwGetKey(window, GLFW_KEY_HOME) == GLFW_PRESS) {
@@ -176,9 +176,9 @@ void processInput(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		moveX += 1.0f;
 	if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS)
-		angle += 45.0f;
+		angle += 5.0f;
 	if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS)
-		angle -= 45.0f;
+		angle -= 5.0f;
 
 	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_RELEASE) {
 		glfwSetInputMode(window, GLFW_STICKY_KEYS, GLFW_FALSE);
