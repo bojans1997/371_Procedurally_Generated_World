@@ -144,6 +144,7 @@ void processInput(GLFWwindow* window)
 		fov = 45.0f;
 		angle, moveX, moveY = 0.0f;
 		scale = 1.0f;
+		angle = 0.0f;
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
