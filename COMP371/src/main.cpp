@@ -288,21 +288,21 @@ int main(void)
 		new Cube(-44, 4, -45),
 		new Cube(-43, 4, -45),
 		new Cube(-42, 4, -45),
-		// Draw 0
+		// Draw 5
 		new Cube(-35, 0, -45),
 		new Cube(-35, 1, -45),
 		new Cube(-35, 2, -45),
-		new Cube(-35, 3, -45),
 		new Cube(-35, 4, -45),
 		new Cube(-38, 0, -45),
-		new Cube(-38, 1, -45),
 		new Cube(-38, 2, -45),
 		new Cube(-38, 3, -45),
 		new Cube(-38, 4, -45),
 		new Cube(-36, 4, -45),
 		new Cube(-37, 4, -45),
 		new Cube(-36, 0, -45),
-		new Cube(-37, 0, -45)
+		new Cube(-37, 0, -45),
+		new Cube(-36, 2, -45),
+		new Cube(-37, 2, -45)
 	};
 
 	//Letter J and digit 5 for Bojan Srbinoski
