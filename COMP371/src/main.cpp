@@ -270,8 +270,8 @@ int main(void)
 		new Cube(5, 4, 0)
 	};
 
-	//Letter E and digit 0 for Alexis Laurens-Renner
-	Cube *E0Cubes[] = {
+	//Letter E and digit 5 for Alexis Laurens-Renner
+	Cube *E5Cubes[] = {
 		// Draw E
 		new Cube(-45, 0, -45),
 		new Cube(-45, 1, -45),
@@ -404,8 +404,8 @@ int main(void)
 			U4Cubes[i]->draw(shader, modelRenderMode, model);
 		}
 
-		for (int i = 0; i < sizeof(E0Cubes) / sizeof(E0Cubes[0]); i++) {
-			E0Cubes[i]->draw(shader, modelRenderMode, model);
+		for (int i = 0; i < sizeof(E5Cubes) / sizeof(E5Cubes[0]); i++) {
+			E5Cubes[i]->draw(shader, modelRenderMode, model);
 		}
 
 		for (int i = 0; i < sizeof(J5Cubes) / sizeof(J5Cubes[0]); i++) {
@@ -427,8 +427,8 @@ int main(void)
 		delete U4Cubes[i];
 	}
 
-	for (int i = 0; i < sizeof(E0Cubes) / sizeof(E0Cubes[0]); i++) {
-		delete E0Cubes[i];
+	for (int i = 0; i < sizeof(E5Cubes) / sizeof(E5Cubes[0]); i++) {
+		delete E5Cubes[i];
 	}
 
 	for (int i = 0; i < sizeof(J5Cubes) / sizeof(J5Cubes[0]); i++) {
