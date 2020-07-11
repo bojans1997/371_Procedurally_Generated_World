@@ -100,7 +100,8 @@ void mouse_callback_vertical(GLFWwindow* window, double xpos, double ypos)
 	cameraFront.y += direction.y;
 }
 
-void mouse_callback_zoom(GLFWwindow* window, double xpos, double ypos) {
+void mouse_callback_zoom(GLFWwindow* window, double xpos, double ypos)
+{
 	if (firstMouse)
 	{
 		lastX = xpos;
@@ -270,33 +271,6 @@ int main(void)
 		new Cube(5, 4, 0)
 	};
 
-	Cube *U42Cubes[] = {
-		// Draw U
-		new Cube(-5, 0, 0),
-		new Cube(-5, 1, 0),
-		new Cube(-5, 2, 0),
-		new Cube(-5, 3, 0),
-		new Cube(-5, 4, 0),
-		new Cube(-4, 0, 0),
-		new Cube(-3, 0, 0),
-		new Cube(-2, 0, 0),
-		new Cube(-2, 1, 0),
-		new Cube(-2, 2, 0),
-		new Cube(-2, 3, 0),
-		new Cube(-2, 4, 0),
-		// Draw 4
-		new Cube(2, 2, 0),
-		new Cube(2, 3, 0),
-		new Cube(2, 4, 0),
-		new Cube(3, 2, 0),
-		new Cube(4, 2, 0),
-		new Cube(5, 0, 0),
-		new Cube(5, 1, 0),
-		new Cube(5, 2, 0),
-		new Cube(5, 3, 0),
-		new Cube(5, 4, 0)
-	};
-
 	//Letter E and digit 5 for Alexis Laurens-Renner
 	Cube *E5Cubes[] = {
 		// Draw E
@@ -360,7 +334,7 @@ int main(void)
 		new Cube(4, 0, 0),
 		new Cube(3, 0, 0),
 		new Cube(2, 0, 0),
-		new Cube(1, 0, 0),
+		new Cube(1, 0, 0)
 	};
 
 	//Letter A annd digit 6 for Saad Ahmed
@@ -398,7 +372,7 @@ int main(void)
 		new Cube(4, 1, 0),
 		new Cube(4, 2, 0),
 		new Cube(3, 2, 0),
-		new Cube(2, 2, 0),
+		new Cube(2, 2, 0)
 	};
 
 	glEnable(GL_DEPTH_TEST);
@@ -424,7 +398,6 @@ int main(void)
 		modelU4 = glm::rotate(modelU4, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
 		modelU4 = glm::scale(modelU4, glm::vec3(scale, scale, scale));
 
-		
 		for (int i = 0; i < sizeof(U4Cubes) / sizeof(U4Cubes[0]); i++) {
 			U4Cubes[i]->draw(shader, modelRenderMode, modelU4);
 		}
