@@ -28,8 +28,8 @@ void mouse_callback_zoom(GLFWwindow* window, double xpos, double ypos);
 bool firstMouse = true;
 float yaw = -90.0f;	// yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we initially rotate a bit to the left.
 float pitch = 0.0f;
-float lastX = WINDOW_LENGTH/ 2.0;
-float lastY = WINDOW_WIDTH / 2.0;
+float lastX = WINDOW_LENGTH/ 2.0f;
+float lastY = WINDOW_WIDTH / 2.0f;
 float fov = 45.0f;
 
 float angle = 0.0f;
@@ -400,7 +400,7 @@ int main(void)
 		model = glm::scale(model, glm::vec3(scale, scale, scale));
 
 		if (angle == 360.0f)
-			angle = 0;
+			angle = 0.0f;
 		
 		for (int i = 0; i < sizeof(U4Cubes) / sizeof(U4Cubes[0]); i++) {
 			U4Cubes[i]->draw(cameraShader, modelRenderMode, model);
