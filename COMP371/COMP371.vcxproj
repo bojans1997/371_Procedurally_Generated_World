@@ -153,7 +153,6 @@
     <ClCompile Include="src\objects\shader.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="src\shaders\camera.vs" />
     <None Include="src\shaders\shader.fs" />
     <None Include="src\shaders\shader.vs" />
   </ItemGroup>
