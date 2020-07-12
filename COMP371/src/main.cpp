@@ -375,6 +375,37 @@ int main(void)
 		new Cube(2, 2, 0)
 	};
 
+	Cube *N2Cubes[] = { //Letter N and digit 2 for Anna Kmieciak
+		// Draw N
+		new Cube(-5, 0, 0),
+		new Cube(-5, 1, 0),
+		new Cube(-5, 2, 0),
+		new Cube(-5, 3, 0),
+		new Cube(-5, 4, 0),
+		new Cube(-4, 3, 0),
+		new Cube(-3, 2, 0),
+		new Cube(-2, 1, 0),
+		new Cube(-1, 0, 0),
+		new Cube(-1, 1, 0),
+		new Cube(-1, 2, 0),
+		new Cube(-1, 3, 0),
+		new Cube(-1, 4, 0),
+		// Draw 2
+		new Cube(2,4,0),
+		new Cube(3,4,0),
+		new Cube(4,4,0),
+		new Cube(5,4,0),
+		new Cube(5,3,0),
+		new Cube(2,2,0),
+		new Cube(2,1,0),
+		new Cube(3,2,0),
+		new Cube(4,2,0),
+		new Cube(5,2,0),
+		new Cube(2,0,0),
+		new Cube(3,0,0),
+		new Cube(4,0,0),
+		new Cube(5,0,0)
+	};
 	glEnable(GL_DEPTH_TEST);
 
     while (!glfwWindowShouldClose(window))
@@ -429,6 +460,15 @@ int main(void)
 			A6Cubes[i]->draw(shader, modelRenderMode, modelA6);
 		}
 
+		glm::mat4 modelN2 = glm::mat4(1.0f);
+		modelN2 = glm::translate(modelN2, glm::vec3(moveX-40, moveY, 0.0f + 45));
+		modelN2 = glm::rotate(modelN2, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
+		modelN2 = glm::scale(modelN2, glm::vec3(scale, scale, scale));
+
+		for (int i = 0; i < sizeof(N2Cubes) / sizeof(N2Cubes[0]); i++) {
+			N2Cubes[i]->draw(shader, modelRenderMode, modelN2);
+		}
+
 		if (angle == 360.0f)
 			angle = 0.0f;
 
@@ -455,6 +495,9 @@ int main(void)
 		delete A6Cubes[i];
 	}
 
+	for (int i = 0; i < sizeof(N2Cubes) / sizeof(N2Cubes[0]); i++) {
+		delete N2Cubes[i];
+	}
     glfwTerminate();
     return 0;
 }
