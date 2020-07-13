@@ -1,6 +1,6 @@
 #include "axis.h"
 
-Axis::Axis(int size) : size(size), VAO(0), VBO(0)
+Axis::Axis(int size) : size(size)
 {
 	float vertices[] = {
 		// position           // color

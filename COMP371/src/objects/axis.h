@@ -19,6 +19,6 @@ public:
 	void draw(Shader *shader);
 protected:
 	int size;
-	unsigned int VAO, VBO;
+	GLuint VAO = 0, VBO = 0;
 };
 #endif

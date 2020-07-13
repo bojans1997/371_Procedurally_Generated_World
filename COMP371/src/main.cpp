@@ -236,7 +236,7 @@ int main(void)
         return -1;
     }
 
-    unsigned int VBO = 0, VAO = 0;
+    GLuint VBO = 0, VAO = 0;
 
 	Shader *shader = new Shader("src/shaders/shader.vs", "src/shaders/shader.fs");
 
@@ -271,7 +271,7 @@ int main(void)
 		new Cube(5, 4, 0)
 	};
 
-	//Letter E and digit 5 for Alexis Laurens-Renner
+	// Letter E and digit 5 for Alexis Laurens-Renner
 	Cube *E5Cubes[] = {
 		// Draw E
 		new Cube(-5, 0, 0),
@@ -305,7 +305,7 @@ int main(void)
 		new Cube(3, 2, 0)
 	};
 
-	//Letter J and digit 5 for Bojan Srbinoski
+	// Letter J and digit 5 for Bojan Srbinoski
 	Cube *J5Cubes[] = {
 		// Draw J
 		new Cube(-2, 5, 0),
@@ -337,7 +337,7 @@ int main(void)
 		new Cube(1, 0, 0)
 	};
 
-	//Letter A annd digit 6 for Saad Ahmed
+	// Letter A and digit 6 for Saad Ahmed
 	Cube *A6Cubes[] = {
 		// Draw A
 		new Cube(-5, 5, 0),
@@ -375,7 +375,8 @@ int main(void)
 		new Cube(2, 2, 0)
 	};
 
-	Cube *N2Cubes[] = { //Letter N and digit 2 for Anna Kmieciak
+	// Letter N and digit 2 for Anna Kmieciak
+	Cube *N2Cubes[] = {
 		// Draw N
 		new Cube(-5, 0, 0),
 		new Cube(-5, 1, 0),
@@ -406,6 +407,7 @@ int main(void)
 		new Cube(4,0,0),
 		new Cube(5,0,0)
 	};
+
 	glEnable(GL_DEPTH_TEST);
 
     while (!glfwWindowShouldClose(window))
@@ -476,9 +478,6 @@ int main(void)
         glfwPollEvents();
     }
 
-	delete grid;
-	delete shader;
-
 	for (int i = 0; i < sizeof(U4Cubes) / sizeof(U4Cubes[0]); i++) {
 		delete U4Cubes[i];
 	}
@@ -498,6 +497,12 @@ int main(void)
 	for (int i = 0; i < sizeof(N2Cubes) / sizeof(N2Cubes[0]); i++) {
 		delete N2Cubes[i];
 	}
+
+	delete axis;
+	delete grid;
+	delete shader;
+
     glfwTerminate();
+
     return 0;
 }

@@ -1,6 +1,6 @@
 #include "cube.h"
 
-Cube::Cube(int x, int y, int z) : x(x), y(y), z(z), VAO(0), VBO(0)
+Cube::Cube(int x, int y, int z) : x(x), y(y), z(z)
 {
 	float vertices[] = {
 		0.0f, 0.0f, 0.0f,  0.5f, 0.5f, 0.5f,

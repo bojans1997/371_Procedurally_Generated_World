@@ -20,6 +20,6 @@ public:
 	void draw(Shader* shader, unsigned int modelRenderMode, glm::mat4 matrix);
 protected:
 	int x, y, z;
-	unsigned int VAO, VBO;
+	GLuint VAO = 0, VBO = 0;
 };
 #endif

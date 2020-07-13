@@ -1,6 +1,6 @@
 #include "grid.h"
 
-Grid::Grid(int size) : size(size), VAO(0), VBO(0)
+Grid::Grid(int size) : size(size)
 {
 	float vertices[] = {
 		// position           // color
