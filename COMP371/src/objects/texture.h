@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef GRID_H
-#define GRID_H
+#ifndef TEXTURE_H
+#define TEXTURE_H
 
 #include <glad.h>
 #include <glfw3.h>
@@ -12,18 +12,14 @@
 #include <string>
 #include "../stb_image.h"
 #include "shader.h"
-#include "texture.h"
 
-class Grid
+class Texture
 {
 public:
-	unsigned int ID;
-
-	Grid(int size);
-	~Grid();
-	void draw(Shader *shader, Texture *texture);
+	Texture(std::string texturePath);
+	~Texture();
+	GLuint getTextureId();
 protected:
-	int size;
-	GLuint VAO = 0, VBO = 0;
+	GLuint textureId;
 };
 #endif

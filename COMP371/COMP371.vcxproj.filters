@@ -33,10 +33,15 @@
     <ClCompile Include="src\objects\cube.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\objects\texture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\shaders\shader.vs" />
     <None Include="src\shaders\shader.fs" />
+    <None Include="src\shaders\texture.vs" />
+    <None Include="src\shaders\texture.fs" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\objects\grid.h">
@@ -51,5 +56,22 @@
     <ClInclude Include="src\objects\cube.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\stb_image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\objects\texture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="src\textures\gold.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="src\textures\tile.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="src\textures\wood.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

@@ -151,16 +151,26 @@
     <ClCompile Include="src\objects\cube.cpp" />
     <ClCompile Include="src\objects\grid.cpp" />
     <ClCompile Include="src\objects\shader.cpp" />
+    <ClCompile Include="src\objects\texture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\shaders\shader.fs" />
     <None Include="src\shaders\shader.vs" />
+    <None Include="src\shaders\texture.fs" />
+    <None Include="src\shaders\texture.vs" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\objects\axis.h" />
     <ClInclude Include="src\objects\cube.h" />
     <ClInclude Include="src\objects\grid.h" />
     <ClInclude Include="src\objects\shader.h" />
+    <ClInclude Include="src\objects\texture.h" />
+    <ClInclude Include="src\stb_image.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="src\textures\gold.jpg" />
+    <Image Include="src\textures\tile.jpg" />
+    <Image Include="src\textures\wood.jpg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

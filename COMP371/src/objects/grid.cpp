@@ -3,11 +3,11 @@
 Grid::Grid(int size) : size(size)
 {
 	float vertices[] = {
-		// position           // color
-		-1.0f,  -0.01f,  1.0f,  1.0f, 1.0f, 0.0f,   // top left
-		 1.0f,  -0.01f,  1.0f,  1.0f, 1.0f, 0.0f,   // top right
-		 1.0f,  -0.01f, -1.0f,  1.0f, 1.0f, 0.0f,   // bottom right
-		-1.0f,  -0.01f, -1.0f,  1.0f, 1.0f, 0.0f    // bottom left
+		// position             // color           // texture
+		-1.0f,  -0.01f,  1.0f,  1.0f, 1.0f, 0.0f,  0.0f, 1.0f,   // top left
+		 1.0f,  -0.01f,  1.0f,  1.0f, 1.0f, 0.0f,  1.0f, 1.0f,   // top right
+		 1.0f,  -0.01f, -1.0f,  1.0f, 1.0f, 0.0f,  1.0f, 0.0f,   // bottom right
+		-1.0f,  -0.01f, -1.0f,  1.0f, 1.0f, 0.0f,  0.0f, 0.0f    // bottom left
 	};
 
 	glGenVertexArrays(1, &VAO);
@@ -18,11 +18,14 @@ Grid::Grid(int size) : size(size)
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
+
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -33,15 +36,19 @@ Grid::~Grid()
 	glDeleteBuffers(1, &VBO);
 }
 
-void Grid::draw(Shader *shader)
+void Grid::draw(Shader *shader, Texture *texture)
 {
+	if (texture) {
+		glBindTexture(GL_TEXTURE_2D, texture->getTextureId());
+	} else {
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	}
+
 	shader->use();
 	glBindVertexArray(VAO);
 
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-	for (int i = -size/2; i <= size/2; i++) {
-		for (int j = size/2; j >= -size/2; j--) {
+	for (int i = -size / 2; i <= size / 2; i++) {
+		for (int j = size / 2; j >= -size / 2; j--) {
 
 			glm::mat4 model = glm::mat4(1.0f);
 			model = glm::translate(model, glm::vec3(i, 0, j));
@@ -51,5 +58,10 @@ void Grid::draw(Shader *shader)
 		}
 	}
 
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	if (texture) {
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+	else {
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	}
 }
