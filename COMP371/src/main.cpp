@@ -9,7 +9,8 @@
 #include "objects/axis.h"
 #include "objects/cube.h"
 #include "objects/texture.h"
-#include "objects/characters/character.h"
+#include "objects/character.h"
+#include "objects/pair.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -257,39 +258,176 @@ int main(void)
 	Texture *woodTexture = new Texture("src/textures/wood.jpg");
 	Texture *goldTexture = new Texture("src/textures/gold.jpg");
 
-	Grid grid = Grid(100);
-	Axis axis = Axis(5);
+	Grid *grid = new Grid(100);
+	Axis *axis = new Axis(5);
 
 	// Letter U and digit 4 for Giuseppe Campanelli
-	std::vector<Cube> cubesU = {
-		Cube(-5, 0, 0),
-		Cube(-5, 1, 0),
-		Cube(-5, 2, 0),
-		Cube(-5, 3, 0),
-		Cube(-5, 4, 0),
-		Cube(-4, 0, 0),
-		Cube(-3, 0, 0),
-		Cube(-2, 0, 0),
-		Cube(-2, 1, 0),
-		Cube(-2, 2, 0),
-		Cube(-2, 3, 0),
-		Cube(-2, 4, 0)
+	std::vector<Cube*> cubesU = {
+		new Cube(-5, 0, 0),
+		new Cube(-5, 1, 0),
+		new Cube(-5, 2, 0),
+		new Cube(-5, 3, 0),
+		new Cube(-5, 4, 0),
+		new Cube(-4, 0, 0),
+		new Cube(-3, 0, 0),
+		new Cube(-2, 0, 0),
+		new Cube(-2, 1, 0),
+		new Cube(-2, 2, 0),
+		new Cube(-2, 3, 0),
+		new Cube(-2, 4, 0)
 	};
-	std::vector<Cube> cubes4 = {
-		Cube(2, 2, 0),
-		Cube(2, 3, 0),
-		Cube(2, 4, 0),
-		Cube(3, 2, 0),
-		Cube(4, 2, 0),
-		Cube(5, 0, 0),
-		Cube(5, 1, 0),
-		Cube(5, 2, 0),
-		Cube(5, 3, 0),
-		Cube(5, 4, 0)
+	std::vector<Cube*> cubes4 = {
+		new Cube(2, 2, 0),
+		new Cube(2, 3, 0),
+		new Cube(2, 4, 0),
+		new Cube(3, 2, 0),
+		new Cube(4, 2, 0),
+		new Cube(5, 0, 0),
+		new Cube(5, 1, 0),
+		new Cube(5, 2, 0),
+		new Cube(5, 3, 0),
+		new Cube(5, 4, 0)
 	};
+	Pair *pairU4 = new Pair(new Character(cubesU), new Character(cubes4));
 
-	Character letterU = Character(cubesU);
-	Character digit4 = Character(cubes4);
+	// Letter E and digit 5 for Alexis Laurens-Renner
+	std::vector<Cube*> cubesE = {
+		new Cube(-5, 0, 0),
+		new Cube(-5, 1, 0),
+		new Cube(-5, 2, 0),
+		new Cube(-5, 3, 0),
+		new Cube(-5, 4, 0),
+		new Cube(-4, 0, 0),
+		new Cube(-3, 0, 0),
+		new Cube(-2, 0, 0),
+		new Cube(-4, 2, 0),
+		new Cube(-3, 2, 0),
+		new Cube(-2, 2, 0),
+		new Cube(-4, 4, 0),
+		new Cube(-3, 4, 0),
+		new Cube(-2, 4, 0)
+	};
+	std::vector<Cube*> cubes5_1 = {
+		new Cube(5, 0, 0),
+		new Cube(5, 1, 0),
+		new Cube(5, 2, 0),
+		new Cube(5, 4, 0),
+		new Cube(2, 0, 0),
+		new Cube(2, 2, 0),
+		new Cube(2, 3, 0),
+		new Cube(2, 4, 0),
+		new Cube(4, 4, 0),
+		new Cube(3, 4, 0),
+		new Cube(4, 0, 0),
+		new Cube(3, 0, 0),
+		new Cube(4, 2, 0),
+		new Cube(3, 2, 0)
+	};
+	Pair *pairE5 = new Pair(new Character(cubesE), new Character(cubes5_1));
+
+	// Letter J and digit 5 for Bojan Srbinoski
+	std::vector<Cube*> cubesJ = {
+		new Cube(-2, 4, 0),
+		new Cube(-3, 4, 0),
+		new Cube(-4, 4, 0),
+		new Cube(-3, 3, 0),
+		new Cube(-3, 2, 0),
+		new Cube(-3, 1, 0),
+		new Cube(-3, 0, 0),
+		new Cube(-4, 0, 0),
+		new Cube(-5, 0, 0),
+		new Cube(-5, 1, 0)
+	};
+	std::vector<Cube*> cubes5_2 = {
+		new Cube(5, 0, 0),
+		new Cube(5, 1, 0),
+		new Cube(5, 2, 0),
+		new Cube(5, 4, 0),
+		new Cube(2, 0, 0),
+		new Cube(2, 2, 0),
+		new Cube(2, 3, 0),
+		new Cube(2, 4, 0),
+		new Cube(4, 4, 0),
+		new Cube(3, 4, 0),
+		new Cube(4, 0, 0),
+		new Cube(3, 0, 0),
+		new Cube(4, 2, 0),
+		new Cube(3, 2, 0)
+	};
+	Pair *pairJ5 = new Pair(new Character(cubesJ), new Character(cubes5_2));
+
+	// Letter A and digit 6 for Saad Ahmed
+	std::vector<Cube*> cubesA = {
+		new Cube(-5, 5, 0),
+		new Cube(-4, 5, 0),
+		new Cube(-3, 5, 0),
+		new Cube(-2, 5, 0),
+		new Cube(-5, 4, 0),
+		new Cube(-5, 3, 0),
+		new Cube(-5, 2, 0),
+		new Cube(-5, 1, 0),
+		new Cube(-5, 0, 0),
+		new Cube(-2, 4, 0),
+		new Cube(-2, 3, 0),
+		new Cube(-2, 2, 0),
+		new Cube(-2, 1, 0),
+		new Cube(-2, 0, 0),
+		new Cube(-4, 3, 0),
+		new Cube(-3, 3, 0)
+	};
+	std::vector<Cube*> cubes6 = {
+		new Cube(1, 5, 0),
+		new Cube(2, 5, 0),
+		new Cube(3, 5, 0),
+		new Cube(4, 5, 0),
+		new Cube(1, 4, 0),
+		new Cube(1, 3, 0),
+		new Cube(1, 2, 0),
+		new Cube(1, 1, 0),
+		new Cube(1, 0, 0),
+		new Cube(2, 0, 0),
+		new Cube(3, 0, 0),
+		new Cube(4, 0, 0),
+		new Cube(4, 1, 0),
+		new Cube(4, 2, 0),
+		new Cube(3, 2, 0),
+		new Cube(2, 2, 0)
+	};
+	Pair *pairA6 = new Pair(new Character(cubesA), new Character(cubes6));
+
+	// Letter N and digit 2 for Anna Kmieciak
+	std::vector<Cube*> cubesN = {
+		new Cube(-5, 0, 0),
+		new Cube(-5, 1, 0),
+		new Cube(-5, 2, 0),
+		new Cube(-5, 3, 0),
+		new Cube(-5, 4, 0),
+		new Cube(-4, 3, 0),
+		new Cube(-3, 2, 0),
+		new Cube(-2, 1, 0),
+		new Cube(-1, 0, 0),
+		new Cube(-1, 1, 0),
+		new Cube(-1, 2, 0),
+		new Cube(-1, 3, 0),
+		new Cube(-1, 4, 0)
+	};
+	std::vector<Cube*> cubes2 = {
+		new Cube(2, 4, 0),
+		new Cube(3, 4, 0),
+		new Cube(4, 4, 0),
+		new Cube(5, 4, 0),
+		new Cube(5, 3, 0),
+		new Cube(2, 2, 0),
+		new Cube(2, 1, 0),
+		new Cube(3, 2, 0),
+		new Cube(4, 2, 0),
+		new Cube(5, 2, 0),
+		new Cube(2, 0, 0),
+		new Cube(3, 0, 0),
+		new Cube(4, 0, 0),
+		new Cube(5, 0, 0)
+	};
+	Pair *pairN2 = new Pair(new Character(cubesN), new Character(cubes2));
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -306,12 +444,12 @@ int main(void)
 		shader->use();
 		shader->setMat4("projection", projection);
 		shader->setMat4("view", view);
-		axis.draw(shader);
+		axis->draw(shader);
 
 		textureShader->use();
 		textureShader->setMat4("projection", projection);
 		textureShader->setMat4("view", view);
-		grid.draw(textureShader, tileTexture);
+		grid->draw(textureShader, tileTexture);
 		
 		glm::mat4 modelU4 = glm::mat4(1.0f);
 		modelU4 = glm::translate(modelU4, glm::vec3(moveX, moveY, 0.0f));
@@ -319,11 +457,57 @@ int main(void)
 		modelU4 = glm::scale(modelU4, glm::vec3(scale, scale, scale));
 
 		if (textures) {
-			letterU.draw(textureShader, modelRenderMode, modelU4, woodTexture);
-			digit4.draw(textureShader, modelRenderMode, modelU4, goldTexture);
+			pairU4->draw(textureShader, modelRenderMode, modelU4, woodTexture, goldTexture);
 		} else {
-			letterU.draw(shader, modelRenderMode, modelU4);
-			digit4.draw(shader, modelRenderMode, modelU4);
+			pairU4->draw(shader, modelRenderMode, modelU4);
+		}
+
+		glm::mat4 modelE5 = glm::mat4(1.0f);
+		modelE5 = glm::translate(modelE5, glm::vec3(moveX - 40, moveY, 0.0f - 45));
+		modelE5 = glm::rotate(modelE5, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
+		modelE5 = glm::scale(modelE5, glm::vec3(scale, scale, scale));
+
+		if (textures) {
+			pairE5->draw(textureShader, modelRenderMode, modelE5, woodTexture, goldTexture);
+		}
+		else {
+			pairE5->draw(shader, modelRenderMode, modelE5);
+		}
+
+		glm::mat4 modelJ5 = glm::mat4(1.0f);
+		modelJ5 = glm::translate(modelJ5, glm::vec3(moveX + 40, moveY, 0.0f - 45));
+		modelJ5 = glm::rotate(modelJ5, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
+		modelJ5 = glm::scale(modelJ5, glm::vec3(scale, scale, scale));
+
+		if (textures) {
+			pairJ5->draw(textureShader, modelRenderMode, modelJ5, woodTexture, goldTexture);
+		}
+		else {
+			pairJ5->draw(shader, modelRenderMode, modelJ5);
+		}
+
+		glm::mat4 modelA6 = glm::mat4(1.0f);
+		modelA6 = glm::translate(modelA6, glm::vec3(moveX + 40, moveY, 0.0f + 45));
+		modelA6 = glm::rotate(modelA6, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
+		modelA6 = glm::scale(modelA6, glm::vec3(scale, scale, scale));
+
+		if (textures) {
+			pairA6->draw(textureShader, modelRenderMode, modelA6, woodTexture, goldTexture);
+		}
+		else {
+			pairA6->draw(shader, modelRenderMode, modelA6);
+		}
+
+		glm::mat4 modelN2 = glm::mat4(1.0f);
+		modelN2 = glm::translate(modelN2, glm::vec3(moveX - 40, moveY, 0.0f + 45));
+		modelN2 = glm::rotate(modelN2, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
+		modelN2 = glm::scale(modelN2, glm::vec3(scale, scale, scale));
+
+		if (textures) {
+			pairN2->draw(textureShader, modelRenderMode, modelN2, woodTexture, goldTexture);
+		}
+		else {
+			pairN2->draw(shader, modelRenderMode, modelN2);
 		}
 
 		if (angle == 360.0f)
@@ -333,11 +517,18 @@ int main(void)
         glfwPollEvents();
     }
 
-	delete shader;
-	delete textureShader;
+	delete pairU4;
+	delete pairE5;
+	delete pairJ5;
+	delete pairA6;
+	delete pairN2;
+	delete axis;
+	delete grid;
 	delete tileTexture;
 	delete woodTexture;
 	delete goldTexture;
+	delete textureShader;
+	delete shader;
 
     glfwTerminate();
 

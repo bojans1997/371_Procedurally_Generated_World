@@ -23,7 +23,7 @@
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{9d34d118-19d2-443d-bdce-33d1b7ca1441}</ProjectGuid>
     <RootNamespace>COMP371</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -148,9 +148,10 @@
     <ClCompile Include="src\glad.c" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\objects\axis.cpp" />
-    <ClCompile Include="src\objects\characters\character.cpp" />
+    <ClCompile Include="src\objects\character.cpp" />
     <ClCompile Include="src\objects\cube.cpp" />
     <ClCompile Include="src\objects\grid.cpp" />
+    <ClCompile Include="src\objects\pair.cpp" />
     <ClCompile Include="src\objects\shader.cpp" />
     <ClCompile Include="src\objects\texture.cpp" />
   </ItemGroup>
@@ -164,7 +165,8 @@
     <ClInclude Include="src\objects\axis.h" />
     <ClInclude Include="src\objects\cube.h" />
     <ClInclude Include="src\objects\grid.h" />
-    <ClInclude Include="src\objects\characters\character.h" />
+    <ClInclude Include="src\objects\character.h" />
+    <ClInclude Include="src\objects\pair.h" />
     <ClInclude Include="src\objects\shader.h" />
     <ClInclude Include="src\objects\texture.h" />
     <ClInclude Include="src\stb_image.h" />
