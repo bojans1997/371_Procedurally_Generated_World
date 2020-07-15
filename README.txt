@@ -22,9 +22,12 @@ CONTROLS
 	- "a" -> move left
 	- "d" -> move right
 	- "s" -> move down
+	- "q" -> move forward
+	- "e" -> move backward
 	- "w" -> move up
 	- "k" -> rotate clockwise
 	- "i" -> rotate counter-clockwise
+	- "space" -> reposition models to random location on grid
 
 - Rendering mode change
 	- "t" -> render using triangles

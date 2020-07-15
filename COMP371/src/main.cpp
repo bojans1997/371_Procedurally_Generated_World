@@ -3,11 +3,14 @@
 #include <glm.hpp>
 #include <iostream>
 #include <string>
+#include <vector>
 #include "objects/shader.h"
 #include "objects/grid.h"
 #include "objects/axis.h"
 #include "objects/cube.h"
 #include "objects/texture.h"
+#include "objects/character.h"
+#include "objects/pair.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -15,9 +18,11 @@
 const int WINDOW_LENGTH = 1024;
 const int WINDOW_WIDTH = 768;
 
+const int GRID_SIZE = 100;
+const int AXIS_SIZE = 5;
+
 GLFWwindow* window;
 
-GLuint modelRenderMode = GL_TRIANGLES;
 glm::vec3 cameraPos = glm::vec3(0.0f, 5.0f, 20.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 1.0f, 0.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -26,10 +31,6 @@ GLfloat camX = 0;
 GLfloat camZ = 0;
 GLfloat camY = 0;
 
-void mouse_callback_horizontal(GLFWwindow* window, double xpos, double ypos);
-void mouse_callback_vertical(GLFWwindow* window, double xpos, double ypos);
-void mouse_callback_zoom(GLFWwindow* window, double xpos, double ypos);
-
 bool firstMouse = true;
 GLfloat yaw = -90.0f;	// yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we initially rotate a bit to the left.
 GLfloat pitch = 0.0f;
@@ -37,11 +38,21 @@ GLfloat lastX = WINDOW_LENGTH/ 2.0f;
 GLfloat lastY = WINDOW_WIDTH / 2.0f;
 GLfloat fov = 45.0f;
 
+GLuint modelRenderMode = GL_TRIANGLES;
+
 GLfloat angle = 0.0f;
-GLfloat moveX, moveY = 0.0f;
+GLfloat moveX = 0.0f;
+GLfloat moveY = 0.0f;
+GLfloat moveZ = 0.0f;
 GLfloat scale = 1.0f;
 
 bool textures = true;
+
+glm::vec3 pairU4Pos = glm::vec3(0, 0, 0);
+glm::vec3 pairE5Pos = glm::vec3(-40, 0, -45);
+glm::vec3 pairJ5Pos = glm::vec3(40, 0, -45);
+glm::vec3 pairA6Pos = glm::vec3(40, 0, 45);
+glm::vec3 pairN2Pos = glm::vec3(-40, 0, 45);
 
 void mouse_callback_horizontal(GLFWwindow* window, double xpos, double ypos)
 {
@@ -129,6 +140,13 @@ void mouse_callback_zoom(GLFWwindow* window, double xpos, double ypos)
 		fov = 90.0f;
 }
 
+glm::vec3 generateRandomGridPosition() {
+	int min = -GRID_SIZE/2, max = GRID_SIZE/2;
+	int x = min + (rand() % static_cast<int>(max - min + 1));
+	int z = min + (rand() % static_cast<int>(max - min + 1));
+	return glm::vec3(x, 0, z);
+}
+
 void processInput(GLFWwindow* window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -153,9 +171,11 @@ void processInput(GLFWwindow* window)
 		cameraPos = glm::vec3(0.0f, 5.0f, 20.0f);
 		cameraFront = glm::vec3(0.0f, 1.0f, 0.0f);
 		fov = 45.0f;
-		angle, moveX, moveY = 0.0f;
-		scale = 1.0f;
 		angle = 0.0f;
+		moveX = 0.0f;
+		moveY = 0.0f;
+		moveZ = 0.0f;
+		scale = 1.0f;
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
@@ -179,6 +199,14 @@ void processInput(GLFWwindow* window)
 		camZ -= 0.1f;
 	}
 
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+		pairU4Pos = generateRandomGridPosition();
+		pairE5Pos = generateRandomGridPosition();
+		pairJ5Pos = generateRandomGridPosition();
+		pairA6Pos = generateRandomGridPosition();
+		pairN2Pos = generateRandomGridPosition();
+	}
+
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 		moveY += 1.0f;
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
@@ -187,6 +215,10 @@ void processInput(GLFWwindow* window)
 		moveX -= 1.0f;
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		moveX += 1.0f;
+	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+		moveZ -= 1.0f;
+	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+		moveZ += 1.0f;
 	if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS)
 		angle += 5.0f;
 	if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS)
@@ -255,11 +287,11 @@ int main(void)
 	Texture *woodTexture = new Texture("src/textures/wood.jpg");
 	Texture *goldTexture = new Texture("src/textures/gold.jpg");
 
-	Grid *grid = new Grid(100);
-	Axis *axis = new Axis(5);
+	Grid *grid = new Grid(GRID_SIZE);
+	Axis *axis = new Axis(AXIS_SIZE);
 
 	// Letter U and digit 4 for Giuseppe Campanelli
-	Cube *LetterUCubes[] = {
+	std::vector<Cube*> cubesU = {
 		new Cube(-5, 0, 0),
 		new Cube(-5, 1, 0),
 		new Cube(-5, 2, 0),
@@ -273,7 +305,7 @@ int main(void)
 		new Cube(-2, 3, 0),
 		new Cube(-2, 4, 0)
 	};
-	Cube *Digit4Cubes[] = {
+	std::vector<Cube*> cubes4 = {
 		new Cube(2, 2, 0),
 		new Cube(2, 3, 0),
 		new Cube(2, 4, 0),
@@ -285,9 +317,10 @@ int main(void)
 		new Cube(5, 3, 0),
 		new Cube(5, 4, 0)
 	};
+	Pair *pairU4 = new Pair(new Character(cubesU), new Character(cubes4));
 
 	// Letter E and digit 5 for Alexis Laurens-Renner
-	Cube *LetterECubes[] = {
+	std::vector<Cube*> cubesE = {
 		new Cube(-5, 0, 0),
 		new Cube(-5, 1, 0),
 		new Cube(-5, 2, 0),
@@ -303,7 +336,7 @@ int main(void)
 		new Cube(-3, 4, 0),
 		new Cube(-2, 4, 0)
 	};
-	Cube *Digit5Cubes[] = {
+	std::vector<Cube*> cubes5_1 = {
 		new Cube(5, 0, 0),
 		new Cube(5, 1, 0),
 		new Cube(5, 2, 0),
@@ -319,9 +352,10 @@ int main(void)
 		new Cube(4, 2, 0),
 		new Cube(3, 2, 0)
 	};
+	Pair *pairE5 = new Pair(new Character(cubesE), new Character(cubes5_1));
 
 	// Letter J and digit 5 for Bojan Srbinoski
-	Cube *LetterJCubes[] = {
+	std::vector<Cube*> cubesJ = {
 		new Cube(-2, 4, 0),
 		new Cube(-3, 4, 0),
 		new Cube(-4, 4, 0),
@@ -333,9 +367,26 @@ int main(void)
 		new Cube(-5, 0, 0),
 		new Cube(-5, 1, 0)
 	};
+	std::vector<Cube*> cubes5_2 = {
+		new Cube(5, 0, 0),
+		new Cube(5, 1, 0),
+		new Cube(5, 2, 0),
+		new Cube(5, 4, 0),
+		new Cube(2, 0, 0),
+		new Cube(2, 2, 0),
+		new Cube(2, 3, 0),
+		new Cube(2, 4, 0),
+		new Cube(4, 4, 0),
+		new Cube(3, 4, 0),
+		new Cube(4, 0, 0),
+		new Cube(3, 0, 0),
+		new Cube(4, 2, 0),
+		new Cube(3, 2, 0)
+	};
+	Pair *pairJ5 = new Pair(new Character(cubesJ), new Character(cubes5_2));
 
 	// Letter A and digit 6 for Saad Ahmed
-	Cube *LetterACubes[] = {
+	std::vector<Cube*> cubesA = {
 		new Cube(-5, 5, 0),
 		new Cube(-4, 5, 0),
 		new Cube(-3, 5, 0),
@@ -353,7 +404,7 @@ int main(void)
 		new Cube(-4, 3, 0),
 		new Cube(-3, 3, 0)
 	};
-	Cube *Digit6Cubes[] = {
+	std::vector<Cube*> cubes6 = {
 		new Cube(1, 5, 0),
 		new Cube(2, 5, 0),
 		new Cube(3, 5, 0),
@@ -371,9 +422,10 @@ int main(void)
 		new Cube(3, 2, 0),
 		new Cube(2, 2, 0)
 	};
+	Pair *pairA6 = new Pair(new Character(cubesA), new Character(cubes6));
 
 	// Letter N and digit 2 for Anna Kmieciak
-	Cube *LetterNCubes[] = {
+	std::vector<Cube*> cubesN = {
 		new Cube(-5, 0, 0),
 		new Cube(-5, 1, 0),
 		new Cube(-5, 2, 0),
@@ -388,8 +440,7 @@ int main(void)
 		new Cube(-1, 3, 0),
 		new Cube(-1, 4, 0)
 	};
-
-	Cube *Digit2Cubes[] = {
+	std::vector<Cube*> cubes2 = {
 		new Cube(2, 4, 0),
 		new Cube(3, 4, 0),
 		new Cube(4, 4, 0),
@@ -405,6 +456,7 @@ int main(void)
 		new Cube(4, 0, 0),
 		new Cube(5, 0, 0)
 	};
+	Pair *pairN2 = new Pair(new Character(cubesN), new Character(cubes2));
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -429,98 +481,62 @@ int main(void)
 		grid->draw(textureShader, tileTexture);
 		
 		glm::mat4 modelU4 = glm::mat4(1.0f);
-		modelU4 = glm::translate(modelU4, glm::vec3(moveX, moveY, 0.0f));
+		modelU4 = glm::translate(modelU4, glm::vec3(pairU4Pos.x + moveX, pairU4Pos.y + moveY, pairU4Pos.z + moveZ));
 		modelU4 = glm::rotate(modelU4, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
 		modelU4 = glm::scale(modelU4, glm::vec3(scale, scale, scale));
 
-		for (int i = 0; i < sizeof(LetterUCubes) / sizeof(LetterUCubes[0]); i++) {
-			if (textures)
-				LetterUCubes[i]->draw(textureShader, modelRenderMode, modelU4, woodTexture);
-			else
-				LetterUCubes[i]->draw(shader, modelRenderMode, modelU4, NULL);
-		}
-
-		for (int i = 0; i < sizeof(Digit4Cubes) / sizeof(Digit4Cubes[0]); i++) {
-			if (textures)
-				Digit4Cubes[i]->draw(textureShader, modelRenderMode, modelU4, goldTexture);
-			else
-				Digit4Cubes[i]->draw(shader, modelRenderMode, modelU4, NULL);
+		if (textures) {
+			pairU4->draw(textureShader, modelRenderMode, modelU4, woodTexture, goldTexture);
+		} else {
+			pairU4->draw(shader, modelRenderMode, modelU4);
 		}
 
 		glm::mat4 modelE5 = glm::mat4(1.0f);
-		modelE5 = glm::translate(modelE5, glm::vec3(moveX - 40, moveY, 0.0f - 45));
+		modelE5 = glm::translate(modelE5, glm::vec3(pairE5Pos.x + moveX, pairE5Pos.y + moveY, pairE5Pos.z + moveZ));
 		modelE5 = glm::rotate(modelE5, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
 		modelE5 = glm::scale(modelE5, glm::vec3(scale, scale, scale));
 
-		for (int i = 0; i < sizeof(LetterECubes) / sizeof(LetterECubes[0]); i++) {
-			if (textures)
-				LetterECubes[i]->draw(textureShader, modelRenderMode, modelE5, woodTexture);
-			else
-				LetterECubes[i]->draw(shader, modelRenderMode, modelE5, NULL);
+		if (textures) {
+			pairE5->draw(textureShader, modelRenderMode, modelE5, woodTexture, goldTexture);
 		}
-
-		for (int i = 0; i < sizeof(Digit5Cubes) / sizeof(Digit5Cubes[0]); i++) {
-			if (textures)
-				Digit5Cubes[i]->draw(textureShader, modelRenderMode, modelE5, goldTexture);
-			else
-				Digit5Cubes[i]->draw(shader, modelRenderMode, modelE5, NULL);
+		else {
+			pairE5->draw(shader, modelRenderMode, modelE5);
 		}
 
 		glm::mat4 modelJ5 = glm::mat4(1.0f);
-		modelJ5 = glm::translate(modelJ5, glm::vec3(moveX + 40, moveY, 0.0f - 45));
+		modelJ5 = glm::translate(modelJ5, glm::vec3(pairJ5Pos.x + moveX, pairJ5Pos.y + moveY, pairJ5Pos.z + moveZ));
 		modelJ5 = glm::rotate(modelJ5, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
 		modelJ5 = glm::scale(modelJ5, glm::vec3(scale, scale, scale));
 
-		for (int i = 0; i < sizeof(LetterJCubes) / sizeof(LetterJCubes[0]); i++) {
-			if (textures)
-				LetterJCubes[i]->draw(textureShader, modelRenderMode, modelJ5, woodTexture);
-			else
-				LetterJCubes[i]->draw(shader, modelRenderMode, modelJ5, NULL);
+		if (textures) {
+			pairJ5->draw(textureShader, modelRenderMode, modelJ5, woodTexture, goldTexture);
 		}
-
-		for (int i = 0; i < sizeof(Digit5Cubes) / sizeof(Digit5Cubes[0]); i++) {
-			if (textures)
-				Digit5Cubes[i]->draw(textureShader, modelRenderMode, modelJ5, goldTexture);
-			else
-				Digit5Cubes[i]->draw(shader, modelRenderMode, modelJ5, NULL);
+		else {
+			pairJ5->draw(shader, modelRenderMode, modelJ5);
 		}
 
 		glm::mat4 modelA6 = glm::mat4(1.0f);
-		modelA6 = glm::translate(modelA6, glm::vec3(moveX + 40, moveY, 0.0f + 45));
+		modelA6 = glm::translate(modelA6, glm::vec3(pairA6Pos.x + moveX, pairA6Pos.y + moveY, pairA6Pos.z + moveZ));
 		modelA6 = glm::rotate(modelA6, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
 		modelA6 = glm::scale(modelA6, glm::vec3(scale, scale, scale));
 
-		for (int i = 0; i < sizeof(LetterACubes) / sizeof(LetterACubes[0]); i++) {
-			if (textures)
-				LetterACubes[i]->draw(textureShader, modelRenderMode, modelA6, woodTexture);
-			else
-				LetterACubes[i]->draw(shader, modelRenderMode, modelA6, NULL);
+		if (textures) {
+			pairA6->draw(textureShader, modelRenderMode, modelA6, woodTexture, goldTexture);
 		}
-
-		for (int i = 0; i < sizeof(Digit6Cubes) / sizeof(Digit6Cubes[0]); i++) {
-			if (textures)
-				Digit6Cubes[i]->draw(textureShader, modelRenderMode, modelA6, goldTexture);
-			else
-				Digit6Cubes[i]->draw(shader, modelRenderMode, modelA6, NULL);
+		else {
+			pairA6->draw(shader, modelRenderMode, modelA6);
 		}
 
 		glm::mat4 modelN2 = glm::mat4(1.0f);
-		modelN2 = glm::translate(modelN2, glm::vec3(moveX-40, moveY, 0.0f + 45));
+		modelN2 = glm::translate(modelN2, glm::vec3(pairN2Pos.x + moveX, pairN2Pos.y + moveY, pairN2Pos.z + moveZ));
 		modelN2 = glm::rotate(modelN2, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
 		modelN2 = glm::scale(modelN2, glm::vec3(scale, scale, scale));
 
-		for (int i = 0; i < sizeof(LetterNCubes) / sizeof(LetterNCubes[0]); i++) {
-			if (textures)
-				LetterNCubes[i]->draw(textureShader, modelRenderMode, modelN2, woodTexture);
-			else
-				LetterNCubes[i]->draw(shader, modelRenderMode, modelN2, NULL);
+		if (textures) {
+			pairN2->draw(textureShader, modelRenderMode, modelN2, woodTexture, goldTexture);
 		}
-
-		for (int i = 0; i < sizeof(Digit2Cubes) / sizeof(Digit2Cubes[0]); i++) {
-			if (textures)
-				Digit2Cubes[i]->draw(textureShader, modelRenderMode, modelN2, goldTexture);
-			else
-				Digit2Cubes[i]->draw(shader, modelRenderMode, modelN2, NULL);
+		else {
+			pairN2->draw(shader, modelRenderMode, modelN2);
 		}
 
 		if (angle == 360.0f)
@@ -530,49 +546,18 @@ int main(void)
         glfwPollEvents();
     }
 
-	for (int i = 0; i < sizeof(LetterUCubes) / sizeof(LetterUCubes[0]); i++) {
-		delete LetterUCubes[i];
-	}
-
-	for (int i = 0; i < sizeof(Digit4Cubes) / sizeof(Digit4Cubes[0]); i++) {
-		delete Digit4Cubes[i];
-	}
-
-	for (int i = 0; i < sizeof(LetterECubes) / sizeof(LetterECubes[0]); i++) {
-		delete LetterECubes[i];
-	}
-
-	for (int i = 0; i < sizeof(Digit5Cubes) / sizeof(Digit5Cubes[0]); i++) {
-		delete Digit5Cubes[i];
-	}
-
-	for (int i = 0; i < sizeof(LetterJCubes) / sizeof(LetterJCubes[0]); i++) {
-		delete LetterJCubes[i];
-	}
-
-	for (int i = 0; i < sizeof(LetterACubes) / sizeof(LetterACubes[0]); i++) {
-		delete LetterACubes[i];
-	}
-
-	for (int i = 0; i < sizeof(Digit6Cubes) / sizeof(Digit6Cubes[0]); i++) {
-		delete Digit6Cubes[i];
-	}
-
-	for (int i = 0; i < sizeof(LetterNCubes) / sizeof(LetterNCubes[0]); i++) {
-		delete LetterNCubes[i];
-	}
-
-	for (int i = 0; i < sizeof(Digit2Cubes) / sizeof(Digit2Cubes[0]); i++) {
-		delete Digit2Cubes[i];
-	}
-
+	delete pairU4;
+	delete pairE5;
+	delete pairJ5;
+	delete pairA6;
+	delete pairN2;
 	delete axis;
 	delete grid;
-	delete shader;
-	delete textureShader;
 	delete tileTexture;
 	delete woodTexture;
 	delete goldTexture;
+	delete textureShader;
+	delete shader;
 
     glfwTerminate();
 
