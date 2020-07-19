@@ -280,15 +280,18 @@ int main(void)
 
     GLuint VBO = 0, VAO = 0;
 
-	Shader *shader = new Shader("src/shaders/shader.vs", "src/shaders/shader.fs");
+	Shader *basicShader = new Shader("src/shaders/shader.vs", "src/shaders/shader.fs");
+	Shader *shader = new Shader("src/shaders/light.vs", "src/shaders/light.fs");
 	Shader *textureShader = new Shader("src/shaders/texture.vs", "src/shaders/texture.fs");
-
+	Shader *lightShader = new Shader("src/shaders/lightCube.vs", "src/shaders/lightCube.fs");
 	Texture *tileTexture = new Texture("src/textures/tile.jpg");
 	Texture *woodTexture = new Texture("src/textures/wood.jpg");
 	Texture *goldTexture = new Texture("src/textures/gold.jpg");
 
 	Grid *grid = new Grid(GRID_SIZE);
 	Axis *axis = new Axis(AXIS_SIZE);
+
+	Cube *lightSource = new Cube(0, 10, 0);
 
 	// Letter U and digit 4 for Giuseppe Campanelli
 	std::vector<Cube*> cubesU = {
@@ -470,16 +473,29 @@ int main(void)
 		glm::mat4 projection = glm::perspective(glm::radians(fov), (float)WINDOW_LENGTH / (float)WINDOW_WIDTH, 0.1f, 100.0f);
 		glm::mat4 view = glm::lookAt(cameraPos, cameraFront, cameraUp);
 
-		shader->use();
-		shader->setMat4("projection", projection);
-		shader->setMat4("view", view);
-		axis->draw(shader);
+		basicShader->use();
+		basicShader->setMat4("projection", projection);
+		basicShader->setMat4("view", view);
+		axis->draw(basicShader);
+
+		glm::mat4 lightModel(1.0f);
+		lightShader->use();
+		lightShader->setMat4("projection", projection);
+		lightShader->setMat4("view", view);
+		lightSource->draw(lightShader, modelRenderMode, lightModel);
 
 		textureShader->use();
 		textureShader->setMat4("projection", projection);
 		textureShader->setMat4("view", view);
 		grid->draw(textureShader, tileTexture);
 		
+		shader->use();
+		shader->setMat4("projection", projection);
+		shader->setMat4("view", view);
+		shader->setVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+		shader->setVec3("lightPos", glm::vec3(0.0f, 10.0f, 0.0f));
+		shader->setVec3("viewPos", cameraPos);
+
 		glm::mat4 modelU4 = glm::mat4(1.0f);
 		modelU4 = glm::translate(modelU4, glm::vec3(pairU4Pos.x + moveX, pairU4Pos.y + moveY, pairU4Pos.z + moveZ));
 		modelU4 = glm::rotate(modelU4, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
