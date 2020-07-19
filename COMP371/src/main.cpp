@@ -487,6 +487,9 @@ int main(void)
 		textureShader->use();
 		textureShader->setMat4("projection", projection);
 		textureShader->setMat4("view", view);
+		textureShader->setVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+		textureShader->setVec3("lightPos", glm::vec3(0.0f, 10.0f, 0.0f));
+		textureShader->setVec3("viewPos", cameraPos);
 		grid->draw(textureShader, tileTexture);
 		
 		shader->use();
