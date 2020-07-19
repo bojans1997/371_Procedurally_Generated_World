@@ -291,7 +291,7 @@ int main(void)
 	Grid *grid = new Grid(GRID_SIZE);
 	Axis *axis = new Axis(AXIS_SIZE);
 
-	Cube *lightSource = new Cube(0, 10, 0);
+	Cube *lightSource = new Cube(0, 30, 0);
 
 	// Letter U and digit 4 for Giuseppe Campanelli
 	std::vector<Cube*> cubesU = {
@@ -496,7 +496,7 @@ int main(void)
 		shader->setMat4("projection", projection);
 		shader->setMat4("view", view);
 		shader->setVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
-		shader->setVec3("lightPos", glm::vec3(0.0f, 10.0f, 0.0f));
+		shader->setVec3("lightPos", glm::vec3(0.0f, 30.0f, 0.0f));
 		shader->setVec3("viewPos", cameraPos);
 
 		glm::mat4 modelU4 = glm::mat4(1.0f);

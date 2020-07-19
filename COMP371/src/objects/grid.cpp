@@ -48,6 +48,10 @@ void Grid::draw(Shader *shader, Texture *texture)
 	}
 
 	shader->use();
+	shader->setVec3("material.ambient", glm::vec3(0.05f, 0.05f, 0.05f));
+	shader->setVec3("material.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
+	shader->setVec3("material.specular", glm::vec3(0.7f, 0.7f, 0.7f));
+	shader->setFloat("material.shininess", 10.0f);
 	glBindVertexArray(VAO);
 
 	for (int i = -size / 2; i <= size / 2; i++) {
