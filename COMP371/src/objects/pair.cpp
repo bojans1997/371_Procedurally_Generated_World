@@ -16,6 +16,7 @@ void Pair::draw(Shader *shader, Shader *sphereShader, GLuint modelRenderMode, gl
 
 void Pair::draw(Shader *shader, Shader *sphereShader, GLuint modelRenderMode, glm::mat4 matrix, Texture *letterTexture, Texture *digitTexture)
 {
+	sphere->draw(sphereShader, modelRenderMode, matrix);
 	shader->setVec3("material.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
 	shader->setVec3("material.diffuse", glm::vec3(0.2f, 0.2f, 0.2f));
 	shader->setVec3("material.specular", glm::vec3(0.332741f, 0.328634f, 0.346435f));
@@ -27,5 +28,5 @@ void Pair::draw(Shader *shader, Shader *sphereShader, GLuint modelRenderMode, gl
 	shader->setFloat("material.shininess", 51.2f);
 	digit->draw(shader, modelRenderMode, matrix, digitTexture);
 
-	sphere->draw(sphereShader, modelRenderMode, matrix);
+	
 }

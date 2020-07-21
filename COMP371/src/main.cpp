@@ -326,7 +326,7 @@ int main(void)
 		new Cube(5, 4, 0)
 	};
 
-	Sphere *test = new Sphere(0, 5, 0, 5, 3, 3);
+	Sphere *test = new Sphere(0, 5, 0, 5, 50, 50);
 	Pair *pairU4 = new Pair(new Character(cubesU), test, new Character(cubes4));
 	/*
 	// Letter E and digit 5 for Alexis Laurens-Renner
