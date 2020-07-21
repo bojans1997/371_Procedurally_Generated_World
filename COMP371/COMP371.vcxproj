@@ -177,6 +177,7 @@
     <ClInclude Include="src\objects\character.h" />
     <ClInclude Include="src\objects\pair.h" />
     <ClInclude Include="src\objects\shader.h" />
+    <ClInclude Include="src\objects\Stack.h" />
     <ClInclude Include="src\objects\Stack2.h" />
     <ClInclude Include="src\objects\texture.h" />
     <ClInclude Include="src\stb_image.h" />
