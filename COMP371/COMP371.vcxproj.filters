@@ -42,12 +42,25 @@
     <ClCompile Include="src\objects\pair.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\objects\Sector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\objects\Stack.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\objects\Sphere.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\shaders\shader.vs" />
     <None Include="src\shaders\shader.fs" />
     <None Include="src\shaders\texture.vs" />
     <None Include="src\shaders\texture.fs" />
+    <None Include="src\textures\SphereShader.vs" />
+    <None Include="src\textures\SphereShader.fs" />
+    <None Include="src\shaders\SphereShader.vs" />
+    <None Include="src\shaders\SphereShader.fs" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\objects\grid.h">
@@ -72,6 +85,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\objects\pair.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Sector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Sphere.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\objects\Stack2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

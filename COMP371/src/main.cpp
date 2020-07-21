@@ -12,7 +12,7 @@
 #include "objects/character.h"
 #include "objects/pair.h"
 #include "objects/Sphere.h"
-#include "objects/Stack.h"
+#include "objects/stack.h"
 #include "objects/Sector.h"
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -288,6 +288,8 @@ int main(void)
 	Shader *shader = new Shader("src/shaders/light.vs", "src/shaders/light.fs");
 	Shader *textureShader = new Shader("src/shaders/texture.vs", "src/shaders/texture.fs");
 	Shader *lightShader = new Shader("src/shaders/lightCube.vs", "src/shaders/lightCube.fs");
+	Shader *sphereShader = new Shader("src/shaders/SphereShader.vs", "src/shaders/SphereShader.fs");
+
 	Texture *tileTexture = new Texture("src/textures/tile.jpg");
 	Texture *woodTexture = new Texture("src/textures/wood.jpg");
 	Texture *goldTexture = new Texture("src/textures/gold.jpg");
@@ -325,8 +327,10 @@ int main(void)
 		new Cube(5, 3, 0),
 		new Cube(5, 4, 0)
 	};
-	Pair *pairU4 = new Pair(new Character(cubesU), new Character(cubes4));
 
+	Sphere *test = new Sphere(0, 5, 0, 5, 3, 3);
+	Pair *pairU4 = new Pair(new Character(cubesU), test, new Character(cubes4));
+	/*
 	// Letter E and digit 5 for Alexis Laurens-Renner
 	std::vector<Cube*> cubesE = {
 		new Cube(-5, 0, 0),
@@ -465,7 +469,7 @@ int main(void)
 		new Cube(5, 0, 0)
 	};
 	Pair *pairN2 = new Pair(new Character(cubesN), new Character(cubes2));
-
+	*/
 	glEnable(GL_DEPTH_TEST);
 
     while (!glfwWindowShouldClose(window))
@@ -504,17 +508,24 @@ int main(void)
 		shader->setVec3("lightPos", glm::vec3(0.0f, 30.0f, 0.0f));
 		shader->setVec3("viewPos", cameraPos);
 
+		sphereShader->use();
+		sphereShader->setMat4("projection", projection);
+		sphereShader->setMat4("view", view);
+		sphereShader->setVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+		sphereShader->setVec3("lightPos", glm::vec3(0.0f, 30.0f, 0.0f));
+		sphereShader->setVec3("viewPos", cameraPos);
+
 		glm::mat4 modelU4 = glm::mat4(1.0f);
 		modelU4 = glm::translate(modelU4, glm::vec3(pairU4Pos.x + moveX, pairU4Pos.y + moveY, pairU4Pos.z + moveZ));
 		modelU4 = glm::rotate(modelU4, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
 		modelU4 = glm::scale(modelU4, glm::vec3(scale, scale, scale));
 
 		if (textures) {
-			pairU4->draw(textureShader, modelRenderMode, modelU4, woodTexture, goldTexture);
+			pairU4->draw(textureShader, sphereShader, modelRenderMode, modelU4, woodTexture, goldTexture);
 		} else {
-			pairU4->draw(shader, modelRenderMode, modelU4);
+			pairU4->draw(shader, sphereShader, modelRenderMode, modelU4);
 		}
-
+		/*
 		glm::mat4 modelE5 = glm::mat4(1.0f);
 		modelE5 = glm::translate(modelE5, glm::vec3(pairE5Pos.x + moveX, pairE5Pos.y + moveY, pairE5Pos.z + moveZ));
 		modelE5 = glm::rotate(modelE5, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
@@ -562,7 +573,7 @@ int main(void)
 		else {
 			pairN2->draw(shader, modelRenderMode, modelN2);
 		}
-
+		*/
 		if (angle == 360.0f)
 			angle = 0.0f;
 
@@ -571,10 +582,10 @@ int main(void)
     }
 
 	delete pairU4;
-	delete pairE5;
-	delete pairJ5;
-	delete pairA6;
-	delete pairN2;
+	//delete pairE5;
+	//delete pairJ5;
+	//delete pairA6;
+	//delete pairN2;
 	delete axis;
 	delete grid;
 	delete tileTexture;

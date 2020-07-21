@@ -13,22 +13,22 @@
 #include "../stb_image.h"
 #include "shader.h"
 #include "texture.h"
+#include "stack.h"
 
 class Sector {
 	//position
 public:
 
-	Sector(float sA1, float sA2, float r, float s1, float s2);
-	void draw();
+	Sector(float x, float y, float z, float sA1, float sA2, float r, float s1, float s2);
+	void draw(Shader *shader, GLuint modelRenderMode, glm::mat4 matrix);
 	~Sector();
 
 
 protected:
+	float x, y, z;
 	glm::vec3 normal;
 	float stackAngle1, stackAngle2, sectorAngle1, sectorAngle2;
 	float radius;
-
-	std::vector<Stack*>stacks;
 	GLuint VAO = 0, VBO = 0;
 };
 #endif

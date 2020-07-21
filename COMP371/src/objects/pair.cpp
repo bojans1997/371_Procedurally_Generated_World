@@ -1,19 +1,20 @@
 #include "pair.h"
 
-Pair::Pair(Character *letter, Character *digit) : letter(letter), digit(digit) {}
+Pair::Pair(Character *letter, Sphere *sphere, Character *digit) : letter(letter), sphere(sphere), digit(digit) {}
 
 Pair::~Pair() {
 	delete letter;
 	delete digit;
 }
 
-void Pair::draw(Shader *shader, GLuint modelRenderMode, glm::mat4 matrix)
+void Pair::draw(Shader *shader, Shader *sphereShader, GLuint modelRenderMode, glm::mat4 matrix)
 {
 	letter->draw(shader, modelRenderMode, matrix);
 	digit->draw(shader, modelRenderMode, matrix);
+	sphere->draw(sphereShader, modelRenderMode, matrix);
 }
 
-void Pair::draw(Shader *shader, GLuint modelRenderMode, glm::mat4 matrix, Texture *letterTexture, Texture *digitTexture)
+void Pair::draw(Shader *shader, Shader *sphereShader, GLuint modelRenderMode, glm::mat4 matrix, Texture *letterTexture, Texture *digitTexture)
 {
 	shader->setVec3("material.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
 	shader->setVec3("material.diffuse", glm::vec3(0.2f, 0.2f, 0.2f));
@@ -25,4 +26,6 @@ void Pair::draw(Shader *shader, GLuint modelRenderMode, glm::mat4 matrix, Textur
 	shader->setVec3("material.specular", glm::vec3(0.628281f, 0.555802f, 0.366065f));
 	shader->setFloat("material.shininess", 51.2f);
 	digit->draw(shader, modelRenderMode, matrix, digitTexture);
+
+	sphere->draw(sphereShader, modelRenderMode, matrix);
 }
