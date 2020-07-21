@@ -169,16 +169,15 @@
     <None Include="src\textures\SphereShader.vs" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Sector.h" />
-    <ClInclude Include="Sphere.h" />
     <ClInclude Include="src\objects\axis.h" />
     <ClInclude Include="src\objects\cube.h" />
     <ClInclude Include="src\objects\grid.h" />
     <ClInclude Include="src\objects\character.h" />
     <ClInclude Include="src\objects\pair.h" />
+    <ClInclude Include="src\objects\Sector.h" />
     <ClInclude Include="src\objects\shader.h" />
+    <ClInclude Include="src\objects\Sphere.h" />
     <ClInclude Include="src\objects\Stack.h" />
-    <ClInclude Include="src\objects\Stack2.h" />
     <ClInclude Include="src\objects\texture.h" />
     <ClInclude Include="src\stb_image.h" />
   </ItemGroup>

@@ -87,16 +87,16 @@
     <ClInclude Include="src\objects\pair.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Sector.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Sphere.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\objects\Stack2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\objects\Stack.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\objects\Sphere.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\objects\Sector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -12,8 +12,6 @@
 #include "objects/character.h"
 #include "objects/pair.h"
 #include "objects/Sphere.h"
-#include "objects/stack.h"
-#include "objects/Sector.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
