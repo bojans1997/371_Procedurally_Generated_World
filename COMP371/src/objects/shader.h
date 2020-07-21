@@ -10,6 +10,8 @@
 #include <sstream>
 #include <iostream>
 
+// Based on learnopengl's https://learnopengl.com/Getting-started/Shaders
+
 class Shader
 {
 public:

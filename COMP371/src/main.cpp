@@ -34,8 +34,8 @@ GLfloat camY = 0;
 bool firstMouse = true;
 GLfloat yaw = -90.0f;	// yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we initially rotate a bit to the left.
 GLfloat pitch = 0.0f;
-GLfloat lastX = WINDOW_LENGTH/ 2.0f;
-GLfloat lastY = WINDOW_WIDTH / 2.0f;
+GLdouble lastX = WINDOW_LENGTH/ 2.0;
+GLdouble lastY = WINDOW_WIDTH / 2.0;
 GLfloat fov = 45.0f;
 
 GLuint modelRenderMode = GL_TRIANGLES;
@@ -54,7 +54,7 @@ glm::vec3 pairJ5Pos = glm::vec3(40, 0, -45);
 glm::vec3 pairA6Pos = glm::vec3(40, 0, 45);
 glm::vec3 pairN2Pos = glm::vec3(-40, 0, 45);
 
-void mouse_callback_horizontal(GLFWwindow* window, double xpos, double ypos)
+void mouse_callback_horizontal(GLFWwindow* window, GLdouble xpos, GLdouble ypos)
 {
 	if (firstMouse)
 	{
@@ -63,7 +63,7 @@ void mouse_callback_horizontal(GLFWwindow* window, double xpos, double ypos)
 		firstMouse = false;
 	}
 
-	float xoffset = xpos - lastX;
+	GLdouble xoffset = xpos - lastX;
 	lastX = xpos;
 
 	float sensitivity = 0.1f;
@@ -85,7 +85,7 @@ void mouse_callback_horizontal(GLFWwindow* window, double xpos, double ypos)
 	
 }
 
-void mouse_callback_vertical(GLFWwindow* window, double xpos, double ypos)
+void mouse_callback_vertical(GLFWwindow* window, GLdouble xpos, GLdouble ypos)
 {
 	if (firstMouse)
 	{
@@ -94,8 +94,8 @@ void mouse_callback_vertical(GLFWwindow* window, double xpos, double ypos)
 		firstMouse = false;
 	}
 
-	float xoffset = xpos - lastX;
-	float yoffset = lastY - ypos;
+	GLdouble xoffset = xpos - lastX;
+	GLdouble yoffset = lastY - ypos;
 	lastX = xpos;
 	lastY = ypos;
 
@@ -118,7 +118,7 @@ void mouse_callback_vertical(GLFWwindow* window, double xpos, double ypos)
 	cameraFront.y += direction.y;
 }
 
-void mouse_callback_zoom(GLFWwindow* window, double xpos, double ypos)
+void mouse_callback_zoom(GLFWwindow* window, GLdouble xpos, GLdouble ypos)
 {
 	if (firstMouse)
 	{
@@ -126,7 +126,8 @@ void mouse_callback_zoom(GLFWwindow* window, double xpos, double ypos)
 		lastY = ypos;
 		firstMouse = false;
 	}
-	float yoffset = lastY - ypos;
+
+	GLdouble yoffset = lastY - ypos;
 	lastY = ypos;
 
 	float sensitivity = 0.1f;
