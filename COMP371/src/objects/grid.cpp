@@ -46,7 +46,7 @@ void Grid::draw(Shader *shader, Texture *texture)
 	} else {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	}
-
+	
 	shader->use();
 	shader->setVec3("material.ambient", glm::vec3(0.05f, 0.05f, 0.05f));
 	shader->setVec3("material.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));

@@ -11,6 +11,9 @@
 #include "objects/texture.h"
 #include "objects/character.h"
 #include "objects/pair.h"
+#include "objects/Sphere.h"
+#include "objects/Stack.h"
+#include "objects/Sector.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -293,6 +296,7 @@ int main(void)
 	Axis *axis = new Axis(AXIS_SIZE);
 
 	Cube *lightSource = new Cube(0, 30, 0);
+	
 
 	// Letter U and digit 4 for Giuseppe Campanelli
 	std::vector<Cube*> cubesU = {
