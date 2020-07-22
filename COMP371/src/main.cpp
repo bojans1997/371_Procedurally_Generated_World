@@ -325,7 +325,7 @@ int main(void)
 		new Cube(4, 3, 0),
 		new Cube(4, 4, 0)
 	};
-	Pair *pairU4 = new Pair(new Character(cubesU), new Character(cubes4), new Sphere(0, 6, 0, 5, 50, 50));
+	Pair *pairU4 = new Pair(new Character(cubesU), new Character(cubes4), new Sphere(0, 6, 0, 5, 10, 10));
 	
 	// Letter E and digit 5 for Alexis Laurens-Renner
 	std::vector<Cube*> cubesE = {
@@ -360,7 +360,7 @@ int main(void)
 		new Cube(4, 2, 0),
 		new Cube(2, 2, 0)
 	};
-	Pair *pairE5 = new Pair(new Character(cubesE), new Character(cubes5_1), new Sphere(0, 6, 0, 5, 50, 50));
+	Pair *pairE5 = new Pair(new Character(cubesE), new Character(cubes5_1), new Sphere(0, 6, 0, 5, 10, 10));
 
 	// Letter J and digit 5 for Bojan Srbinoski
 	std::vector<Cube*> cubesJ = {
@@ -391,7 +391,7 @@ int main(void)
 		new Cube(3, 2, 0),
 		new Cube(2, 2, 0)
 	};
-	Pair *pairJ5 = new Pair(new Character(cubesJ), new Character(cubes5_2), new Sphere(0, 6, 0, 5, 50, 50));
+	Pair *pairJ5 = new Pair(new Character(cubesJ), new Character(cubes5_2), new Sphere(0, 6, 0, 5, 10, 10));
 
 	// Letter A and digit 6 for Saad Ahmed
 	std::vector<Cube*> cubesA = {
@@ -430,7 +430,7 @@ int main(void)
 		new Cube(3, 2, 0),
 		new Cube(2, 2, 0)
 	};
-	Pair *pairA6 = new Pair(new Character(cubesA), new Character(cubes6), new Sphere(0, 6, 0, 5, 50, 50));
+	Pair *pairA6 = new Pair(new Character(cubesA), new Character(cubes6), new Sphere(0, 6, 0, 5, 10, 10));
 
 	// Letter N and digit 2 for Anna Kmieciak
 	std::vector<Cube*> cubesN = {
@@ -464,7 +464,7 @@ int main(void)
 		new Cube(4, 0, 0),
 		new Cube(5, 0, 0)
 	};
-	Pair *pairN2 = new Pair(new Character(cubesN), new Character(cubes2), new Sphere(0, 6, 0, 5, 50, 50));
+	Pair *pairN2 = new Pair(new Character(cubesN), new Character(cubes2), new Sphere(0, 6, 0, 5, 10, 10));
 	
 	glEnable(GL_DEPTH_TEST);
 
