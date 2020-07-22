@@ -11,6 +11,7 @@
 #include "objects/texture.h"
 #include "objects/character.h"
 #include "objects/pair.h"
+#include "objects/Sphere.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -36,7 +37,7 @@ GLfloat yaw = -90.0f;	// yaw is initialized to -90.0 degrees since a yaw of 0.0 
 GLfloat pitch = 0.0f;
 GLdouble lastX = WINDOW_LENGTH/ 2.0;
 GLdouble lastY = WINDOW_WIDTH / 2.0;
-GLfloat fov = 45.0f;
+GLfloat fov = 60.0f;
 
 GLuint modelRenderMode = GL_TRIANGLES;
 
@@ -141,7 +142,8 @@ void mouse_callback_zoom(GLFWwindow* window, GLdouble xpos, GLdouble ypos)
 		fov = 90.0f;
 }
 
-glm::vec3 generateRandomGridPosition() {
+glm::vec3 generateRandomGridPosition()
+{
 	int min = -GRID_SIZE/2, max = GRID_SIZE/2;
 	int x = min + (rand() % static_cast<int>(max - min + 1));
 	int z = min + (rand() % static_cast<int>(max - min + 1));
@@ -251,7 +253,6 @@ void processInput(GLFWwindow* window)
 	}
 }
 
-
 void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
@@ -285,6 +286,8 @@ int main(void)
 	Shader *shader = new Shader("src/shaders/light.vs", "src/shaders/light.fs");
 	Shader *textureShader = new Shader("src/shaders/texture.vs", "src/shaders/texture.fs");
 	Shader *lightShader = new Shader("src/shaders/lightCube.vs", "src/shaders/lightCube.fs");
+	Shader *sphereShader = new Shader("src/shaders/SphereShader.vs", "src/shaders/SphereShader.fs");
+
 	Texture *tileTexture = new Texture("src/textures/tile.jpg");
 	Texture *woodTexture = new Texture("src/textures/wood.jpg");
 	Texture *goldTexture = new Texture("src/textures/gold.jpg");
@@ -293,6 +296,7 @@ int main(void)
 	Axis *axis = new Axis(AXIS_SIZE);
 
 	Cube *lightSource = new Cube(0, 30, 0);
+	
 
 	// Letter U and digit 4 for Giuseppe Campanelli
 	std::vector<Cube*> cubesU = {
@@ -310,19 +314,19 @@ int main(void)
 		new Cube(-2, 4, 0)
 	};
 	std::vector<Cube*> cubes4 = {
+		new Cube(1, 2, 0),
+		new Cube(1, 3, 0),
+		new Cube(1, 4, 0),
 		new Cube(2, 2, 0),
-		new Cube(2, 3, 0),
-		new Cube(2, 4, 0),
 		new Cube(3, 2, 0),
+		new Cube(4, 0, 0),
+		new Cube(4, 1, 0),
 		new Cube(4, 2, 0),
-		new Cube(5, 0, 0),
-		new Cube(5, 1, 0),
-		new Cube(5, 2, 0),
-		new Cube(5, 3, 0),
-		new Cube(5, 4, 0)
+		new Cube(4, 3, 0),
+		new Cube(4, 4, 0)
 	};
-	Pair *pairU4 = new Pair(new Character(cubesU), new Character(cubes4));
-
+	Pair *pairU4 = new Pair(new Character(cubesU), new Character(cubes4), new Sphere(0, 6, 0, 5, 50, 50));
+	
 	// Letter E and digit 5 for Alexis Laurens-Renner
 	std::vector<Cube*> cubesE = {
 		new Cube(-5, 0, 0),
@@ -341,22 +345,22 @@ int main(void)
 		new Cube(-2, 4, 0)
 	};
 	std::vector<Cube*> cubes5_1 = {
-		new Cube(5, 0, 0),
-		new Cube(5, 1, 0),
-		new Cube(5, 2, 0),
-		new Cube(5, 4, 0),
-		new Cube(2, 0, 0),
-		new Cube(2, 2, 0),
-		new Cube(2, 3, 0),
-		new Cube(2, 4, 0),
-		new Cube(4, 4, 0),
-		new Cube(3, 4, 0),
 		new Cube(4, 0, 0),
-		new Cube(3, 0, 0),
+		new Cube(4, 1, 0),
 		new Cube(4, 2, 0),
-		new Cube(3, 2, 0)
+		new Cube(4, 4, 0),
+		new Cube(1, 0, 0),
+		new Cube(1, 2, 0),
+		new Cube(1, 3, 0),
+		new Cube(1, 4, 0),
+		new Cube(3, 4, 0),
+		new Cube(2, 4, 0),
+		new Cube(3, 0, 0),
+		new Cube(2, 0, 0),
+		new Cube(4, 2, 0),
+		new Cube(2, 2, 0)
 	};
-	Pair *pairE5 = new Pair(new Character(cubesE), new Character(cubes5_1));
+	Pair *pairE5 = new Pair(new Character(cubesE), new Character(cubes5_1), new Sphere(0, 6, 0, 5, 50, 50));
 
 	// Letter J and digit 5 for Bojan Srbinoski
 	std::vector<Cube*> cubesJ = {
@@ -372,22 +376,22 @@ int main(void)
 		new Cube(-5, 1, 0)
 	};
 	std::vector<Cube*> cubes5_2 = {
-		new Cube(5, 0, 0),
-		new Cube(5, 1, 0),
-		new Cube(5, 2, 0),
-		new Cube(5, 4, 0),
-		new Cube(2, 0, 0),
-		new Cube(2, 2, 0),
-		new Cube(2, 3, 0),
-		new Cube(2, 4, 0),
-		new Cube(4, 4, 0),
-		new Cube(3, 4, 0),
 		new Cube(4, 0, 0),
-		new Cube(3, 0, 0),
+		new Cube(4, 1, 0),
 		new Cube(4, 2, 0),
-		new Cube(3, 2, 0)
+		new Cube(4, 4, 0),
+		new Cube(1, 0, 0),
+		new Cube(1, 2, 0),
+		new Cube(1, 3, 0),
+		new Cube(1, 4, 0),
+		new Cube(3, 4, 0),
+		new Cube(2, 4, 0),
+		new Cube(3, 0, 0),
+		new Cube(2, 0, 0),
+		new Cube(3, 2, 0),
+		new Cube(2, 2, 0)
 	};
-	Pair *pairJ5 = new Pair(new Character(cubesJ), new Character(cubes5_2));
+	Pair *pairJ5 = new Pair(new Character(cubesJ), new Character(cubes5_2), new Sphere(0, 6, 0, 5, 50, 50));
 
 	// Letter A and digit 6 for Saad Ahmed
 	std::vector<Cube*> cubesA = {
@@ -426,7 +430,7 @@ int main(void)
 		new Cube(3, 2, 0),
 		new Cube(2, 2, 0)
 	};
-	Pair *pairA6 = new Pair(new Character(cubesA), new Character(cubes6));
+	Pair *pairA6 = new Pair(new Character(cubesA), new Character(cubes6), new Sphere(0, 6, 0, 5, 50, 50));
 
 	// Letter N and digit 2 for Anna Kmieciak
 	std::vector<Cube*> cubesN = {
@@ -460,8 +464,8 @@ int main(void)
 		new Cube(4, 0, 0),
 		new Cube(5, 0, 0)
 	};
-	Pair *pairN2 = new Pair(new Character(cubesN), new Character(cubes2));
-
+	Pair *pairN2 = new Pair(new Character(cubesN), new Character(cubes2), new Sphere(0, 6, 0, 5, 50, 50));
+	
 	glEnable(GL_DEPTH_TEST);
 
     while (!glfwWindowShouldClose(window))
@@ -500,27 +504,33 @@ int main(void)
 		shader->setVec3("lightPos", glm::vec3(0.0f, 30.0f, 0.0f));
 		shader->setVec3("viewPos", cameraPos);
 
+		sphereShader->use();
+		sphereShader->setMat4("projection", projection);
+		sphereShader->setMat4("view", view);
+		sphereShader->setVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+		sphereShader->setVec3("lightPos", glm::vec3(0.0f, 30.0f, 0.0f));
+		sphereShader->setVec3("viewPos", cameraPos);
+
 		glm::mat4 modelU4 = glm::mat4(1.0f);
 		modelU4 = glm::translate(modelU4, glm::vec3(pairU4Pos.x + moveX, pairU4Pos.y + moveY, pairU4Pos.z + moveZ));
 		modelU4 = glm::rotate(modelU4, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
 		modelU4 = glm::scale(modelU4, glm::vec3(scale, scale, scale));
 
 		if (textures) {
-			pairU4->draw(textureShader, modelRenderMode, modelU4, woodTexture, goldTexture);
+			pairU4->draw(textureShader, sphereShader, modelRenderMode, modelU4, woodTexture, goldTexture);
 		} else {
-			pairU4->draw(shader, modelRenderMode, modelU4);
+			pairU4->draw(shader, sphereShader, modelRenderMode, modelU4);
 		}
-
+		
 		glm::mat4 modelE5 = glm::mat4(1.0f);
 		modelE5 = glm::translate(modelE5, glm::vec3(pairE5Pos.x + moveX, pairE5Pos.y + moveY, pairE5Pos.z + moveZ));
 		modelE5 = glm::rotate(modelE5, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
 		modelE5 = glm::scale(modelE5, glm::vec3(scale, scale, scale));
 
 		if (textures) {
-			pairE5->draw(textureShader, modelRenderMode, modelE5, woodTexture, goldTexture);
-		}
-		else {
-			pairE5->draw(shader, modelRenderMode, modelE5);
+			pairE5->draw(textureShader, sphereShader, modelRenderMode, modelE5, woodTexture, goldTexture);
+		} else {
+			pairE5->draw(shader, sphereShader, modelRenderMode, modelE5);
 		}
 
 		glm::mat4 modelJ5 = glm::mat4(1.0f);
@@ -529,10 +539,9 @@ int main(void)
 		modelJ5 = glm::scale(modelJ5, glm::vec3(scale, scale, scale));
 
 		if (textures) {
-			pairJ5->draw(textureShader, modelRenderMode, modelJ5, woodTexture, goldTexture);
-		}
-		else {
-			pairJ5->draw(shader, modelRenderMode, modelJ5);
+			pairJ5->draw(textureShader, sphereShader, modelRenderMode, modelJ5, woodTexture, goldTexture);
+		} else {
+			pairJ5->draw(shader, sphereShader, modelRenderMode, modelJ5);
 		}
 
 		glm::mat4 modelA6 = glm::mat4(1.0f);
@@ -541,10 +550,9 @@ int main(void)
 		modelA6 = glm::scale(modelA6, glm::vec3(scale, scale, scale));
 
 		if (textures) {
-			pairA6->draw(textureShader, modelRenderMode, modelA6, woodTexture, goldTexture);
-		}
-		else {
-			pairA6->draw(shader, modelRenderMode, modelA6);
+			pairA6->draw(textureShader, sphereShader, modelRenderMode, modelA6, woodTexture, goldTexture);
+		} else {
+			pairA6->draw(shader, sphereShader, modelRenderMode, modelA6);
 		}
 
 		glm::mat4 modelN2 = glm::mat4(1.0f);
@@ -553,12 +561,11 @@ int main(void)
 		modelN2 = glm::scale(modelN2, glm::vec3(scale, scale, scale));
 
 		if (textures) {
-			pairN2->draw(textureShader, modelRenderMode, modelN2, woodTexture, goldTexture);
+			pairN2->draw(textureShader, sphereShader, modelRenderMode, modelN2, woodTexture, goldTexture);
+		} else {
+			pairN2->draw(shader, sphereShader, modelRenderMode, modelN2);
 		}
-		else {
-			pairN2->draw(shader, modelRenderMode, modelN2);
-		}
-
+		
 		if (angle == 360.0f)
 			angle = 0.0f;
 
@@ -577,6 +584,9 @@ int main(void)
 	delete woodTexture;
 	delete goldTexture;
 	delete textureShader;
+	delete sphereShader;
+	delete lightShader;
+	delete basicShader;
 	delete shader;
 
     glfwTerminate();

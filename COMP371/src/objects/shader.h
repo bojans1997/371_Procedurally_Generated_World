@@ -23,7 +23,6 @@ public:
 	void setVec3(const std::string &name, const glm::vec3 &value) const;
 	void setVec3(const std::string &name, float x, float y, float z) const;
 	void setFloat(const std::string &name, const float &value) const;
-
 private:
 	void checkCompileErrors(unsigned int shader, std::string type);
 };
