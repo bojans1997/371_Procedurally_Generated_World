@@ -1,4 +1,5 @@
 #pragma once
+
 #ifndef SECTOR_H
 #define SECTOR_H
 
@@ -13,14 +14,12 @@
 #include "shader.h"
 #include "texture.h"
 
-class Sector {
-	//position
+class Sector
+{
 public:
 	Sector(float x, float y, float z, float sA1, float sA2, float r, float s1, float s2);
 	void draw(Shader *shader, GLuint modelRenderMode, glm::mat4 matrix);
 	~Sector();
-
-
 protected:
 	float x, y, z;
 	glm::vec3 normal;

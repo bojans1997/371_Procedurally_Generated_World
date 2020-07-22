@@ -1,7 +1,7 @@
 #include "Stack.h"
 
-Stack::Stack(float x, float y, float z, float sA1, float sA2, float radius, int sectorCount) : stackAngle1(sA1), stackAngle2(sA2), radius(radius), sectorCount(sectorCount){
-	
+Stack::Stack(float x, float y, float z, float sA1, float sA2, float radius, int sectorCount) : stackAngle1(sA1), stackAngle2(sA2), radius(radius), sectorCount(sectorCount)
+{	
 	float sectorStep = 2 * M_PI / sectorCount;
 	float sectorAngle;
 	for (int i = 0; i < sectorCount; i++) {
@@ -10,9 +10,6 @@ Stack::Stack(float x, float y, float z, float sA1, float sA2, float radius, int 
 
 		sectors.push_back(new Sector(x, y, z, sA1, sA2, radius, sectorAngle, sectorAngle2));
 	}
-
-
-
 }
 
 void Stack::draw(Shader *shader, GLuint modelRenderMode, glm::mat4 matrix)
@@ -22,5 +19,9 @@ void Stack::draw(Shader *shader, GLuint modelRenderMode, glm::mat4 matrix)
 	}
 }
 
-Stack::~Stack() {
+Stack::~Stack()
+{
+	for (std::vector<Sector*>::iterator it = sectors.begin(); it != sectors.end(); ++it) {
+		delete *it;
+	}
 }

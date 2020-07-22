@@ -1,8 +1,7 @@
 #include "Sector.h"
 
-Sector::Sector(float x, float y, float z, float sA1, float sA2, float r, float s1, float s2) : x(x), y(y), z(z), stackAngle1(sA1), stackAngle2(sA2), radius(r), sectorAngle1(s1), sectorAngle2(s2){
-	
-
+Sector::Sector(float x, float y, float z, float sA1, float sA2, float r, float s1, float s2) : x(x), y(y), z(z), stackAngle1(sA1), stackAngle2(sA2), radius(r), sectorAngle1(s1), sectorAngle2(s2)
+{
 	float x1 = (radius*cos(stackAngle1))*sin(sectorAngle1);
 	float y1 = (radius*sin(stackAngle1));
 	float z1 = (radius*cos(stackAngle1))*cos(sectorAngle1);
@@ -34,7 +33,6 @@ Sector::Sector(float x, float y, float z, float sA1, float sA2, float r, float s
 		x4, y4, z4, normal.x, normal.y, normal.z
 	};
 	
-	
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
 
@@ -49,16 +47,17 @@ Sector::Sector(float x, float y, float z, float sA1, float sA2, float r, float s
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
 
-
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-Sector::~Sector() {
+Sector::~Sector()
+{
 	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(1, &VBO);
 }
 
-void Sector::draw(Shader *shader, GLuint modelRenderMode, glm::mat4 matrix) {
+void Sector::draw(Shader *shader, GLuint modelRenderMode, glm::mat4 matrix)
+{
 	shader->use();
 	glBindVertexArray(VAO);
 	matrix = glm::translate(matrix, glm::vec3(x, y, z));

@@ -159,6 +159,10 @@
     <ClCompile Include="src\objects\texture.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="src\shaders\light.fs" />
+    <None Include="src\shaders\light.vs" />
+    <None Include="src\shaders\lightCube.fs" />
+    <None Include="src\shaders\lightCube.vs" />
     <None Include="src\shaders\shader.fs" />
     <None Include="src\shaders\shader.vs" />
     <None Include="src\shaders\SphereShader.fs" />

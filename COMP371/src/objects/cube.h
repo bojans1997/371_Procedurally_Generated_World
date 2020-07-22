@@ -1,5 +1,4 @@
 #pragma once
-
 #ifndef CUBE_H
 #define CUBE_H
 
@@ -16,8 +15,6 @@
 class Cube
 {
 public:
-	unsigned int ID;
-
 	Cube(int x, int y, int z);
 	~Cube();
 	void draw(Shader *shader, GLuint modelRenderMode, glm::mat4 matrix);

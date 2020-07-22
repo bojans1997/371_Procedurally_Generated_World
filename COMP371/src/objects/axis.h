@@ -12,8 +12,6 @@
 class Axis
 {
 public:
-	unsigned int ID;
-
 	Axis(int size);
 	~Axis();
 	void draw(Shader *shader);

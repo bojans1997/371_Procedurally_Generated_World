@@ -2,7 +2,8 @@
 
 Character::Character(std::vector<Cube*> cubes) : cubes(cubes) {}
 
-Character::~Character() {
+Character::~Character()
+{
 	for (std::vector<Cube*>::iterator it = cubes.begin(); it != cubes.end(); ++it) {
 		delete *it;
 	}

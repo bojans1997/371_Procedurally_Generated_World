@@ -17,14 +17,12 @@
 #include "texture.h"
 #include "stack.h"
 
-class Sphere {
+class Sphere
+{
 public:
-
 	Sphere(float x, float y, float z, float radius, int sC, int rC);
 	void draw(Shader *shader, GLuint modelRenderMode, glm::mat4 matrix);
 	~Sphere();
-
-
 protected:
 	float x, y, z;
 	float radius;

@@ -17,8 +17,6 @@
 class Grid
 {
 public:
-	unsigned int ID;
-
 	Grid(int size);
 	~Grid();
 	void draw(Shader *shader, Texture *texture);

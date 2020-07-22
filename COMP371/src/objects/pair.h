@@ -19,13 +19,13 @@
 class Pair
 {
 public:
-	Pair(Character *letter, Sphere *sphere, Character *digit);
+	Pair(Character *letter, Character *digit, Sphere *sphere);
 	~Pair();
 	void draw(Shader *shader, Shader *sphereShader, GLuint modelRenderMode, glm::mat4 matrix);
 	void draw(Shader *shader, Shader *sphereShader, GLuint modelRenderMode, glm::mat4 matrix, Texture *letterTexture, Texture *digitTexture);
 protected:
 	Character *letter;
-	Sphere *sphere;
 	Character *digit;
+	Sphere *sphere;
 };
 #endif
