@@ -24,7 +24,7 @@ const int AXIS_SIZE = 5;
 
 GLFWwindow* window;
 
-glm::vec3 cameraPos = glm::vec3(0.0f, 5.0f, 20.0f);
+glm::vec3 cameraPos = glm::vec3(0.0f, 35.0f, 1.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 1.0f, 0.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 GLfloat distance = 20.0f;
@@ -287,6 +287,7 @@ int main(void)
 	Shader *textureShader = new Shader("src/shaders/texture.vs", "src/shaders/texture.fs");
 	Shader *lightShader = new Shader("src/shaders/lightCube.vs", "src/shaders/lightCube.fs");
 	Shader *sphereShader = new Shader("src/shaders/SphereShader.vs", "src/shaders/SphereShader.fs");
+	Shader simpleDepthShader("src/shaders/depthShader.vs", "src/shaders/depthShader.fs");
 
 	Texture *tileTexture = new Texture("src/textures/tile.jpg");
 	Texture *woodTexture = new Texture("src/textures/wood.jpg");
@@ -468,6 +469,27 @@ int main(void)
 	
 	glEnable(GL_DEPTH_TEST);
 
+	// configure depth map FBO
+	// -----------------------
+	const unsigned int DEPTH_MAP_TEXTURE_SIZE = 1024;
+	GLuint depthMapFBO;
+	glGenFramebuffers(1, &depthMapFBO);
+	// create depth texture
+	unsigned int depthMap;
+	glGenTextures(1, &depthMap);
+	glBindTexture(GL_TEXTURE_2D, depthMap);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, DEPTH_MAP_TEXTURE_SIZE, DEPTH_MAP_TEXTURE_SIZE, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	// attach depth texture as FBO's depth buffer
+	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
     while (!glfwWindowShouldClose(window))
     {
         processInput(window);
@@ -483,12 +505,14 @@ int main(void)
 		basicShader->setMat4("view", view);
 		axis->draw(basicShader);
 
+		//Draw light cube
 		glm::mat4 lightModel(1.0f);
 		lightShader->use();
 		lightShader->setMat4("projection", projection);
 		lightShader->setMat4("view", view);
 		lightSource->draw(lightShader, modelRenderMode, lightModel);
 
+		//Draw Light on ground
 		textureShader->use();
 		textureShader->setMat4("projection", projection);
 		textureShader->setMat4("view", view);
@@ -497,6 +521,7 @@ int main(void)
 		textureShader->setVec3("viewPos", cameraPos);
 		grid->draw(textureShader, tileTexture);
 		
+		//The Light???
 		shader->use();
 		shader->setMat4("projection", projection);
 		shader->setMat4("view", view);
@@ -504,6 +529,7 @@ int main(void)
 		shader->setVec3("lightPos", glm::vec3(0.0f, 30.0f, 0.0f));
 		shader->setVec3("viewPos", cameraPos);
 
+		//Generate Sphere
 		sphereShader->use();
 		sphereShader->setMat4("projection", projection);
 		sphereShader->setMat4("view", view);

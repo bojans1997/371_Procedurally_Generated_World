@@ -57,8 +57,6 @@
     <None Include="src\shaders\shader.fs" />
     <None Include="src\shaders\texture.vs" />
     <None Include="src\shaders\texture.fs" />
-    <None Include="src\textures\SphereShader.vs" />
-    <None Include="src\textures\SphereShader.fs" />
     <None Include="src\shaders\SphereShader.vs" />
     <None Include="src\shaders\SphereShader.fs" />
     <None Include="src\shaders\light.fs" />
