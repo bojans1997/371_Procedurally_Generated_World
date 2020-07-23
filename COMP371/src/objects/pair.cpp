@@ -9,6 +9,7 @@ Pair::~Pair()
 	delete sphere;
 }
 
+
 void Pair::draw(Shader *shader, Shader *sphereShader, GLuint modelRenderMode, glm::mat4 matrix)
 {
 	letter->draw(shader, modelRenderMode, matrix);

@@ -159,6 +159,8 @@
     <ClCompile Include="src\objects\texture.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="src\shaders\depthShader.fs" />
+    <None Include="src\shaders\depthShader.vs" />
     <None Include="src\shaders\light.fs" />
     <None Include="src\shaders\light.vs" />
     <None Include="src\shaders\lightCube.fs" />

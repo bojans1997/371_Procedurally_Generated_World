@@ -63,6 +63,8 @@
     <None Include="src\shaders\light.vs" />
     <None Include="src\shaders\lightCube.fs" />
     <None Include="src\shaders\lightCube.vs" />
+    <None Include="src\shaders\depthShader.fs" />
+    <None Include="src\shaders\depthShader.vs" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\objects\grid.h">
