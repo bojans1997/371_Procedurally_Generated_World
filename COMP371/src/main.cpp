@@ -288,8 +288,11 @@ int main(void)
 	Shader *lightShader = new Shader("src/shaders/lightCube.vs", "src/shaders/lightCube.fs");
 	Shader *sphereShader = new Shader("src/shaders/SphereShader.vs", "src/shaders/SphereShader.fs");
 
+	// Created in paint
 	Texture *tileTexture = new Texture("src/textures/tile.jpg");
+	// Referenced from https://jooinn.com/wood-texture-box.html#gal_post_113596_wood-texture-box-4.jpg
 	Texture *woodTexture = new Texture("src/textures/wood.jpg");
+	// Referenced from https://unsplash.com/photos/Em96eDRJPD8
 	Texture *goldTexture = new Texture("src/textures/gold.jpg");
 
 	Grid *grid = new Grid(GRID_SIZE);
@@ -357,7 +360,7 @@ int main(void)
 		new Cube(2, 4, 0),
 		new Cube(3, 0, 0),
 		new Cube(2, 0, 0),
-		new Cube(4, 2, 0),
+		new Cube(3, 2, 0),
 		new Cube(2, 2, 0)
 	};
 	Pair *pairE5 = new Pair(new Character(cubesE), new Character(cubes5_1), new Sphere(0, 6, 0, 5, 10, 10));
