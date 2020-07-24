@@ -490,6 +490,8 @@ int main(void)
 	glReadBuffer(GL_NONE);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+
+	textureShader->setInt("shadowMap", 1);
 	glm::vec3 lightPosition(-2.0f, 4.0f, -1.0f);
 
     while (!glfwWindowShouldClose(window))
