@@ -490,7 +490,7 @@ int main(void)
 	glReadBuffer(GL_NONE);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	glm::vec3 lightPosition(0.0f, 30.0f, 0.0f);
+	glm::vec3 lightPosition(-2.0f, 4.0f, -1.0f);
 
     while (!glfwWindowShouldClose(window))
     {
@@ -499,47 +499,6 @@ int main(void)
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
-		glm::mat4 projection = glm::perspective(glm::radians(fov), (float)WINDOW_LENGTH / (float)WINDOW_WIDTH, 0.1f, 100.0f);
-		glm::mat4 view = glm::lookAt(cameraPos, cameraFront, cameraUp);
-
-		//???
-		basicShader->use();
-		basicShader->setMat4("projection", projection);
-		basicShader->setMat4("view", view);
-		axis->draw(basicShader);
-
-		//Draw light cube
-		glm::mat4 lightModel(1.0f);
-		lightShader->use();
-		lightShader->setMat4("projection", projection);
-		lightShader->setMat4("view", view);
-		lightSource->draw(lightShader, modelRenderMode, lightModel);
-
-		//Light For Texture
-		textureShader->use();
-		textureShader->setMat4("projection", projection);
-		textureShader->setMat4("view", view);
-		textureShader->setVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
-		textureShader->setVec3("lightPos", glm::vec3(0.0f, 10.0f, 0.0f));
-		textureShader->setVec3("viewPos", cameraPos);
-		grid->draw(textureShader, tileTexture);
-		
-		//Light For No Texture
-		shader->use();
-		shader->setMat4("projection", projection);
-		shader->setMat4("view", view);
-		shader->setVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
-		shader->setVec3("lightPos", glm::vec3(0.0f, 30.0f, 0.0f));
-		shader->setVec3("viewPos", cameraPos);
-
-		//Generate Sphere
-		sphereShader->use();
-		sphereShader->setMat4("projection", projection);
-		sphereShader->setMat4("view", view);
-		sphereShader->setVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
-		sphereShader->setVec3("lightPos", glm::vec3(0.0f, 30.0f, 0.0f));
-		sphereShader->setVec3("viewPos", cameraPos);
-
 		//Shadow Map
 		glm::mat4 lightProjection, lightView;
 		glm::mat4 lightSpaceMatrix;
@@ -578,6 +537,52 @@ int main(void)
 		modelN2 = glm::translate(modelN2, glm::vec3(pairN2Pos.x + moveX, pairN2Pos.y + moveY, pairN2Pos.z + moveZ));
 		modelN2 = glm::rotate(modelN2, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
 		modelN2 = glm::scale(modelN2, glm::vec3(scale, scale, scale));
+
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+		// reset viewport
+		glViewport(0, 0, WINDOW_LENGTH, WINDOW_WIDTH);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glm::mat4 projection = glm::perspective(glm::radians(fov), (float)WINDOW_LENGTH / (float)WINDOW_WIDTH, 0.1f, 100.0f);
+		glm::mat4 view = glm::lookAt(cameraPos, cameraFront, cameraUp);
+
+		//???
+		basicShader->use();
+		basicShader->setMat4("projection", projection);
+		basicShader->setMat4("view", view);
+		axis->draw(basicShader);
+
+		//Draw light cube
+		glm::mat4 lightModel(1.0f);
+		lightShader->use();
+		lightShader->setMat4("projection", projection);
+		lightShader->setMat4("view", view);
+		lightSource->draw(lightShader, modelRenderMode, lightModel);
+
+		//Light For Texture
+		textureShader->use();
+		textureShader->setMat4("projection", projection);
+		textureShader->setMat4("view", view);
+		textureShader->setVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+		textureShader->setVec3("lightPos", glm::vec3(0.0f, 10.0f, 0.0f));
+		textureShader->setVec3("viewPos", cameraPos);
+		grid->draw(textureShader, tileTexture);
+
+		//Light For No Texture
+		shader->use();
+		shader->setMat4("projection", projection);
+		shader->setMat4("view", view);
+		shader->setVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+		shader->setVec3("lightPos", glm::vec3(0.0f, 30.0f, 0.0f));
+		shader->setVec3("viewPos", cameraPos);
+
+		//Generate Sphere
+		sphereShader->use();
+		sphereShader->setMat4("projection", projection);
+		sphereShader->setMat4("view", view);
+		sphereShader->setVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+		sphereShader->setVec3("lightPos", glm::vec3(0.0f, 30.0f, 0.0f));
+		sphereShader->setVec3("viewPos", cameraPos);
 
 		//Draw Models with Texture
 		if (textures) {
