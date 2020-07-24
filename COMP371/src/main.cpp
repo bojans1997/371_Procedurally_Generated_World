@@ -506,31 +506,61 @@ int main(void)
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
 		//Shadow Map
-		if (shadow){
-			glm::mat4 lightProjection, lightView;
-			glm::mat4 lightSpaceMatrix;
-			float near_plane = 1.0f, far_plane = 7.5f;
-			lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
-			lightView = glm::lookAt(lightPosition, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
-			lightSpaceMatrix = lightProjection * lightView;
-			// render scene from light's point of view
-			depthShader->use();
-			depthShader->setMat4("lightSpaceMatrix", lightSpaceMatrix);
-			glViewport(0, 0, DEPTH_MAP_TEXTURE_SIZE, DEPTH_MAP_TEXTURE_SIZE);
-			glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-			glClear(GL_DEPTH_BUFFER_BIT);
+		glm::mat4 lightProjection, lightView;
+		glm::mat4 lightSpaceMatrix;
+		float near_plane = 1.0f, far_plane = 7.5f;
+		lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+		lightView = glm::lookAt(lightPosition, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
+		lightSpaceMatrix = lightProjection * lightView;
+		// render scene from light's point of view
+		depthShader->use();
+		depthShader->setMat4("lightSpaceMatrix", lightSpaceMatrix);
+		glViewport(0, 0, DEPTH_MAP_TEXTURE_SIZE, DEPTH_MAP_TEXTURE_SIZE);
+		glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+		glClear(GL_DEPTH_BUFFER_BIT);
 
-			//===========================================================//
-			//Need a function or smth that can render the shadow objects.
-			//need to send model info to depthShader.vs
-			//depthShader->setMat4("model", something);
-			//===========================================================//
+		glm::mat4 modelU4 = glm::mat4(1.0f);
+		modelU4 = glm::translate(modelU4, glm::vec3(pairU4Pos.x + moveX, pairU4Pos.y + moveY, pairU4Pos.z + moveZ));
+		modelU4 = glm::rotate(modelU4, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
+		modelU4 = glm::scale(modelU4, glm::vec3(scale, scale, scale));
 
-			// reset viewport
-			glBindFramebuffer(GL_FRAMEBUFFER, 0);
-			glViewport(0, 0, WINDOW_LENGTH, WINDOW_WIDTH);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		}
+		glm::mat4 modelE5 = glm::mat4(1.0f);
+		modelE5 = glm::translate(modelE5, glm::vec3(pairE5Pos.x + moveX, pairE5Pos.y + moveY, pairE5Pos.z + moveZ));
+		modelE5 = glm::rotate(modelE5, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
+		modelE5 = glm::scale(modelE5, glm::vec3(scale, scale, scale));
+
+		glm::mat4 modelJ5 = glm::mat4(1.0f);
+		modelJ5 = glm::translate(modelJ5, glm::vec3(pairJ5Pos.x + moveX, pairJ5Pos.y + moveY, pairJ5Pos.z + moveZ));
+		modelJ5 = glm::rotate(modelJ5, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
+		modelJ5 = glm::scale(modelJ5, glm::vec3(scale, scale, scale));
+
+		glm::mat4 modelA6 = glm::mat4(1.0f);
+		modelA6 = glm::translate(modelA6, glm::vec3(pairA6Pos.x + moveX, pairA6Pos.y + moveY, pairA6Pos.z + moveZ));
+		modelA6 = glm::rotate(modelA6, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
+		modelA6 = glm::scale(modelA6, glm::vec3(scale, scale, scale));
+
+		glm::mat4 modelN2 = glm::mat4(1.0f);
+		modelN2 = glm::translate(modelN2, glm::vec3(pairN2Pos.x + moveX, pairN2Pos.y + moveY, pairN2Pos.z + moveZ));
+		modelN2 = glm::rotate(modelN2, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
+		modelN2 = glm::scale(modelN2, glm::vec3(scale, scale, scale));
+
+		pairU4->draw(depthShader, sphereShader, modelRenderMode, modelU4);
+		pairE5->draw(depthShader, sphereShader, modelRenderMode, modelE5);
+		pairJ5->draw(depthShader, sphereShader, modelRenderMode, modelJ5);
+		pairA6->draw(depthShader, sphereShader, modelRenderMode, modelA6);
+		pairN2->draw(depthShader, sphereShader, modelRenderMode, modelN2);
+
+		//===========================================================//
+		//Need a function or smth that can render the shadow objects.
+		//need to send model info to depthShader.vs
+		//depthShader->setMat4("model", something);
+		//===========================================================//
+
+		// reset viewport
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glViewport(0, 0, WINDOW_LENGTH, WINDOW_WIDTH);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 
 		glm::mat4 projection = glm::perspective(glm::radians(fov), (float)WINDOW_LENGTH / (float)WINDOW_WIDTH, 0.1f, 100.0f);
 		glm::mat4 view = glm::lookAt(cameraPos, cameraFront, cameraUp);
@@ -556,7 +586,8 @@ int main(void)
 		textureShader->setVec3("lightPos", glm::vec3(0.0f, 10.0f, 0.0f));
 		textureShader->setVec3("viewPos", cameraPos);
 		grid->draw(textureShader, tileTexture);
-
+		textureShader->setMat4("lightSpaceMatrix", lightSpaceMatrix);
+		
 		//Light For No Texture
 		shader->use();
 		shader->setMat4("projection", projection);
@@ -573,34 +604,13 @@ int main(void)
 		sphereShader->setVec3("lightPos", glm::vec3(0.0f, 30.0f, 0.0f));
 		sphereShader->setVec3("viewPos", cameraPos);
 
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, depthMap);
 
 		//===========================================================//
 		//Need a function or smth that can render the objects.
 		//===========================================================//
-		glm::mat4 modelU4 = glm::mat4(1.0f);
-		modelU4 = glm::translate(modelU4, glm::vec3(pairU4Pos.x + moveX, pairU4Pos.y + moveY, pairU4Pos.z + moveZ));
-		modelU4 = glm::rotate(modelU4, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
-		modelU4 = glm::scale(modelU4, glm::vec3(scale, scale, scale));
-
-		glm::mat4 modelE5 = glm::mat4(1.0f);
-		modelE5 = glm::translate(modelE5, glm::vec3(pairE5Pos.x + moveX, pairE5Pos.y + moveY, pairE5Pos.z + moveZ));
-		modelE5 = glm::rotate(modelE5, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
-		modelE5 = glm::scale(modelE5, glm::vec3(scale, scale, scale));
-
-		glm::mat4 modelJ5 = glm::mat4(1.0f);
-		modelJ5 = glm::translate(modelJ5, glm::vec3(pairJ5Pos.x + moveX, pairJ5Pos.y + moveY, pairJ5Pos.z + moveZ));
-		modelJ5 = glm::rotate(modelJ5, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
-		modelJ5 = glm::scale(modelJ5, glm::vec3(scale, scale, scale));
-
-		glm::mat4 modelA6 = glm::mat4(1.0f);
-		modelA6 = glm::translate(modelA6, glm::vec3(pairA6Pos.x + moveX, pairA6Pos.y + moveY, pairA6Pos.z + moveZ));
-		modelA6 = glm::rotate(modelA6, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
-		modelA6 = glm::scale(modelA6, glm::vec3(scale, scale, scale));
-
-		glm::mat4 modelN2 = glm::mat4(1.0f);
-		modelN2 = glm::translate(modelN2, glm::vec3(pairN2Pos.x + moveX, pairN2Pos.y + moveY, pairN2Pos.z + moveZ));
-		modelN2 = glm::rotate(modelN2, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
-		modelN2 = glm::scale(modelN2, glm::vec3(scale, scale, scale));
+		
 
 		//Draw Models with Texture
 		if (textures) {
