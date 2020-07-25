@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{fe6fc98b-967d-4d14-9a6f-63d72d171108}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -53,18 +56,54 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="src\shaders\shader.vs" />
-    <None Include="src\shaders\shader.fs" />
-    <None Include="src\shaders\texture.vs" />
-    <None Include="src\shaders\texture.fs" />
-    <None Include="src\shaders\SphereShader.vs" />
-    <None Include="src\shaders\SphereShader.fs" />
-    <None Include="src\shaders\light.fs" />
-    <None Include="src\shaders\light.vs" />
-    <None Include="src\shaders\lightCube.fs" />
-    <None Include="src\shaders\lightCube.vs" />
-    <None Include="src\shaders\depthShader.fs" />
-    <None Include="src\shaders\depthShader.vs" />
+    <None Include="src\shaders\debug_quad.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="src\shaders\debug_quad.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="src\shaders\depthShader.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="src\shaders\depthShader.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="src\shaders\light.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="src\shaders\light.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="src\shaders\lightCube.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="src\shaders\lightCube.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="src\shaders\shader.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="src\shaders\shader.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="src\shaders\shadowTest.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="src\shaders\shadowTest.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="src\shaders\SphereShader.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="src\shaders\SphereShader.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="src\shaders\texture.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="src\shaders\texture.vs">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\objects\grid.h">

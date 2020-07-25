@@ -262,6 +262,8 @@ void framebufferSizeCallback(GLFWwindow* window, int width, int height)
     glViewport(0, 0, width, height);
 }
 
+void renderQuad();
+
 int main(void)
 {
     if (!glfwInit())
@@ -292,6 +294,9 @@ int main(void)
 	Shader *lightShader = new Shader("src/shaders/lightCube.vs", "src/shaders/lightCube.fs");
 	Shader *sphereShader = new Shader("src/shaders/SphereShader.vs", "src/shaders/SphereShader.fs");
 	Shader *depthShader = new Shader("src/shaders/depthShader.vs", "src/shaders/depthShader.fs");
+	Shader *debug = new Shader("src/shaders/debug_quad.vs", "src/shaders/debug_quad.fs");
+	Shader *shadowtest = new Shader("src/shaders/shadowTest.vs","src/shaders/shadowTest.fs");
+
 
 	Texture *tileTexture = new Texture("src/textures/tile.jpg");
 	Texture *woodTexture = new Texture("src/textures/wood.jpg");
@@ -479,23 +484,28 @@ int main(void)
 	GLuint depthMapFBO;
 	glGenFramebuffers(1, &depthMapFBO);
 	// create depth texture
-	unsigned int depthMap;
+	GLuint depthMap;
 	glGenTextures(1, &depthMap);
 	glBindTexture(GL_TEXTURE_2D, depthMap);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, DEPTH_MAP_TEXTURE_SIZE, DEPTH_MAP_TEXTURE_SIZE, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	// attach depth texture as FBO's depth buffer
 	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
 	glDrawBuffer(GL_NONE);
 	glReadBuffer(GL_NONE);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-
+	
+	textureShader->use();
 	textureShader->setInt("shadowMap", 1);
+	/*shadowtest->use();
+	shadowtest->setInt("shadowMap", 1);*/
+	debug->use();
+	debug->setInt("depthMap", 0);
+	
 	glm::vec3 lightPosition(-2.0f, 4.0f, -1.0f);
 
 	while (!glfwWindowShouldClose(window))
@@ -505,7 +515,7 @@ int main(void)
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
-		//Shadow Map
+		//Shadow Pass 1 - Shadow Map
 		glm::mat4 lightProjection, lightView;
 		glm::mat4 lightSpaceMatrix;
 		float near_plane = 1.0f, far_plane = 7.5f;
@@ -561,6 +571,7 @@ int main(void)
 		glViewport(0, 0, WINDOW_LENGTH, WINDOW_WIDTH);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		//Shadow Pass 2 - Normal Render
 
 		glm::mat4 projection = glm::perspective(glm::radians(fov), (float)WINDOW_LENGTH / (float)WINDOW_WIDTH, 0.1f, 100.0f);
 		glm::mat4 view = glm::lookAt(cameraPos, cameraFront, cameraUp);
@@ -587,7 +598,7 @@ int main(void)
 		textureShader->setVec3("viewPos", cameraPos);
 		grid->draw(textureShader, tileTexture);
 		textureShader->setMat4("lightSpaceMatrix", lightSpaceMatrix);
-		
+
 		//Light For No Texture
 		shader->use();
 		shader->setMat4("projection", projection);
@@ -604,13 +615,23 @@ int main(void)
 		sphereShader->setVec3("lightPos", glm::vec3(0.0f, 30.0f, 0.0f));
 		sphereShader->setVec3("viewPos", cameraPos);
 
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, depthMap);
+		//shadowtest->use();
+		//projection = glm::perspective(glm::radians(fov), (float)WINDOW_LENGTH / (float)WINDOW_WIDTH, 0.1f, 100.0f);
+		//view = glm::lookAt(cameraPos, cameraFront, cameraUp);
+		//shadowtest->setMat4("projection", projection);
+		//shadowtest->setMat4("view", view);
+		//// set light uniforms
+		//shadowtest->setVec3("viewPos", cameraPos);
+		//shadowtest->setVec3("lightPos", lightPosition);
+		//shadowtest->setMat4("lightSpaceMatrix", lightSpaceMatrix);
+		//glActiveTexture(GL_TEXTURE0);
+		//glBindTexture(GL_TEXTURE_2D, depthMap);
 
-		//===========================================================//
-		//Need a function or smth that can render the objects.
-		//===========================================================//
-		
+		//pairU4->draw(shadowtest, sphereShader, modelRenderMode, modelU4, woodTexture, goldTexture);
+		//pairE5->draw(shadowtest, sphereShader, modelRenderMode, modelE5, woodTexture, goldTexture);
+		//pairJ5->draw(shadowtest, sphereShader, modelRenderMode, modelJ5, woodTexture, goldTexture);
+		//pairA6->draw(shadowtest, sphereShader, modelRenderMode, modelA6, woodTexture, goldTexture);
+		//pairN2->draw(shadowtest, sphereShader, modelRenderMode, modelN2, woodTexture, goldTexture);
 
 		//Draw Models with Texture
 		if (textures) {
@@ -627,6 +648,13 @@ int main(void)
 			pairA6->draw(shader, sphereShader, modelRenderMode, modelA6);
 			pairN2->draw(shader, sphereShader, modelRenderMode, modelN2);
 		}
+
+		debug->use();
+		debug->setFloat("near_plane", near_plane);
+		debug->setFloat("far_plane", far_plane);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, depthMap);
+		renderQuad();
 
 		if (angle == 360.0f)
 			angle = 0.0f;
@@ -655,4 +683,35 @@ int main(void)
     glfwTerminate();
 
     return 0;
+}
+
+// renderQuad() renders a 1x1 XY quad in NDC
+// -----------------------------------------
+unsigned int quadVAO = 0;
+unsigned int quadVBO;
+void renderQuad()
+{
+	if (quadVAO == 0)
+	{
+		float quadVertices[] = {
+			// positions        // texture Coords
+			-1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
+			-1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+			 1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
+			 1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+		};
+		// setup plane VAO
+		glGenVertexArrays(1, &quadVAO);
+		glGenBuffers(1, &quadVBO);
+		glBindVertexArray(quadVAO);
+		glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+	}
+	glBindVertexArray(quadVAO);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	glBindVertexArray(0);
 }
