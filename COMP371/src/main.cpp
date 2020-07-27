@@ -48,7 +48,7 @@ GLfloat moveZ = 0.0f;
 GLfloat scale = 1.0f;
 
 bool textures = true;
-bool shadow = true;
+bool shadows = true;
 
 glm::vec3 pairU4Pos = glm::vec3(0, 0, 0);
 glm::vec3 pairE5Pos = glm::vec3(-40, 0, -45);
@@ -160,7 +160,7 @@ void processInput(GLFWwindow* window)
 		textures = !textures;
 
 	if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS)
-		shadow = !shadow;
+		shadows = !shadows;
 
 	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
 		modelRenderMode = GL_POINTS;
@@ -513,21 +513,6 @@ int main(void)
 
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		
-		//Shadow Pass 1 - Shadow Map
-		glm::mat4 lightProjection, lightView;
-		glm::mat4 lightSpaceMatrix;
-		float near_plane = 1.0f, far_plane = 7.5f;
-		lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
-		lightView = glm::lookAt(lightPosition, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
-		lightSpaceMatrix = lightProjection * lightView;
-		// render scene from light's point of view
-		depthShader->use();
-		depthShader->setMat4("lightSpaceMatrix", lightSpaceMatrix);
-
-		glViewport(0, 0, DEPTH_MAP_TEXTURE_SIZE, DEPTH_MAP_TEXTURE_SIZE);
-		glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-		glClear(GL_DEPTH_BUFFER_BIT);
 
 		glm::mat4 modelU4 = glm::mat4(1.0f);
 		modelU4 = glm::translate(modelU4, glm::vec3(pairU4Pos.x + moveX, pairU4Pos.y + moveY, pairU4Pos.z + moveZ));
@@ -554,13 +539,30 @@ int main(void)
 		modelN2 = glm::rotate(modelN2, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
 		modelN2 = glm::scale(modelN2, glm::vec3(scale, scale, scale));
 
-		grid->draw(depthShader);
+		//Shadow Pass 1 - Shadow Map
+		glm::mat4 lightProjection, lightView;
+		glm::mat4 lightSpaceMatrix;
+		float near_plane = 1.0f, far_plane = 7.5f;
+		lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+		lightView = glm::lookAt(lightPosition, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
+		lightSpaceMatrix = lightProjection * lightView;
+		// render scene from light's point of view
+		depthShader->use();
+		depthShader->setMat4("lightSpaceMatrix", lightSpaceMatrix);
 
-		pairU4->draw(depthShader, sphereShader, modelRenderMode, modelU4);
-		pairE5->draw(depthShader, sphereShader, modelRenderMode, modelE5);
-		pairJ5->draw(depthShader, sphereShader, modelRenderMode, modelJ5);
-		pairA6->draw(depthShader, sphereShader, modelRenderMode, modelA6);
-		pairN2->draw(depthShader, sphereShader, modelRenderMode, modelN2);
+		glViewport(0, 0, DEPTH_MAP_TEXTURE_SIZE, DEPTH_MAP_TEXTURE_SIZE);
+		glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+		glClear(GL_DEPTH_BUFFER_BIT);
+
+		if (shadows) {
+			grid->draw(depthShader);
+
+			pairU4->draw(depthShader, sphereShader, modelRenderMode, modelU4);
+			pairE5->draw(depthShader, sphereShader, modelRenderMode, modelE5);
+			pairJ5->draw(depthShader, sphereShader, modelRenderMode, modelJ5);
+			pairA6->draw(depthShader, sphereShader, modelRenderMode, modelA6);
+			pairN2->draw(depthShader, sphereShader, modelRenderMode, modelN2);
+		}
 
 		// reset viewport
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
