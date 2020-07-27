@@ -17,11 +17,12 @@
 class Grid
 {
 public:
-	Grid(int size);
+	Grid(float size);
 	~Grid();
-	void draw(Shader *shader, Texture *texture);
+	void draw(Shader *shader);
+	void draw(Shader *shader, Texture *texture, GLuint depthMap);
 protected:
-	int size;
+	float size;
 	GLuint VAO = 0, VBO = 0;
 };
 #endif

@@ -19,7 +19,7 @@
 const int WINDOW_LENGTH = 1024;
 const int WINDOW_WIDTH = 768;
 
-const int GRID_SIZE = 100;
+const float GRID_SIZE = 100;
 const int AXIS_SIZE = 5;
 
 GLFWwindow* window;
@@ -262,11 +262,6 @@ void framebufferSizeCallback(GLFWwindow* window, int width, int height)
     glViewport(0, 0, width, height);
 }
 
-void renderQuad();
-void renderScene(const Shader &shader);
-void renderCube();
-unsigned int planeVAO;
-
 int main(void)
 {
     if (!glfwInit())
@@ -297,33 +292,7 @@ int main(void)
 	Shader *lightShader = new Shader("src/shaders/lightCube.vs", "src/shaders/lightCube.fs");
 	Shader *sphereShader = new Shader("src/shaders/SphereShader.vs", "src/shaders/SphereShader.fs");
 	Shader *depthShader = new Shader("src/shaders/depthShader.vs", "src/shaders/depthShader.fs");
-	Shader *debug = new Shader("src/shaders/debug_quad.vs", "src/shaders/debug_quad.fs");
-	Shader *shadowtest = new Shader("src/shaders/shadowTest.vs","src/shaders/shadowTest.fs");
-
-	float planeVertices[] = {
-		// positions            // normals         // texcoords
-		 100.0f, -0.01f,  100.0f,  0.0f, 1.0f, 0.0f,  100.0f,  0.0f,
-		-100.0f, -0.01f,  100.0f,  0.0f, 1.0f, 0.0f,   0.0f,  0.0f,
-		-100.0f, -0.01f, -100.0f,  0.0f, 1.0f, 0.0f,   0.0f, 100.0f,
-
-		 100.0f, -0.01f,  100.0f,  0.0f, 1.0f, 0.0f,  100.0f,  0.0f,
-		-100.0f, -0.01f, -100.0f,  0.0f, 1.0f, 0.0f,   0.0f, 100.0f,
-		 100.0f, -0.01f, -100.0f,  0.0f, 1.0f, 0.0f,  100.0f, 100.0f
-	};
-	// plane VAO
-	unsigned int planeVBO;
-	glGenVertexArrays(1, &planeVAO);
-	glGenBuffers(1, &planeVBO);
-	glBindVertexArray(planeVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, planeVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(planeVertices), planeVertices, GL_STATIC_DRAW);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-	glBindVertexArray(0);
+	Shader *gridShader = new Shader("src/shaders/gridShader.vs","src/shaders/gridShader.fs");
 
 	// Created in paint
 	Texture *tileTexture = new Texture("src/textures/tile.jpg");
@@ -336,7 +305,6 @@ int main(void)
 	Axis *axis = new Axis(AXIS_SIZE);
 
 	Cube *lightSource = new Cube(0, 30, 0);
-	
 
 	// Letter U and digit 4 for Giuseppe Campanelli
 	std::vector<Cube*> cubesU = {
@@ -532,12 +500,10 @@ int main(void)
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	
 	// shader configuration
-	textureShader->use();
-	textureShader->setInt("shadowMap", 1);
-	textureShader->setInt("diffuseTexture", 0);
-	debug->use();
-	debug->setInt("depthMap", 0);
-	
+	gridShader->use();
+	gridShader->setInt("shadowMap", 1);
+	gridShader->setInt("diffuseTexture", 0);
+
 	// lighting info
 	glm::vec3 lightPosition(-2.0f, 4.0f, -1.0f);
 
@@ -587,21 +553,14 @@ int main(void)
 		modelN2 = glm::translate(modelN2, glm::vec3(pairN2Pos.x + moveX, pairN2Pos.y + moveY, pairN2Pos.z + moveZ));
 		modelN2 = glm::rotate(modelN2, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
 		modelN2 = glm::scale(modelN2, glm::vec3(scale, scale, scale));
-		
-		//The Plane
-		//grid->draw(depthShader, tileTexture);
-		glm::mat4 testModel = glm::mat4(1.0f);
-		depthShader->setMat4("model", testModel);
-		glBindVertexArray(planeVAO);
-		glDrawArrays(GL_TRIANGLES, 0, 6);
+
+		grid->draw(depthShader);
 
 		pairU4->draw(depthShader, sphereShader, modelRenderMode, modelU4);
 		pairE5->draw(depthShader, sphereShader, modelRenderMode, modelE5);
 		pairJ5->draw(depthShader, sphereShader, modelRenderMode, modelJ5);
 		pairA6->draw(depthShader, sphereShader, modelRenderMode, modelA6);
 		pairN2->draw(depthShader, sphereShader, modelRenderMode, modelN2);
-		
-		//renderScene(*depthShader);
 
 		// reset viewport
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -651,24 +610,20 @@ int main(void)
 		textureShader->setVec3("viewPos", cameraPos);
 		textureShader->setMat4("lightSpaceMatrix", lightSpaceMatrix);
 		
-		shadowtest->use();
-		shadowtest->setMat4("projection", projection);
-		shadowtest->setMat4("view", view);
+		gridShader->use();
+		gridShader->setMat4("projection", projection);
+		gridShader->setMat4("view", view);
 		// set light uniforms
-		shadowtest->setVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
-		shadowtest->setVec3("lightPos", lightPosition);
-		shadowtest->setVec3("viewPos", cameraPos);
-		shadowtest->setMat4("lightSpaceMatrix", lightSpaceMatrix);
+		gridShader->setVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+		gridShader->setVec3("lightPos", lightPosition);
+		gridShader->setVec3("viewPos", cameraPos);
+		gridShader->setMat4("lightSpaceMatrix", lightSpaceMatrix);
+
+		//Draw Grid
+		grid->draw(gridShader, tileTexture, depthMap);
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, depthMap);
-
-		//The Plane
-		//grid->draw(textureShader, tileTexture);
-		testModel = glm::mat4(1.0f);
-		shadowtest->setMat4("model", testModel);
-		glBindVertexArray(planeVAO);
-		glDrawArrays(GL_TRIANGLES, 0, 6);
 
 		//Draw Models with Texture
 		if (textures) {
@@ -685,18 +640,9 @@ int main(void)
 			pairA6->draw(shader, sphereShader, modelRenderMode, modelA6);
 			pairN2->draw(shader, sphereShader, modelRenderMode, modelN2);
 		}
-		//renderScene(*shadowtest);
-
-		/*debug->use();
-		debug->setFloat("near_plane", near_plane);
-		debug->setFloat("far_plane", far_plane);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, depthMap);
-		renderQuad();*/
 
 		if (angle == 360.0f)
 			angle = 0.0f;
-
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -712,6 +658,8 @@ int main(void)
 	delete tileTexture;
 	delete woodTexture;
 	delete goldTexture;
+	delete gridShader;
+	delete depthShader;
 	delete textureShader;
 	delete sphereShader;
 	delete lightShader;
@@ -721,138 +669,4 @@ int main(void)
     glfwTerminate();
 
     return 0;
-}
-
-// renderQuad() renders a 1x1 XY quad in NDC
-// -----------------------------------------
-unsigned int quadVAO = 0;
-unsigned int quadVBO;
-void renderQuad()
-{
-	if (quadVAO == 0)
-	{
-		float quadVertices[] = {
-			// positions        // texture Coords
-			-1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
-			-1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-			 1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
-			 1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
-		};
-		// setup plane VAO
-		glGenVertexArrays(1, &quadVAO);
-		glGenBuffers(1, &quadVBO);
-		glBindVertexArray(quadVAO);
-		glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-	}
-	glBindVertexArray(quadVAO);
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	glBindVertexArray(0);
-}
-
-void renderScene(const Shader &shader)
-{
-	// floor
-	glm::mat4 testModel = glm::mat4(1.0f);
-	shader.setMat4("model", testModel);
-	glBindVertexArray(planeVAO);
-	glDrawArrays(GL_TRIANGLES, 0, 6);
-	
-	// cubes
-	testModel = glm::mat4(1.0f);
-	testModel = glm::translate(testModel, glm::vec3(0.0f, 1.5f, 0.0));
-	testModel = glm::scale(testModel, glm::vec3(0.5f));
-	shader.setMat4("model", testModel);
-	renderCube();
-	testModel = glm::mat4(1.0f);
-	testModel = glm::translate(testModel, glm::vec3(2.0f, 0.0f, 1.0));
-	testModel = glm::scale(testModel, glm::vec3(0.5f));
-	shader.setMat4("model", testModel);
-	renderCube();
-	testModel = glm::mat4(1.0f);
-	testModel = glm::translate(testModel, glm::vec3(-1.0f, 0.0f, 2.0));
-	testModel = glm::rotate(testModel, glm::radians(60.0f), glm::normalize(glm::vec3(1.0, 0.0, 1.0)));
-	testModel = glm::scale(testModel, glm::vec3(0.25));
-	shader.setMat4("model", testModel);
-	renderCube();
-}
-
-
-// renderCube() renders a 1x1 3D cube in NDC.
-// -------------------------------------------------
-unsigned int cubeVAO = 0;
-unsigned int cubeVBO = 0;
-void renderCube()
-{
-	// initialize (if necessary)
-	if (cubeVAO == 0)
-	{
-		float vertices[] = {
-			// back face
-			-1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 0.0f, 0.0f, // bottom-left
-			 1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 1.0f, 1.0f, // top-right
-			 1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 1.0f, 0.0f, // bottom-right         
-			 1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 1.0f, 1.0f, // top-right
-			-1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 0.0f, 0.0f, // bottom-left
-			-1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 0.0f, 1.0f, // top-left
-			// front face
-			-1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f, 0.0f, // bottom-left
-			 1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, 0.0f, // bottom-right
-			 1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, 1.0f, // top-right
-			 1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, 1.0f, // top-right
-			-1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f, 1.0f, // top-left
-			-1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f, 0.0f, // bottom-left
-			// left face
-			-1.0f,  1.0f,  1.0f, -1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-right
-			-1.0f,  1.0f, -1.0f, -1.0f,  0.0f,  0.0f, 1.0f, 1.0f, // top-left
-			-1.0f, -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-left
-			-1.0f, -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-left
-			-1.0f, -1.0f,  1.0f, -1.0f,  0.0f,  0.0f, 0.0f, 0.0f, // bottom-right
-			-1.0f,  1.0f,  1.0f, -1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-right
-			// right face
-			 1.0f,  1.0f,  1.0f,  1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-left
-			 1.0f, -1.0f, -1.0f,  1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-right
-			 1.0f,  1.0f, -1.0f,  1.0f,  0.0f,  0.0f, 1.0f, 1.0f, // top-right         
-			 1.0f, -1.0f, -1.0f,  1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-right
-			 1.0f,  1.0f,  1.0f,  1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-left
-			 1.0f, -1.0f,  1.0f,  1.0f,  0.0f,  0.0f, 0.0f, 0.0f, // bottom-left     
-			// bottom face
-			-1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f, 0.0f, 1.0f, // top-right
-			 1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f, 1.0f, 1.0f, // top-left
-			 1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f, 1.0f, 0.0f, // bottom-left
-			 1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f, 1.0f, 0.0f, // bottom-left
-			-1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f, 0.0f, 0.0f, // bottom-right
-			-1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f, 0.0f, 1.0f, // top-right
-			// top face
-			-1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f, 0.0f, 1.0f, // top-left
-			 1.0f,  1.0f , 1.0f,  0.0f,  1.0f,  0.0f, 1.0f, 0.0f, // bottom-right
-			 1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f, 1.0f, 1.0f, // top-right     
-			 1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f, 1.0f, 0.0f, // bottom-right
-			-1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f, 0.0f, 1.0f, // top-left
-			-1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f, 0.0f, 0.0f  // bottom-left        
-		};
-		glGenVertexArrays(1, &cubeVAO);
-		glGenBuffers(1, &cubeVBO);
-		// fill buffer
-		glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-		// link vertex attributes
-		glBindVertexArray(cubeVAO);
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-		glEnableVertexAttribArray(2);
-		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glBindVertexArray(0);
-	}
-	// render Cube
-	glBindVertexArray(cubeVAO);
-	glDrawArrays(GL_TRIANGLES, 0, 36);
-	glBindVertexArray(0);
 }

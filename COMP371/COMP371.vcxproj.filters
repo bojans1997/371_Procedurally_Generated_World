@@ -56,12 +56,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="src\shaders\debug_quad.fs">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="src\shaders\debug_quad.vs">
-      <Filter>Shaders</Filter>
-    </None>
     <None Include="src\shaders\depthShader.fs">
       <Filter>Shaders</Filter>
     </None>
@@ -86,12 +80,6 @@
     <None Include="src\shaders\shader.vs">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="src\shaders\shadowTest.fs">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="src\shaders\shadowTest.vs">
-      <Filter>Shaders</Filter>
-    </None>
     <None Include="src\shaders\SphereShader.fs">
       <Filter>Shaders</Filter>
     </None>
@@ -102,6 +90,12 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="src\shaders\texture.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="src\shaders\gridShader.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="src\shaders\gridShader.vs">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
