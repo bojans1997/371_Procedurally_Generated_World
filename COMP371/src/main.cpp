@@ -505,7 +505,7 @@ int main(void)
 	gridShader->setInt("diffuseTexture", 0);
 
 	// lighting info
-	glm::vec3 lightPosition(-2.0f, 4.0f, -1.0f);
+	glm::vec3 lightPosition(0.0f, 30.0f, -5.0f);
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -542,8 +542,8 @@ int main(void)
 		//Shadow Pass 1 - Shadow Map
 		glm::mat4 lightProjection, lightView;
 		glm::mat4 lightSpaceMatrix;
-		float near_plane = 1.0f, far_plane = 7.5f;
-		lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+		float near_plane = 1.0f, far_plane = 30.5f;
+		lightProjection = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, near_plane, far_plane);
 		lightView = glm::lookAt(lightPosition, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
 		lightSpaceMatrix = lightProjection * lightView;
 		// render scene from light's point of view
