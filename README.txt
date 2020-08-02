@@ -61,3 +61,7 @@ CONTROLS
 - Rendering
 	- "x" -> toggle textures on / off.
 	- "b" -> toggle shadows on / off.
+
+- Movements
+	- 't' -> move model backwards
+	- 'g' -> move model forward

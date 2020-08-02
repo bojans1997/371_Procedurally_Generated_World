@@ -47,6 +47,8 @@ GLfloat moveY = 0.0f;
 GLfloat moveZ = 0.0f;
 GLfloat scale = 1.0f;
 
+glm::mat4 shear(glm::vec4(1.0f, 0.0f, 0.0f, 0.0f), glm::vec4(0.0f, 1.0f, 0.5f, 0.0f), glm::vec4(0.0f, 0.0f, 1.0f, 0.0f), glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+
 bool textures = true;
 bool shadows = true;
 
@@ -254,6 +256,21 @@ void processInput(GLFWwindow* window)
 	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 		glfwSetCursorPosCallback(window, mouse_callback_zoom);
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_T) == GLFW_RELEASE) {
+		shear = glm::mat4(1.0f);
+	}
+	if (glfwGetKey(window, GLFW_KEY_G) == GLFW_RELEASE) {
+		shear = glm::mat4(1.0f);
+	}
+	if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS && moveY == 0) {
+		shear = glm::mat4 (glm::vec4(1.0f, 0.0f, 0.0f, 0.0f), glm::vec4(0.0f, 1.0f, 0.5f, 0.0f), glm::vec4(0.0f, 0.0f, 1.0f, 0.0f), glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+		moveZ -= 1.0f;
+	}
+	if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS && moveY == 0) {
+		shear = glm::mat4(glm::vec4(1.0f, 0.0f, 0.0f, 0.0f), glm::vec4(0.0f, 1.0f, -0.5f, 0.0f), glm::vec4(0.0f, 0.0f, 1.0f, 0.0f), glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+		moveZ += 1.0f;
 	}
 }
 
@@ -518,26 +535,32 @@ int main(void)
 		modelU4 = glm::translate(modelU4, glm::vec3(pairU4Pos.x + moveX, pairU4Pos.y + moveY, pairU4Pos.z + moveZ));
 		modelU4 = glm::rotate(modelU4, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
 		modelU4 = glm::scale(modelU4, glm::vec3(scale, scale, scale));
+		modelU4 = modelU4 * shear;
 
 		glm::mat4 modelE5 = glm::mat4(1.0f);
 		modelE5 = glm::translate(modelE5, glm::vec3(pairE5Pos.x + moveX, pairE5Pos.y + moveY, pairE5Pos.z + moveZ));
 		modelE5 = glm::rotate(modelE5, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
 		modelE5 = glm::scale(modelE5, glm::vec3(scale, scale, scale));
+		modelE5 = modelE5 * shear;
 
 		glm::mat4 modelJ5 = glm::mat4(1.0f);
 		modelJ5 = glm::translate(modelJ5, glm::vec3(pairJ5Pos.x + moveX, pairJ5Pos.y + moveY, pairJ5Pos.z + moveZ));
 		modelJ5 = glm::rotate(modelJ5, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
 		modelJ5 = glm::scale(modelJ5, glm::vec3(scale, scale, scale));
+		modelJ5 = modelJ5 * shear;
 
 		glm::mat4 modelA6 = glm::mat4(1.0f);
 		modelA6 = glm::translate(modelA6, glm::vec3(pairA6Pos.x + moveX, pairA6Pos.y + moveY, pairA6Pos.z + moveZ));
 		modelA6 = glm::rotate(modelA6, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
 		modelA6 = glm::scale(modelA6, glm::vec3(scale, scale, scale));
+		modelA6 = modelA6 * shear;
 
 		glm::mat4 modelN2 = glm::mat4(1.0f);
 		modelN2 = glm::translate(modelN2, glm::vec3(pairN2Pos.x + moveX, pairN2Pos.y + moveY, pairN2Pos.z + moveZ));
 		modelN2 = glm::rotate(modelN2, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
 		modelN2 = glm::scale(modelN2, glm::vec3(scale, scale, scale));
+		modelN2 = modelN2 * shear;
+
 
 		//Shadow Pass 1 - Shadow Map
 		glm::mat4 lightProjection, lightView;
