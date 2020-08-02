@@ -19,12 +19,12 @@
 const int WINDOW_LENGTH = 1024;
 const int WINDOW_WIDTH = 768;
 
-const int GRID_SIZE = 100;
+const float GRID_SIZE = 100;
 const int AXIS_SIZE = 5;
 
 GLFWwindow* window;
 
-glm::vec3 cameraPos = glm::vec3(0.0f, 5.0f, 20.0f);
+glm::vec3 cameraPos = glm::vec3(0.0f, 35.0f, 1.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 1.0f, 0.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 GLfloat distance = 20.0f;
@@ -47,7 +47,10 @@ GLfloat moveY = 0.0f;
 GLfloat moveZ = 0.0f;
 GLfloat scale = 1.0f;
 
+glm::mat4 shear(glm::vec4(1.0f, 0.0f, 0.0f, 0.0f), glm::vec4(0.0f, 1.0f, 0.5f, 0.0f), glm::vec4(0.0f, 0.0f, 1.0f, 0.0f), glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+
 bool textures = true;
+bool shadows = true;
 
 glm::vec3 pairU4Pos = glm::vec3(0, 0, 0);
 glm::vec3 pairE5Pos = glm::vec3(-40, 0, -45);
@@ -158,6 +161,9 @@ void processInput(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
 		textures = !textures;
 
+	if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS)
+		shadows = !shadows;
+
 	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
 		modelRenderMode = GL_POINTS;
 	if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS)
@@ -251,6 +257,21 @@ void processInput(GLFWwindow* window)
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 		glfwSetCursorPosCallback(window, mouse_callback_zoom);
 	}
+
+	if (glfwGetKey(window, GLFW_KEY_T) == GLFW_RELEASE) {
+		shear = glm::mat4(1.0f);
+	}
+	if (glfwGetKey(window, GLFW_KEY_G) == GLFW_RELEASE) {
+		shear = glm::mat4(1.0f);
+	}
+	if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS && moveY == 0) {
+		shear = glm::mat4 (glm::vec4(1.0f, 0.0f, 0.0f, 0.0f), glm::vec4(0.0f, 1.0f, 0.5f, 0.0f), glm::vec4(0.0f, 0.0f, 1.0f, 0.0f), glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+		moveZ -= 1.0f;
+	}
+	if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS && moveY == 0) {
+		shear = glm::mat4(glm::vec4(1.0f, 0.0f, 0.0f, 0.0f), glm::vec4(0.0f, 1.0f, -0.5f, 0.0f), glm::vec4(0.0f, 0.0f, 1.0f, 0.0f), glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+		moveZ += 1.0f;
+	}
 }
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height)
@@ -287,6 +308,8 @@ int main(void)
 	Shader *textureShader = new Shader("src/shaders/texture.vs", "src/shaders/texture.fs");
 	Shader *lightShader = new Shader("src/shaders/lightCube.vs", "src/shaders/lightCube.fs");
 	Shader *sphereShader = new Shader("src/shaders/SphereShader.vs", "src/shaders/SphereShader.fs");
+	Shader *depthShader = new Shader("src/shaders/depthShader.vs", "src/shaders/depthShader.fs");
+	Shader *gridShader = new Shader("src/shaders/gridShader.vs","src/shaders/gridShader.fs");
 
 	// Created in paint
 	Texture *tileTexture = new Texture("src/textures/tile.jpg");
@@ -299,7 +322,6 @@ int main(void)
 	Axis *axis = new Axis(AXIS_SIZE);
 
 	Cube *lightSource = new Cube(0, 30, 0);
-	
 
 	// Letter U and digit 4 for Giuseppe Campanelli
 	std::vector<Cube*> cubesU = {
@@ -471,35 +493,131 @@ int main(void)
 	
 	glEnable(GL_DEPTH_TEST);
 
-    while (!glfwWindowShouldClose(window))
-    {
-        processInput(window);
+	// configure depth map FBO
+	// -----------------------
+	const unsigned int DEPTH_MAP_TEXTURE_SIZE = 1024;
+	GLuint depthMapFBO;
+	glGenFramebuffers(1, &depthMapFBO);
+	// create depth texture
+	GLuint depthMap;
+	glGenTextures(1, &depthMap);
+	glBindTexture(GL_TEXTURE_2D, depthMap);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, DEPTH_MAP_TEXTURE_SIZE, DEPTH_MAP_TEXTURE_SIZE, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	float bordercolor[] = {1.0, 1.0, 1.0, 1.0};
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, bordercolor);
+	// attach depth texture as FBO's depth buffer
+	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	
+	// shader configuration
+	gridShader->use();
+	gridShader->setInt("shadowMap", 1);
+	gridShader->setInt("diffuseTexture", 0);
 
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+	// lighting info
+	glm::vec3 lightPosition(0.0f, 30.0f, -5.0f);
+
+	while (!glfwWindowShouldClose(window))
+	{
+		processInput(window);
+
+		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		
+
+		glm::mat4 modelU4 = glm::mat4(1.0f);
+		modelU4 = glm::translate(modelU4, glm::vec3(pairU4Pos.x + moveX, pairU4Pos.y + moveY, pairU4Pos.z + moveZ));
+		modelU4 = glm::rotate(modelU4, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
+		modelU4 = glm::scale(modelU4, glm::vec3(scale, scale, scale));
+		modelU4 = modelU4 * shear;
+
+		glm::mat4 modelE5 = glm::mat4(1.0f);
+		modelE5 = glm::translate(modelE5, glm::vec3(pairE5Pos.x + moveX, pairE5Pos.y + moveY, pairE5Pos.z + moveZ));
+		modelE5 = glm::rotate(modelE5, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
+		modelE5 = glm::scale(modelE5, glm::vec3(scale, scale, scale));
+		modelE5 = modelE5 * shear;
+
+		glm::mat4 modelJ5 = glm::mat4(1.0f);
+		modelJ5 = glm::translate(modelJ5, glm::vec3(pairJ5Pos.x + moveX, pairJ5Pos.y + moveY, pairJ5Pos.z + moveZ));
+		modelJ5 = glm::rotate(modelJ5, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
+		modelJ5 = glm::scale(modelJ5, glm::vec3(scale, scale, scale));
+		modelJ5 = modelJ5 * shear;
+
+		glm::mat4 modelA6 = glm::mat4(1.0f);
+		modelA6 = glm::translate(modelA6, glm::vec3(pairA6Pos.x + moveX, pairA6Pos.y + moveY, pairA6Pos.z + moveZ));
+		modelA6 = glm::rotate(modelA6, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
+		modelA6 = glm::scale(modelA6, glm::vec3(scale, scale, scale));
+		modelA6 = modelA6 * shear;
+
+		glm::mat4 modelN2 = glm::mat4(1.0f);
+		modelN2 = glm::translate(modelN2, glm::vec3(pairN2Pos.x + moveX, pairN2Pos.y + moveY, pairN2Pos.z + moveZ));
+		modelN2 = glm::rotate(modelN2, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
+		modelN2 = glm::scale(modelN2, glm::vec3(scale, scale, scale));
+		modelN2 = modelN2 * shear;
+
+
+		//Shadow Pass 1 - Shadow Map
+		glm::mat4 lightProjection, lightView;
+		glm::mat4 lightSpaceMatrix;
+		float near_plane = 1.0f, far_plane = 30.5f;
+		lightProjection = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, near_plane, far_plane);
+		lightView = glm::lookAt(lightPosition, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
+		lightSpaceMatrix = lightProjection * lightView;
+		// render scene from light's point of view
+		depthShader->use();
+		depthShader->setMat4("lightSpaceMatrix", lightSpaceMatrix);
+
+		glViewport(0, 0, DEPTH_MAP_TEXTURE_SIZE, DEPTH_MAP_TEXTURE_SIZE);
+		glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+		glClear(GL_DEPTH_BUFFER_BIT);
+
+		if (shadows) {
+			grid->draw(depthShader);
+
+			pairU4->draw(depthShader, sphereShader, modelRenderMode, modelU4);
+			pairE5->draw(depthShader, sphereShader, modelRenderMode, modelE5);
+			pairJ5->draw(depthShader, sphereShader, modelRenderMode, modelJ5);
+			pairA6->draw(depthShader, sphereShader, modelRenderMode, modelA6);
+			pairN2->draw(depthShader, sphereShader, modelRenderMode, modelN2);
+		}
+
+		// reset viewport
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glViewport(0, 0, WINDOW_LENGTH, WINDOW_WIDTH);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		//Shadow Pass 2 - Normal Render
 		glm::mat4 projection = glm::perspective(glm::radians(fov), (float)WINDOW_LENGTH / (float)WINDOW_WIDTH, 0.1f, 100.0f);
 		glm::mat4 view = glm::lookAt(cameraPos, cameraFront, cameraUp);
 
+		//Draw axis
 		basicShader->use();
 		basicShader->setMat4("projection", projection);
 		basicShader->setMat4("view", view);
 		axis->draw(basicShader);
 
+		//Draw light cube
 		glm::mat4 lightModel(1.0f);
 		lightShader->use();
 		lightShader->setMat4("projection", projection);
 		lightShader->setMat4("view", view);
 		lightSource->draw(lightShader, modelRenderMode, lightModel);
 
-		textureShader->use();
-		textureShader->setMat4("projection", projection);
-		textureShader->setMat4("view", view);
-		textureShader->setVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
-		textureShader->setVec3("lightPos", glm::vec3(0.0f, 10.0f, 0.0f));
-		textureShader->setVec3("viewPos", cameraPos);
-		grid->draw(textureShader, tileTexture);
+		//Generate Sphere
+		sphereShader->use();
+		sphereShader->setMat4("projection", projection);
+		sphereShader->setMat4("view", view);
+		sphereShader->setVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+		sphereShader->setVec3("lightPos", glm::vec3(0.0f, 30.0f, 0.0f));
+		sphereShader->setVec3("viewPos", cameraPos);
 		
+		//Light For No Texture
 		shader->use();
 		shader->setMat4("projection", projection);
 		shader->setMat4("view", view);
@@ -507,68 +625,47 @@ int main(void)
 		shader->setVec3("lightPos", glm::vec3(0.0f, 30.0f, 0.0f));
 		shader->setVec3("viewPos", cameraPos);
 
-		sphereShader->use();
-		sphereShader->setMat4("projection", projection);
-		sphereShader->setMat4("view", view);
-		sphereShader->setVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
-		sphereShader->setVec3("lightPos", glm::vec3(0.0f, 30.0f, 0.0f));
-		sphereShader->setVec3("viewPos", cameraPos);
+		//Light For Texture
+		textureShader->use();
+		textureShader->setMat4("projection", projection);
+		textureShader->setMat4("view", view);
+		// set light uniforms
+		textureShader->setVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+		textureShader->setVec3("lightPos", lightPosition);
+		textureShader->setVec3("viewPos", cameraPos);
+		textureShader->setMat4("lightSpaceMatrix", lightSpaceMatrix);
+		
+		gridShader->use();
+		gridShader->setMat4("projection", projection);
+		gridShader->setMat4("view", view);
+		// set light uniforms
+		gridShader->setVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+		gridShader->setVec3("lightPos", lightPosition);
+		gridShader->setVec3("viewPos", cameraPos);
+		gridShader->setMat4("lightSpaceMatrix", lightSpaceMatrix);
 
-		glm::mat4 modelU4 = glm::mat4(1.0f);
-		modelU4 = glm::translate(modelU4, glm::vec3(pairU4Pos.x + moveX, pairU4Pos.y + moveY, pairU4Pos.z + moveZ));
-		modelU4 = glm::rotate(modelU4, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
-		modelU4 = glm::scale(modelU4, glm::vec3(scale, scale, scale));
+		//Draw Grid
+		grid->draw(gridShader, tileTexture, depthMap);
 
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, depthMap);
+
+		//Draw Models with Texture
 		if (textures) {
 			pairU4->draw(textureShader, sphereShader, modelRenderMode, modelU4, woodTexture, goldTexture);
-		} else {
-			pairU4->draw(shader, sphereShader, modelRenderMode, modelU4);
-		}
-		
-		glm::mat4 modelE5 = glm::mat4(1.0f);
-		modelE5 = glm::translate(modelE5, glm::vec3(pairE5Pos.x + moveX, pairE5Pos.y + moveY, pairE5Pos.z + moveZ));
-		modelE5 = glm::rotate(modelE5, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
-		modelE5 = glm::scale(modelE5, glm::vec3(scale, scale, scale));
-
-		if (textures) {
 			pairE5->draw(textureShader, sphereShader, modelRenderMode, modelE5, woodTexture, goldTexture);
-		} else {
-			pairE5->draw(shader, sphereShader, modelRenderMode, modelE5);
-		}
-
-		glm::mat4 modelJ5 = glm::mat4(1.0f);
-		modelJ5 = glm::translate(modelJ5, glm::vec3(pairJ5Pos.x + moveX, pairJ5Pos.y + moveY, pairJ5Pos.z + moveZ));
-		modelJ5 = glm::rotate(modelJ5, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
-		modelJ5 = glm::scale(modelJ5, glm::vec3(scale, scale, scale));
-
-		if (textures) {
 			pairJ5->draw(textureShader, sphereShader, modelRenderMode, modelJ5, woodTexture, goldTexture);
-		} else {
-			pairJ5->draw(shader, sphereShader, modelRenderMode, modelJ5);
-		}
-
-		glm::mat4 modelA6 = glm::mat4(1.0f);
-		modelA6 = glm::translate(modelA6, glm::vec3(pairA6Pos.x + moveX, pairA6Pos.y + moveY, pairA6Pos.z + moveZ));
-		modelA6 = glm::rotate(modelA6, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
-		modelA6 = glm::scale(modelA6, glm::vec3(scale, scale, scale));
-
-		if (textures) {
 			pairA6->draw(textureShader, sphereShader, modelRenderMode, modelA6, woodTexture, goldTexture);
-		} else {
-			pairA6->draw(shader, sphereShader, modelRenderMode, modelA6);
-		}
-
-		glm::mat4 modelN2 = glm::mat4(1.0f);
-		modelN2 = glm::translate(modelN2, glm::vec3(pairN2Pos.x + moveX, pairN2Pos.y + moveY, pairN2Pos.z + moveZ));
-		modelN2 = glm::rotate(modelN2, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
-		modelN2 = glm::scale(modelN2, glm::vec3(scale, scale, scale));
-
-		if (textures) {
 			pairN2->draw(textureShader, sphereShader, modelRenderMode, modelN2, woodTexture, goldTexture);
-		} else {
+		}
+		else {	//Draw Models without Texture
+			pairU4->draw(shader, sphereShader, modelRenderMode, modelU4);
+			pairE5->draw(shader, sphereShader, modelRenderMode, modelE5);
+			pairJ5->draw(shader, sphereShader, modelRenderMode, modelJ5);
+			pairA6->draw(shader, sphereShader, modelRenderMode, modelA6);
 			pairN2->draw(shader, sphereShader, modelRenderMode, modelN2);
 		}
-		
+
 		if (angle == 360.0f)
 			angle = 0.0f;
 
@@ -586,6 +683,8 @@ int main(void)
 	delete tileTexture;
 	delete woodTexture;
 	delete goldTexture;
+	delete gridShader;
+	delete depthShader;
 	delete textureShader;
 	delete sphereShader;
 	delete lightShader;

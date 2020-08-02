@@ -1,13 +1,13 @@
 #include "grid.h"
 
-Grid::Grid(int size) : size(size)
+Grid::Grid(float size) : size(size)
 {
 	float vertices[] = {
-		// position             // color           // texture
-		-1.0f,  -0.01f,  1.0f,  1.0f, 1.0f, 0.0f,  0.0f, 1.0f, 0.0f, 1.0f, 0.0f,  // top left
-		 1.0f,  -0.01f,  1.0f,  1.0f, 1.0f, 0.0f,  1.0f, 1.0f, 0.0f, 1.0f, 0.0f,   // top right
-		 1.0f,  -0.01f, -1.0f,  1.0f, 1.0f, 0.0f,  1.0f, 0.0f, 0.0f, 1.0f, 0.0f,   // bottom right
-		-1.0f,  -0.01f, -1.0f,  1.0f, 1.0f, 0.0f,  0.0f, 0.0f, 0.0f, 1.0f, 0.0f    // bottom left
+		// position            // normal           // texture
+		-size/2, -0.01f,  size/2,  0.0f, 1.0f, 0.0f,  0.0f, 0.0f,     // top left
+		 size/2, -0.01f,  size/2,  0.0f, 1.0f, 0.0f,  size/2, 0.0f,   // top right
+		 size/2, -0.01f, -size/2,  0.0f, 1.0f, 0.0f,  size/2, size/2, // bottom right
+		-size/2, -0.01f, -size/2,  0.0f, 1.0f, 0.0f,  0.0f, size/2    // bottom left
 	};
 
 	glGenVertexArrays(1, &VAO);
@@ -18,17 +18,14 @@ Grid::Grid(int size) : size(size)
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
 
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(6 * sizeof(float)));
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
 	glEnableVertexAttribArray(2);
-
-	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(8 * sizeof(float)));
-	glEnableVertexAttribArray(3);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -39,36 +36,25 @@ Grid::~Grid()
 	glDeleteBuffers(1, &VBO);
 }
 
-void Grid::draw(Shader *shader, Texture *texture)
+void Grid::draw(Shader *shader)
 {
-	if (texture) {
-		glBindTexture(GL_TEXTURE_2D, texture->getTextureId());
-	} else {
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	}
-	
 	shader->use();
-	shader->setVec3("material.ambient", glm::vec3(0.05f, 0.05f, 0.05f));
-	shader->setVec3("material.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
-	shader->setVec3("material.specular", glm::vec3(0.7f, 0.7f, 0.7f));
-	shader->setFloat("material.shininess", 10.0f);
 	glBindVertexArray(VAO);
 
-	for (int i = -size / 2; i <= size / 2; i++) {
-		for (int j = size / 2; j >= -size / 2; j--) {
+	glm::mat4 model = glm::mat4(1.0f);
+	shader->setMat4("model", model);
 
-			glm::mat4 model = glm::mat4(1.0f);
-			model = glm::translate(model, glm::vec3(i, 0, j));
-			shader->setMat4("model", model);
+	glDrawArrays(GL_QUADS, 0, 4);
+}
 
-			glDrawArrays(GL_QUADS, 0, 4);
-		}
-	}
+void Grid::draw(Shader *shader, Texture *texture, GLuint depthMap)
+{
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, texture->getTextureId());
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, depthMap);
 
-	if (texture) {
-		glBindTexture(GL_TEXTURE_2D, 0);
-	}
-	else {
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	}
+	this->draw(shader);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
 }

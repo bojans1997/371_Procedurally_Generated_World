@@ -21,16 +21,15 @@ uniform sampler2D ourTexture;
 void main()
 {
     //Ambient
-	
     vec3 ambient = lightColor * material.ambient;
 
-	// diffuse 
+    // diffuse 
     vec3 norm = normalize(normal);
     vec3 lightDir = normalize(lightPos - fragPos);
     float diff = max(dot(norm, lightDir), 0.0);
     vec3 diffuse = lightColor * (diff * material.diffuse);
 
-	// specular
+    // specular
     float specularStrength = 0.5;
     vec3 viewDir = normalize(viewPos - fragPos);
     vec3 reflectDir = reflect(-lightDir, norm);  
@@ -39,6 +38,6 @@ void main()
 
     vec3 result = (ambient + diffuse + specular) * vec3(texture(ourTexture, textCoord));
     FragColor = vec4(result, 1.0);
-	
-	//FragColor = texture(ourTexture, textCoord);
+
+    //FragColor = texture(ourTexture, textCoord);
 }

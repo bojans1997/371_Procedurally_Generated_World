@@ -23,7 +23,7 @@
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{9d34d118-19d2-443d-bdce-33d1b7ca1441}</ProjectGuid>
     <RootNamespace>COMP371</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -159,18 +159,20 @@
     <ClCompile Include="src\objects\texture.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="src\shaders\depthShader.fs" />
+    <None Include="src\shaders\depthShader.vs" />
     <None Include="src\shaders\light.fs" />
     <None Include="src\shaders\light.vs" />
     <None Include="src\shaders\lightCube.fs" />
     <None Include="src\shaders\lightCube.vs" />
     <None Include="src\shaders\shader.fs" />
     <None Include="src\shaders\shader.vs" />
+    <None Include="src\shaders\gridShader.fs" />
+    <None Include="src\shaders\gridShader.vs" />
     <None Include="src\shaders\SphereShader.fs" />
     <None Include="src\shaders\SphereShader.vs" />
     <None Include="src\shaders\texture.fs" />
     <None Include="src\shaders\texture.vs" />
-    <None Include="src\textures\SphereShader.fs" />
-    <None Include="src\textures\SphereShader.vs" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\objects\axis.h" />
