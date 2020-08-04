@@ -39,19 +39,10 @@
     <ClCompile Include="src\objects\texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\objects\character.cpp">
+    <ClCompile Include="src\objects\tree.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\objects\pair.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\objects\Sector.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\objects\Stack.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\objects\Sphere.cpp">
+    <ClCompile Include="src\objects\bush.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -78,12 +69,6 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="src\shaders\shader.vs">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="src\shaders\SphereShader.fs">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="src\shaders\SphereShader.vs">
       <Filter>Shaders</Filter>
     </None>
     <None Include="src\shaders\texture.fs">
@@ -118,30 +103,24 @@
     <ClInclude Include="src\objects\texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\objects\character.h">
+    <ClInclude Include="src\objects\tree.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\objects\pair.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\objects\Stack.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\objects\Sphere.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\objects\Sector.h">
+    <ClInclude Include="src\objects\bush.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="src\textures\gold.jpg">
+    <Image Include="src\textures\grass.jpg">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="src\textures\tile.jpg">
+    <Image Include="src\textures\leaves.jpg">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="src\textures\wood.jpg">
+    <Image Include="src\textures\bark.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="src\textures\bush.jpg">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

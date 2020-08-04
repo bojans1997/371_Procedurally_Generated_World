@@ -19,10 +19,12 @@ class Grid
 public:
 	Grid(float size);
 	~Grid();
+	void setSize(float size);
 	void draw(Shader *shader);
-	void draw(Shader *shader, Texture *texture, GLuint depthMap);
+	void draw(Shader *shader, GLuint depthMap);
 protected:
-	float size;
 	GLuint VAO = 0, VBO = 0;
+	// Referenced from https://freestocktextures.com/texture/grass-lawn-green,777.html
+	Texture *grassTexture = new Texture("src/textures/grass.jpg");
 };
 #endif

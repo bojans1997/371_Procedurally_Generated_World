@@ -17,10 +17,12 @@ class Cube
 public:
 	Cube(int x, int y, int z);
 	~Cube();
-	void draw(Shader *shader, GLuint modelRenderMode, glm::mat4 matrix);
-	void draw(Shader *shader, GLuint modelRenderMode, glm::mat4 matrix, Texture *texture);
+	glm::mat4 getModel();
+	void draw(Shader *shader, glm::mat4 matrix);
+	void draw(Shader *shader, glm::mat4 matrix, Texture *texture);
 protected:
 	int x, y, z;
+	glm::mat4 model = glm::mat4(1.0f);
 	GLuint VAO = 0, VBO = 0;
 };
 #endif

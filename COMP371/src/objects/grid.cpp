@@ -1,13 +1,18 @@
 #include "grid.h"
 
-Grid::Grid(float size) : size(size)
+Grid::Grid(float size)
+{
+	this->setSize(size);
+}
+
+void Grid::setSize(float size)
 {
 	float vertices[] = {
 		// position            // normal           // texture
-		-size/2, -0.01f,  size/2,  0.0f, 1.0f, 0.0f,  0.0f, 0.0f,     // top left
-		 size/2, -0.01f,  size/2,  0.0f, 1.0f, 0.0f,  size/2, 0.0f,   // top right
-		 size/2, -0.01f, -size/2,  0.0f, 1.0f, 0.0f,  size/2, size/2, // bottom right
-		-size/2, -0.01f, -size/2,  0.0f, 1.0f, 0.0f,  0.0f, size/2    // bottom left
+		-size / 2, -0.01f,  size / 2,  0.0f, 1.0f, 0.0f,  0.0f, 0.0f,     // top left
+		 size / 2, -0.01f,  size / 2,  0.0f, 1.0f, 0.0f,  size / 2, 0.0f,   // top right
+		 size / 2, -0.01f, -size / 2,  0.0f, 1.0f, 0.0f,  size / 2, size / 2, // bottom right
+		-size / 2, -0.01f, -size / 2,  0.0f, 1.0f, 0.0f,  0.0f, size / 2    // bottom left
 	};
 
 	glGenVertexArrays(1, &VAO);
@@ -47,10 +52,10 @@ void Grid::draw(Shader *shader)
 	glDrawArrays(GL_QUADS, 0, 4);
 }
 
-void Grid::draw(Shader *shader, Texture *texture, GLuint depthMap)
+void Grid::draw(Shader *shader, GLuint depthMap)
 {
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, texture->getTextureId());
+	glBindTexture(GL_TEXTURE_2D, grassTexture->getTextureId());
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, depthMap);
 

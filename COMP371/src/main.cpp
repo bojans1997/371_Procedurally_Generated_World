@@ -9,9 +9,8 @@
 #include "objects/axis.h"
 #include "objects/cube.h"
 #include "objects/texture.h"
-#include "objects/character.h"
-#include "objects/pair.h"
-#include "objects/Sphere.h"
+#include "objects/tree.h"
+#include "objects/bush.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -39,8 +38,6 @@ GLdouble lastX = WINDOW_LENGTH/ 2.0;
 GLdouble lastY = WINDOW_WIDTH / 2.0;
 GLfloat fov = 60.0f;
 
-GLuint modelRenderMode = GL_TRIANGLES;
-
 GLfloat angle = 0.0f;
 GLfloat moveX = 0.0f;
 GLfloat moveY = 0.0f;
@@ -49,14 +46,7 @@ GLfloat scale = 1.0f;
 
 glm::mat4 shear(glm::vec4(1.0f, 0.0f, 0.0f, 0.0f), glm::vec4(0.0f, 1.0f, 0.5f, 0.0f), glm::vec4(0.0f, 0.0f, 1.0f, 0.0f), glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 
-bool textures = true;
-bool shadows = true;
-
-glm::vec3 pairU4Pos = glm::vec3(0, 0, 0);
-glm::vec3 pairE5Pos = glm::vec3(-40, 0, -45);
-glm::vec3 pairJ5Pos = glm::vec3(40, 0, -45);
-glm::vec3 pairA6Pos = glm::vec3(40, 0, 45);
-glm::vec3 pairN2Pos = glm::vec3(-40, 0, 45);
+//glm::vec3 pairU4Pos = glm::vec3(0, 0, 0);
 
 void mouse_callback_horizontal(GLFWwindow* window, GLdouble xpos, GLdouble ypos)
 {
@@ -145,31 +135,10 @@ void mouse_callback_zoom(GLFWwindow* window, GLdouble xpos, GLdouble ypos)
 		fov = 90.0f;
 }
 
-glm::vec3 generateRandomGridPosition()
-{
-	int min = -GRID_SIZE/2, max = GRID_SIZE/2;
-	int x = min + (rand() % static_cast<int>(max - min + 1));
-	int z = min + (rand() % static_cast<int>(max - min + 1));
-	return glm::vec3(x, 0, z);
-}
-
 void processInput(GLFWwindow* window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
-
-	if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
-		textures = !textures;
-
-	if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS)
-		shadows = !shadows;
-
-	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
-		modelRenderMode = GL_POINTS;
-	if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS)
-		modelRenderMode = GL_TRIANGLES;
-	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
-		modelRenderMode = GL_LINES;
 
 	if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS && scale <= 3.0f)
 		scale += 0.1f;
@@ -206,14 +175,6 @@ void processInput(GLFWwindow* window)
 		cameraPos = glm::vec3(cameraPos.x, abs(sin(camY)*distance), cos(camZ)*distance);
 		camY -= 0.1f;
 		camZ -= 0.1f;
-	}
-
-	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-		pairU4Pos = generateRandomGridPosition();
-		pairE5Pos = generateRandomGridPosition();
-		pairJ5Pos = generateRandomGridPosition();
-		pairA6Pos = generateRandomGridPosition();
-		pairN2Pos = generateRandomGridPosition();
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
@@ -284,7 +245,7 @@ int main(void)
     if (!glfwInit())
         return -1;
 
-    window = glfwCreateWindow(WINDOW_LENGTH, WINDOW_WIDTH, "COMP 371 Assignment 1 - OpenGLHF", NULL, NULL);
+    window = glfwCreateWindow(WINDOW_LENGTH, WINDOW_WIDTH, "COMP 371 Project - OpenGLHF", NULL, NULL);
 
     if (!window)
     {
@@ -304,192 +265,37 @@ int main(void)
     GLuint VBO = 0, VAO = 0;
 
 	Shader *basicShader = new Shader("src/shaders/shader.vs", "src/shaders/shader.fs");
-	Shader *shader = new Shader("src/shaders/light.vs", "src/shaders/light.fs");
 	Shader *textureShader = new Shader("src/shaders/texture.vs", "src/shaders/texture.fs");
 	Shader *lightShader = new Shader("src/shaders/lightCube.vs", "src/shaders/lightCube.fs");
-	Shader *sphereShader = new Shader("src/shaders/SphereShader.vs", "src/shaders/SphereShader.fs");
 	Shader *depthShader = new Shader("src/shaders/depthShader.vs", "src/shaders/depthShader.fs");
 	Shader *gridShader = new Shader("src/shaders/gridShader.vs","src/shaders/gridShader.fs");
-
-	// Created in paint
-	Texture *tileTexture = new Texture("src/textures/tile.jpg");
-	// Referenced from https://jooinn.com/wood-texture-box.html#gal_post_113596_wood-texture-box-4.jpg
-	Texture *woodTexture = new Texture("src/textures/wood.jpg");
-	// Referenced from https://unsplash.com/photos/Em96eDRJPD8
-	Texture *goldTexture = new Texture("src/textures/gold.jpg");
 
 	Grid *grid = new Grid(GRID_SIZE);
 	Axis *axis = new Axis(AXIS_SIZE);
 
 	Cube *lightSource = new Cube(0, 30, 0);
 
-	// Letter U and digit 4 for Giuseppe Campanelli
-	std::vector<Cube*> cubesU = {
-		new Cube(-5, 0, 0),
-		new Cube(-5, 1, 0),
-		new Cube(-5, 2, 0),
-		new Cube(-5, 3, 0),
-		new Cube(-5, 4, 0),
-		new Cube(-4, 0, 0),
-		new Cube(-3, 0, 0),
-		new Cube(-2, 0, 0),
-		new Cube(-2, 1, 0),
-		new Cube(-2, 2, 0),
-		new Cube(-2, 3, 0),
-		new Cube(-2, 4, 0)
-	};
-	std::vector<Cube*> cubes4 = {
-		new Cube(1, 2, 0),
-		new Cube(1, 3, 0),
-		new Cube(1, 4, 0),
-		new Cube(2, 2, 0),
-		new Cube(3, 2, 0),
-		new Cube(4, 0, 0),
-		new Cube(4, 1, 0),
-		new Cube(4, 2, 0),
-		new Cube(4, 3, 0),
-		new Cube(4, 4, 0)
-	};
-	Pair *pairU4 = new Pair(new Character(cubesU), new Character(cubes4), new Sphere(0, 6, 0, 5, 10, 10));
-	
-	// Letter E and digit 5 for Alexis Laurens-Renner
-	std::vector<Cube*> cubesE = {
-		new Cube(-5, 0, 0),
-		new Cube(-5, 1, 0),
-		new Cube(-5, 2, 0),
-		new Cube(-5, 3, 0),
-		new Cube(-5, 4, 0),
-		new Cube(-4, 0, 0),
-		new Cube(-3, 0, 0),
-		new Cube(-2, 0, 0),
-		new Cube(-4, 2, 0),
-		new Cube(-3, 2, 0),
-		new Cube(-2, 2, 0),
-		new Cube(-4, 4, 0),
-		new Cube(-3, 4, 0),
-		new Cube(-2, 4, 0)
-	};
-	std::vector<Cube*> cubes5_1 = {
-		new Cube(4, 0, 0),
-		new Cube(4, 1, 0),
-		new Cube(4, 2, 0),
-		new Cube(4, 4, 0),
-		new Cube(1, 0, 0),
-		new Cube(1, 2, 0),
-		new Cube(1, 3, 0),
-		new Cube(1, 4, 0),
-		new Cube(3, 4, 0),
-		new Cube(2, 4, 0),
-		new Cube(3, 0, 0),
-		new Cube(2, 0, 0),
-		new Cube(3, 2, 0),
-		new Cube(2, 2, 0)
-	};
-	Pair *pairE5 = new Pair(new Character(cubesE), new Character(cubes5_1), new Sphere(0, 6, 0, 5, 10, 10));
+	std::vector<Tree*> trees;
 
-	// Letter J and digit 5 for Bojan Srbinoski
-	std::vector<Cube*> cubesJ = {
-		new Cube(-2, 4, 0),
-		new Cube(-3, 4, 0),
-		new Cube(-4, 4, 0),
-		new Cube(-3, 3, 0),
-		new Cube(-3, 2, 0),
-		new Cube(-3, 1, 0),
-		new Cube(-3, 0, 0),
-		new Cube(-4, 0, 0),
-		new Cube(-5, 0, 0),
-		new Cube(-5, 1, 0)
-	};
-	std::vector<Cube*> cubes5_2 = {
-		new Cube(4, 0, 0),
-		new Cube(4, 1, 0),
-		new Cube(4, 2, 0),
-		new Cube(4, 4, 0),
-		new Cube(1, 0, 0),
-		new Cube(1, 2, 0),
-		new Cube(1, 3, 0),
-		new Cube(1, 4, 0),
-		new Cube(3, 4, 0),
-		new Cube(2, 4, 0),
-		new Cube(3, 0, 0),
-		new Cube(2, 0, 0),
-		new Cube(3, 2, 0),
-		new Cube(2, 2, 0)
-	};
-	Pair *pairJ5 = new Pair(new Character(cubesJ), new Character(cubes5_2), new Sphere(0, 6, 0, 5, 10, 10));
+	srand(time(NULL));
 
-	// Letter A and digit 6 for Saad Ahmed
-	std::vector<Cube*> cubesA = {
-		new Cube(-5, 5, 0),
-		new Cube(-4, 5, 0),
-		new Cube(-3, 5, 0),
-		new Cube(-2, 5, 0),
-		new Cube(-5, 4, 0),
-		new Cube(-5, 3, 0),
-		new Cube(-5, 2, 0),
-		new Cube(-5, 1, 0),
-		new Cube(-5, 0, 0),
-		new Cube(-2, 4, 0),
-		new Cube(-2, 3, 0),
-		new Cube(-2, 2, 0),
-		new Cube(-2, 1, 0),
-		new Cube(-2, 0, 0),
-		new Cube(-4, 3, 0),
-		new Cube(-3, 3, 0)
-	};
-	std::vector<Cube*> cubes6 = {
-		new Cube(1, 5, 0),
-		new Cube(2, 5, 0),
-		new Cube(3, 5, 0),
-		new Cube(4, 5, 0),
-		new Cube(1, 4, 0),
-		new Cube(1, 3, 0),
-		new Cube(1, 2, 0),
-		new Cube(1, 1, 0),
-		new Cube(1, 0, 0),
-		new Cube(2, 0, 0),
-		new Cube(3, 0, 0),
-		new Cube(4, 0, 0),
-		new Cube(4, 1, 0),
-		new Cube(4, 2, 0),
-		new Cube(3, 2, 0),
-		new Cube(2, 2, 0)
-	};
-	Pair *pairA6 = new Pair(new Character(cubesA), new Character(cubes6), new Sphere(0, 6, 0, 5, 10, 10));
+	for (int i = 0; i < 100; i++) {
+		int x = -40 + (rand() % (80 - -40 + 1));
+		int z = -40 + (rand() % (80 - -40 + 1));
+		int size = 3 + (rand() % (6 - 3 + 1));
+		trees.push_back(new Tree(glm::vec3(x, 0, z), size));
+	}
 
-	// Letter N and digit 2 for Anna Kmieciak
-	std::vector<Cube*> cubesN = {
-		new Cube(-5, 0, 0),
-		new Cube(-5, 1, 0),
-		new Cube(-5, 2, 0),
-		new Cube(-5, 3, 0),
-		new Cube(-5, 4, 0),
-		new Cube(-4, 3, 0),
-		new Cube(-3, 2, 0),
-		new Cube(-2, 1, 0),
-		new Cube(-1, 0, 0),
-		new Cube(-1, 1, 0),
-		new Cube(-1, 2, 0),
-		new Cube(-1, 3, 0),
-		new Cube(-1, 4, 0)
-	};
-	std::vector<Cube*> cubes2 = {
-		new Cube(2, 4, 0),
-		new Cube(3, 4, 0),
-		new Cube(4, 4, 0),
-		new Cube(5, 4, 0),
-		new Cube(5, 3, 0),
-		new Cube(2, 2, 0),
-		new Cube(2, 1, 0),
-		new Cube(3, 2, 0),
-		new Cube(4, 2, 0),
-		new Cube(5, 2, 0),
-		new Cube(2, 0, 0),
-		new Cube(3, 0, 0),
-		new Cube(4, 0, 0),
-		new Cube(5, 0, 0)
-	};
-	Pair *pairN2 = new Pair(new Character(cubesN), new Character(cubes2), new Sphere(0, 6, 0, 5, 10, 10));
+	std::vector<Bush*> bushes;
+
+	for (int i = 0; i < 250; i++) {
+		int x = -40 + (rand() % (80 - -40 + 1));
+		int z = -40 + (rand() % (80 - -40 + 1));
+		int xLen = 2 + (rand() % (4 - 2 + 1));
+		int yLen = 2 + (rand() % (4 - 2 + 1));
+		int zLen = 2 + (rand() % (4 - 2 + 1));
+		bushes.push_back(new Bush(glm::vec3(x, 0, z), glm::vec3(xLen, yLen, zLen)));
+	}
 	
 	glEnable(GL_DEPTH_TEST);
 
@@ -531,36 +337,11 @@ int main(void)
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glm::mat4 modelU4 = glm::mat4(1.0f);
+		/*glm::mat4 modelU4 = glm::mat4(1.0f);
 		modelU4 = glm::translate(modelU4, glm::vec3(pairU4Pos.x + moveX, pairU4Pos.y + moveY, pairU4Pos.z + moveZ));
 		modelU4 = glm::rotate(modelU4, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
 		modelU4 = glm::scale(modelU4, glm::vec3(scale, scale, scale));
-		modelU4 = modelU4 * shear;
-
-		glm::mat4 modelE5 = glm::mat4(1.0f);
-		modelE5 = glm::translate(modelE5, glm::vec3(pairE5Pos.x + moveX, pairE5Pos.y + moveY, pairE5Pos.z + moveZ));
-		modelE5 = glm::rotate(modelE5, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
-		modelE5 = glm::scale(modelE5, glm::vec3(scale, scale, scale));
-		modelE5 = modelE5 * shear;
-
-		glm::mat4 modelJ5 = glm::mat4(1.0f);
-		modelJ5 = glm::translate(modelJ5, glm::vec3(pairJ5Pos.x + moveX, pairJ5Pos.y + moveY, pairJ5Pos.z + moveZ));
-		modelJ5 = glm::rotate(modelJ5, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
-		modelJ5 = glm::scale(modelJ5, glm::vec3(scale, scale, scale));
-		modelJ5 = modelJ5 * shear;
-
-		glm::mat4 modelA6 = glm::mat4(1.0f);
-		modelA6 = glm::translate(modelA6, glm::vec3(pairA6Pos.x + moveX, pairA6Pos.y + moveY, pairA6Pos.z + moveZ));
-		modelA6 = glm::rotate(modelA6, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
-		modelA6 = glm::scale(modelA6, glm::vec3(scale, scale, scale));
-		modelA6 = modelA6 * shear;
-
-		glm::mat4 modelN2 = glm::mat4(1.0f);
-		modelN2 = glm::translate(modelN2, glm::vec3(pairN2Pos.x + moveX, pairN2Pos.y + moveY, pairN2Pos.z + moveZ));
-		modelN2 = glm::rotate(modelN2, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
-		modelN2 = glm::scale(modelN2, glm::vec3(scale, scale, scale));
-		modelN2 = modelN2 * shear;
-
+		modelU4 = modelU4 * shear;*/
 
 		//Shadow Pass 1 - Shadow Map
 		glm::mat4 lightProjection, lightView;
@@ -577,14 +358,14 @@ int main(void)
 		glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
 		glClear(GL_DEPTH_BUFFER_BIT);
 
-		if (shadows) {
-			grid->draw(depthShader);
+		grid->draw(depthShader);
 
-			pairU4->draw(depthShader, sphereShader, modelRenderMode, modelU4);
-			pairE5->draw(depthShader, sphereShader, modelRenderMode, modelE5);
-			pairJ5->draw(depthShader, sphereShader, modelRenderMode, modelJ5);
-			pairA6->draw(depthShader, sphereShader, modelRenderMode, modelA6);
-			pairN2->draw(depthShader, sphereShader, modelRenderMode, modelN2);
+		for (std::vector<Tree*>::iterator it = trees.begin(); it != trees.end(); ++it) {
+			(*it)->draw(depthShader);
+		}
+
+		for (std::vector<Bush*>::iterator it = bushes.begin(); it != bushes.end(); ++it) {
+			(*it)->draw(depthShader);
 		}
 
 		// reset viewport
@@ -603,27 +384,11 @@ int main(void)
 		axis->draw(basicShader);
 
 		//Draw light cube
-		glm::mat4 lightModel(1.0f);
+		glm::mat4 lightModel = lightSource->getModel();
 		lightShader->use();
 		lightShader->setMat4("projection", projection);
 		lightShader->setMat4("view", view);
-		lightSource->draw(lightShader, modelRenderMode, lightModel);
-
-		//Generate Sphere
-		sphereShader->use();
-		sphereShader->setMat4("projection", projection);
-		sphereShader->setMat4("view", view);
-		sphereShader->setVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
-		sphereShader->setVec3("lightPos", glm::vec3(0.0f, 30.0f, 0.0f));
-		sphereShader->setVec3("viewPos", cameraPos);
-		
-		//Light For No Texture
-		shader->use();
-		shader->setMat4("projection", projection);
-		shader->setMat4("view", view);
-		shader->setVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
-		shader->setVec3("lightPos", glm::vec3(0.0f, 30.0f, 0.0f));
-		shader->setVec3("viewPos", cameraPos);
+		lightSource->draw(lightShader, lightModel);
 
 		//Light For Texture
 		textureShader->use();
@@ -634,6 +399,11 @@ int main(void)
 		textureShader->setVec3("lightPos", lightPosition);
 		textureShader->setVec3("viewPos", cameraPos);
 		textureShader->setMat4("lightSpaceMatrix", lightSpaceMatrix);
+
+		textureShader->setVec3("material.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
+		textureShader->setVec3("material.diffuse", glm::vec3(0.2f, 0.2f, 0.2f));
+		textureShader->setVec3("material.specular", glm::vec3(0.332741f, 0.328634f, 0.346435f));
+		textureShader->setFloat("material.shininess", 0.3f);
 		
 		gridShader->use();
 		gridShader->setMat4("projection", projection);
@@ -645,25 +415,18 @@ int main(void)
 		gridShader->setMat4("lightSpaceMatrix", lightSpaceMatrix);
 
 		//Draw Grid
-		grid->draw(gridShader, tileTexture, depthMap);
+		grid->draw(gridShader, depthMap);
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, depthMap);
 
 		//Draw Models with Texture
-		if (textures) {
-			pairU4->draw(textureShader, sphereShader, modelRenderMode, modelU4, woodTexture, goldTexture);
-			pairE5->draw(textureShader, sphereShader, modelRenderMode, modelE5, woodTexture, goldTexture);
-			pairJ5->draw(textureShader, sphereShader, modelRenderMode, modelJ5, woodTexture, goldTexture);
-			pairA6->draw(textureShader, sphereShader, modelRenderMode, modelA6, woodTexture, goldTexture);
-			pairN2->draw(textureShader, sphereShader, modelRenderMode, modelN2, woodTexture, goldTexture);
+		for (std::vector<Tree*>::iterator it = trees.begin(); it != trees.end(); ++it) {
+			(*it)->draw(textureShader);
 		}
-		else {	//Draw Models without Texture
-			pairU4->draw(shader, sphereShader, modelRenderMode, modelU4);
-			pairE5->draw(shader, sphereShader, modelRenderMode, modelE5);
-			pairJ5->draw(shader, sphereShader, modelRenderMode, modelJ5);
-			pairA6->draw(shader, sphereShader, modelRenderMode, modelA6);
-			pairN2->draw(shader, sphereShader, modelRenderMode, modelN2);
+
+		for (std::vector<Bush*>::iterator it = bushes.begin(); it != bushes.end(); ++it) {
+			(*it)->draw(textureShader);
 		}
 
 		if (angle == 360.0f)
@@ -673,23 +436,21 @@ int main(void)
         glfwPollEvents();
     }
 
-	delete pairU4;
-	delete pairE5;
-	delete pairJ5;
-	delete pairA6;
-	delete pairN2;
+	for (std::vector<Tree*>::iterator it = trees.begin(); it != trees.end(); ++it) {
+		delete *it;
+	}
+
+	for (std::vector<Bush*>::iterator it = bushes.begin(); it != bushes.end(); ++it) {
+		delete *it;
+	}
+
 	delete axis;
 	delete grid;
-	delete tileTexture;
-	delete woodTexture;
-	delete goldTexture;
 	delete gridShader;
 	delete depthShader;
 	delete textureShader;
-	delete sphereShader;
 	delete lightShader;
 	delete basicShader;
-	delete shader;
 
     glfwTerminate();
 

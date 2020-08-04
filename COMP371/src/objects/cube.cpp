@@ -79,6 +79,8 @@ Cube::Cube(int x, int y, int z) : x(x), y(y), z(z)
 	glEnableVertexAttribArray(3);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	model = glm::translate(model, glm::vec3(x, y, z));
 }
 
 Cube::~Cube()
@@ -87,24 +89,28 @@ Cube::~Cube()
 	glDeleteBuffers(1, &VBO);
 }
 
-void Cube::draw(Shader *shader, GLuint modelRenderMode, glm::mat4 matrix)
+glm::mat4 Cube::getModel()
+{
+	return model;
+}
+
+void Cube::draw(Shader *shader, glm::mat4 matrix)
 {
 	shader->use();
 	glBindVertexArray(VAO);
 	
-	matrix = glm::translate(matrix, glm::vec3(x, y, z));
 	shader->setMat4("model", matrix);
 
-	glDrawArrays(modelRenderMode, 0, 36);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
 }
 
-void Cube::draw(Shader *shader, GLuint modelRenderMode, glm::mat4 matrix, Texture *texture)
+void Cube::draw(Shader *shader, glm::mat4 matrix, Texture *texture)
 {
 	if (texture) {
 		glBindTexture(GL_TEXTURE_2D, texture->getTextureId());
 	}
 
-	this->draw(shader, modelRenderMode, matrix);
+	this->draw(shader, matrix);
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
