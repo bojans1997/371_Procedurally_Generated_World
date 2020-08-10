@@ -18,12 +18,12 @@
 const int WINDOW_LENGTH = 1024;
 const int WINDOW_WIDTH = 768;
 
-const float GRID_SIZE = 100;
-const int AXIS_SIZE = 5;
+int GRID_SIZE = 100;
+int AXIS_SIZE = 5;
 
 GLFWwindow* window;
 
-glm::vec3 cameraPos = glm::vec3(0.0f, 35.0f, 1.0f);
+glm::vec3 cameraPos = glm::vec3(0.0f, 5.0f, 20.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 1.0f, 0.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 GLfloat distance = 20.0f;
@@ -42,7 +42,6 @@ GLfloat angle = 0.0f;
 GLfloat moveX = 0.0f;
 GLfloat moveY = 0.0f;
 GLfloat moveZ = 0.0f;
-GLfloat scale = 1.0f;
 
 glm::mat4 shear(glm::vec4(1.0f, 0.0f, 0.0f, 0.0f), glm::vec4(0.0f, 1.0f, 0.5f, 0.0f), glm::vec4(0.0f, 0.0f, 1.0f, 0.0f), glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 
@@ -140,11 +139,6 @@ void processInput(GLFWwindow* window)
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 
-	if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS && scale <= 3.0f)
-		scale += 0.1f;
-	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS && scale >= 0.1f)
-		scale -= 0.1f;
-
 	if (glfwGetKey(window, GLFW_KEY_HOME) == GLFW_PRESS) {
 		cameraPos = glm::vec3(0.0f, 5.0f, 20.0f);
 		cameraFront = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -153,46 +147,20 @@ void processInput(GLFWwindow* window)
 		moveX = 0.0f;
 		moveY = 0.0f;
 		moveZ = 0.0f;
-		scale = 1.0f;
 	}
 
-	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
-		cameraPos = glm::vec3(sin(camX)*distance, cameraPos.y, cos(camZ)*distance);
-		camX += 0.1f;
-		camZ += 0.1f;
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+		cameraPos = glm::vec3(cameraPos.x, cameraPos.y, cameraPos.z - 0.2f);
 	}
-	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
-		cameraPos = glm::vec3(sin(camX)*distance, cameraPos.y, cos(camZ)*distance);
-		camX -= 0.1f;
-		camZ -= 0.1f;
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+		cameraPos = glm::vec3(cameraPos.x, cameraPos.y, cameraPos.z + 0.2f);
 	}
-	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
-		cameraPos = glm::vec3(cameraPos.x, abs(sin(camY)*distance), cos(camZ)*distance);
-		camY += 0.1f;
-		camZ += 0.1f;
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+		cameraPos = glm::vec3(cameraPos.x - 0.2f, cameraPos.y, cameraPos.z);
 	}
-	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
-		cameraPos = glm::vec3(cameraPos.x, abs(sin(camY)*distance), cos(camZ)*distance);
-		camY -= 0.1f;
-		camZ -= 0.1f;
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+		cameraPos = glm::vec3(cameraPos.x + 0.2f, cameraPos.y, cameraPos.z);
 	}
-
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		moveY += 1.0f;
-	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		moveY -= 1.0f;
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		moveX -= 1.0f;
-	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		moveX += 1.0f;
-	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
-		moveZ -= 1.0f;
-	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
-		moveZ += 1.0f;
-	if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS)
-		angle += 5.0f;
-	if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS)
-		angle -= 5.0f;
 
 	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_RELEASE) {
 		glfwSetInputMode(window, GLFW_STICKY_KEYS, GLFW_FALSE);
@@ -217,21 +185,6 @@ void processInput(GLFWwindow* window)
 	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 		glfwSetCursorPosCallback(window, mouse_callback_zoom);
-	}
-
-	if (glfwGetKey(window, GLFW_KEY_T) == GLFW_RELEASE) {
-		shear = glm::mat4(1.0f);
-	}
-	if (glfwGetKey(window, GLFW_KEY_G) == GLFW_RELEASE) {
-		shear = glm::mat4(1.0f);
-	}
-	if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS && moveY == 0) {
-		shear = glm::mat4 (glm::vec4(1.0f, 0.0f, 0.0f, 0.0f), glm::vec4(0.0f, 1.0f, 0.5f, 0.0f), glm::vec4(0.0f, 0.0f, 1.0f, 0.0f), glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
-		moveZ -= 1.0f;
-	}
-	if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS && moveY == 0) {
-		shear = glm::mat4(glm::vec4(1.0f, 0.0f, 0.0f, 0.0f), glm::vec4(0.0f, 1.0f, -0.5f, 0.0f), glm::vec4(0.0f, 0.0f, 1.0f, 0.0f), glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
-		moveZ += 1.0f;
 	}
 }
 
@@ -279,16 +232,16 @@ int main(void)
 
 	srand(time(NULL));
 
-	for (int i = 0; i < 100; i++) {
-		int x = -40 + (rand() % (80 - -40 + 1));
-		int z = -40 + (rand() % (80 - -40 + 1));
+	for (int i = 0; i < 50; i++) {
+		int x = -(GRID_SIZE / 2) + (rand() % (GRID_SIZE - -(GRID_SIZE / 2) + 1));
+		int z = -(GRID_SIZE / 2) + (rand() % (GRID_SIZE - -(GRID_SIZE / 2) + 1));
 		int size = 3 + (rand() % (6 - 3 + 1));
 		trees.push_back(new Tree(glm::vec3(x, 0, z), size));
 	}
 
 	std::vector<Bush*> bushes;
 
-	for (int i = 0; i < 250; i++) {
+	for (int i = 0; i < 100; i++) {
 		int x = -40 + (rand() % (80 - -40 + 1));
 		int z = -40 + (rand() % (80 - -40 + 1));
 		int xLen = 2 + (rand() % (4 - 2 + 1));
@@ -333,6 +286,65 @@ int main(void)
 	while (!glfwWindowShouldClose(window))
 	{
 		processInput(window);
+
+		// Procedurally grow terrain and creates objects
+		if (cameraPos.x < -GRID_SIZE / 2 || cameraPos.x > GRID_SIZE / 2 || 
+			cameraPos.z < -GRID_SIZE / 2 || cameraPos.z > GRID_SIZE / 2) {
+			GRID_SIZE += 50;
+			grid->setSize(GRID_SIZE);
+
+			for (int i = 0; i < 25; i++) {
+				int x = -(GRID_SIZE / 2) + (rand() % ((GRID_SIZE / 2) - -(GRID_SIZE / 2) + 1));
+				int z = ((GRID_SIZE - 50) / 2) + (rand() % ((GRID_SIZE / 2) - ((GRID_SIZE - 50) / 2) + 1));
+				int size = 3 + (rand() % (6 - 3 + 1));
+
+				if ((rand() % 100) > 50) {
+					z = -z;
+				}
+
+				trees.push_back(new Tree(glm::vec3(x, 0, z), size));
+			}
+
+			for (int i = 0; i < 25; i++) {
+				int x = ((GRID_SIZE - 50) / 2) + (rand() % ((GRID_SIZE / 2) - ((GRID_SIZE - 50) / 2) + 1));
+				int z = -(GRID_SIZE / 2) + (rand() % ((GRID_SIZE / 2) - -(GRID_SIZE / 2) + 1));
+				int size = 3 + (rand() % (6 - 3 + 1));
+
+				if ((rand() % 100) > 50) {
+					x = -x;
+				}
+
+				trees.push_back(new Tree(glm::vec3(x, 0, z), size));
+			}
+
+			for (int i = 0; i < 50; i++) {
+				int x = -(GRID_SIZE / 2) + (rand() % ((GRID_SIZE / 2) - -(GRID_SIZE / 2) + 1));
+				int z = ((GRID_SIZE - 50) / 2) + (rand() % ((GRID_SIZE / 2) - ((GRID_SIZE - 50) / 2) + 1));
+				int xLen = 2 + (rand() % (4 - 2 + 1));
+				int yLen = 2 + (rand() % (4 - 2 + 1));
+				int zLen = 2 + (rand() % (4 - 2 + 1));
+
+				if (rand() % 100 >= 50) {
+					z = -z;
+				}
+
+				bushes.push_back(new Bush(glm::vec3(x, 0, z), glm::vec3(xLen, yLen, zLen)));
+			}
+
+			for (int i = 0; i < 50; i++) {
+				int x = ((GRID_SIZE - 50) / 2) + (rand() % ((GRID_SIZE / 2) - ((GRID_SIZE - 50) / 2) + 1));
+				int z = -(GRID_SIZE / 2) + (rand() % ((GRID_SIZE / 2) - -(GRID_SIZE / 2) + 1));
+				int xLen = 2 + (rand() % (4 - 2 + 1));
+				int yLen = 2 + (rand() % (4 - 2 + 1));
+				int zLen = 2 + (rand() % (4 - 2 + 1));
+
+				if (rand() % 100 >= 50) {
+					x = -x;
+				}
+
+				bushes.push_back(new Bush(glm::vec3(x, 0, z), glm::vec3(xLen, yLen, zLen)));
+			}
+		}
 
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
