@@ -9,6 +9,9 @@
 #include "objects/axis.h"
 #include "objects/cube.h"
 #include "objects/texture.h"
+#include "objects/character.h"
+#include "objects/pair.h"
+#include "objects/Sphere.h"
 #include "objects/tree.h"
 #include "objects/bush.h"
 
@@ -38,14 +41,11 @@ GLdouble lastX = WINDOW_LENGTH/ 2.0;
 GLdouble lastY = WINDOW_WIDTH / 2.0;
 GLfloat fov = 60.0f;
 
-GLfloat angle = 0.0f;
-GLfloat moveX = 0.0f;
-GLfloat moveY = 0.0f;
-GLfloat moveZ = 0.0f;
-
-glm::mat4 shear(glm::vec4(1.0f, 0.0f, 0.0f, 0.0f), glm::vec4(0.0f, 1.0f, 0.5f, 0.0f), glm::vec4(0.0f, 0.0f, 1.0f, 0.0f), glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
-
-//glm::vec3 pairU4Pos = glm::vec3(0, 0, 0);
+glm::vec3 pairU4Pos = glm::vec3(0, 0, 0);
+glm::vec3 pairE5Pos = glm::vec3(-40, 0, -45);
+glm::vec3 pairJ5Pos = glm::vec3(40, 0, -45);
+glm::vec3 pairA6Pos = glm::vec3(40, 0, 45);
+glm::vec3 pairN2Pos = glm::vec3(-40, 0, 45);
 
 void mouse_callback_horizontal(GLFWwindow* window, GLdouble xpos, GLdouble ypos)
 {
@@ -143,10 +143,6 @@ void processInput(GLFWwindow* window)
 		cameraPos = glm::vec3(0.0f, 5.0f, 20.0f);
 		cameraFront = glm::vec3(0.0f, 1.0f, 0.0f);
 		fov = 45.0f;
-		angle = 0.0f;
-		moveX = 0.0f;
-		moveY = 0.0f;
-		moveZ = 0.0f;
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
@@ -221,25 +217,197 @@ int main(void)
 	Shader *textureShader = new Shader("src/shaders/texture.vs", "src/shaders/texture.fs");
 	Shader *lightShader = new Shader("src/shaders/lightCube.vs", "src/shaders/lightCube.fs");
 	Shader *depthShader = new Shader("src/shaders/depthShader.vs", "src/shaders/depthShader.fs");
+	Shader *sphereShader = new Shader("src/shaders/SphereShader.vs", "src/shaders/SphereShader.fs");
 	Shader *gridShader = new Shader("src/shaders/gridShader.vs","src/shaders/gridShader.fs");
+
+	// Referenced from https://freestocktextures.com/texture/wall-moss-brick,621.html
+	Texture *ruinTexture = new Texture("src/textures/ruin.jpg");
 
 	Grid *grid = new Grid(GRID_SIZE);
 	Axis *axis = new Axis(AXIS_SIZE);
 
 	Cube *lightSource = new Cube(0, 30, 0);
 
+	// Letter U and digit 4 for Giuseppe Campanelli
+	std::vector<Cube*> cubesU = {
+		new Cube(-5, 0, 0),
+		new Cube(-5, 1, 0),
+		new Cube(-5, 2, 0),
+		new Cube(-5, 3, 0),
+		new Cube(-5, 4, 0),
+		new Cube(-4, 0, 0),
+		new Cube(-3, 0, 0),
+		new Cube(-2, 0, 0),
+		new Cube(-2, 1, 0),
+		new Cube(-2, 2, 0),
+		new Cube(-2, 3, 0),
+		new Cube(-2, 4, 0)
+	};
+	std::vector<Cube*> cubes4 = {
+		new Cube(1, 2, 0),
+		new Cube(1, 3, 0),
+		new Cube(1, 4, 0),
+		new Cube(2, 2, 0),
+		new Cube(3, 2, 0),
+		new Cube(4, 0, 0),
+		new Cube(4, 1, 0),
+		new Cube(4, 2, 0),
+		new Cube(4, 3, 0),
+		new Cube(4, 4, 0)
+	};
+	Pair *pairU4 = new Pair(new Character(cubesU), new Character(cubes4), new Sphere(0, 6, 0, 5, 10, 10));
+
+	// Letter E and digit 5 for Alexis Laurens-Renner
+	std::vector<Cube*> cubesE = {
+		new Cube(-5, 0, 0),
+		new Cube(-5, 1, 0),
+		new Cube(-5, 2, 0),
+		new Cube(-5, 3, 0),
+		new Cube(-5, 4, 0),
+		new Cube(-4, 0, 0),
+		new Cube(-3, 0, 0),
+		new Cube(-2, 0, 0),
+		new Cube(-4, 2, 0),
+		new Cube(-3, 2, 0),
+		new Cube(-2, 2, 0),
+		new Cube(-4, 4, 0),
+		new Cube(-3, 4, 0),
+		new Cube(-2, 4, 0)
+	};
+	std::vector<Cube*> cubes5_1 = {
+		new Cube(4, 0, 0),
+		new Cube(4, 1, 0),
+		new Cube(4, 2, 0),
+		new Cube(4, 4, 0),
+		new Cube(1, 0, 0),
+		new Cube(1, 2, 0),
+		new Cube(1, 3, 0),
+		new Cube(1, 4, 0),
+		new Cube(3, 4, 0),
+		new Cube(2, 4, 0),
+		new Cube(3, 0, 0),
+		new Cube(2, 0, 0),
+		new Cube(3, 2, 0),
+		new Cube(2, 2, 0)
+	};
+	Pair *pairE5 = new Pair(new Character(cubesE), new Character(cubes5_1), new Sphere(0, 6, 0, 5, 10, 10));
+
+	// Letter J and digit 5 for Bojan Srbinoski
+	std::vector<Cube*> cubesJ = {
+		new Cube(-2, 4, 0),
+		new Cube(-3, 4, 0),
+		new Cube(-4, 4, 0),
+		new Cube(-3, 3, 0),
+		new Cube(-3, 2, 0),
+		new Cube(-3, 1, 0),
+		new Cube(-3, 0, 0),
+		new Cube(-4, 0, 0),
+		new Cube(-5, 0, 0),
+		new Cube(-5, 1, 0)
+	};
+	std::vector<Cube*> cubes5_2 = {
+		new Cube(4, 0, 0),
+		new Cube(4, 1, 0),
+		new Cube(4, 2, 0),
+		new Cube(4, 4, 0),
+		new Cube(1, 0, 0),
+		new Cube(1, 2, 0),
+		new Cube(1, 3, 0),
+		new Cube(1, 4, 0),
+		new Cube(3, 4, 0),
+		new Cube(2, 4, 0),
+		new Cube(3, 0, 0),
+		new Cube(2, 0, 0),
+		new Cube(3, 2, 0),
+		new Cube(2, 2, 0)
+	};
+	Pair *pairJ5 = new Pair(new Character(cubesJ), new Character(cubes5_2), new Sphere(0, 6, 0, 5, 10, 10));
+
+	// Letter A and digit 6 for Saad Ahmed
+	std::vector<Cube*> cubesA = {
+		new Cube(-5, 5, 0),
+		new Cube(-4, 5, 0),
+		new Cube(-3, 5, 0),
+		new Cube(-2, 5, 0),
+		new Cube(-5, 4, 0),
+		new Cube(-5, 3, 0),
+		new Cube(-5, 2, 0),
+		new Cube(-5, 1, 0),
+		new Cube(-5, 0, 0),
+		new Cube(-2, 4, 0),
+		new Cube(-2, 3, 0),
+		new Cube(-2, 2, 0),
+		new Cube(-2, 1, 0),
+		new Cube(-2, 0, 0),
+		new Cube(-4, 3, 0),
+		new Cube(-3, 3, 0)
+	};
+	std::vector<Cube*> cubes6 = {
+		new Cube(1, 5, 0),
+		new Cube(2, 5, 0),
+		new Cube(3, 5, 0),
+		new Cube(4, 5, 0),
+		new Cube(1, 4, 0),
+		new Cube(1, 3, 0),
+		new Cube(1, 2, 0),
+		new Cube(1, 1, 0),
+		new Cube(1, 0, 0),
+		new Cube(2, 0, 0),
+		new Cube(3, 0, 0),
+		new Cube(4, 0, 0),
+		new Cube(4, 1, 0),
+		new Cube(4, 2, 0),
+		new Cube(3, 2, 0),
+		new Cube(2, 2, 0)
+	};
+	Pair *pairA6 = new Pair(new Character(cubesA), new Character(cubes6), new Sphere(0, 6, 0, 5, 10, 10));
+
+	// Letter N and digit 2 for Anna Kmieciak
+	std::vector<Cube*> cubesN = {
+		new Cube(-5, 0, 0),
+		new Cube(-5, 1, 0),
+		new Cube(-5, 2, 0),
+		new Cube(-5, 3, 0),
+		new Cube(-5, 4, 0),
+		new Cube(-4, 3, 0),
+		new Cube(-3, 2, 0),
+		new Cube(-2, 1, 0),
+		new Cube(-1, 0, 0),
+		new Cube(-1, 1, 0),
+		new Cube(-1, 2, 0),
+		new Cube(-1, 3, 0),
+		new Cube(-1, 4, 0)
+	};
+	std::vector<Cube*> cubes2 = {
+		new Cube(2, 4, 0),
+		new Cube(3, 4, 0),
+		new Cube(4, 4, 0),
+		new Cube(5, 4, 0),
+		new Cube(5, 3, 0),
+		new Cube(2, 2, 0),
+		new Cube(2, 1, 0),
+		new Cube(3, 2, 0),
+		new Cube(4, 2, 0),
+		new Cube(5, 2, 0),
+		new Cube(2, 0, 0),
+		new Cube(3, 0, 0),
+		new Cube(4, 0, 0),
+		new Cube(5, 0, 0)
+	};
+	Pair *pairN2 = new Pair(new Character(cubesN), new Character(cubes2), new Sphere(0, 6, 0, 5, 10, 10));
+
+	// Initial procedural creation of objects on terrain
 	std::vector<Tree*> trees;
+	std::vector<Bush*> bushes;
 
 	srand(time(NULL));
 
-	for (int i = 0; i < 50; i++) {
+	/*for (int i = 0; i < 50; i++) {
 		int x = -(GRID_SIZE / 2) + (rand() % (GRID_SIZE - -(GRID_SIZE / 2) + 1));
 		int z = -(GRID_SIZE / 2) + (rand() % (GRID_SIZE - -(GRID_SIZE / 2) + 1));
 		int size = 3 + (rand() % (6 - 3 + 1));
 		trees.push_back(new Tree(glm::vec3(x, 0, z), size));
 	}
-
-	std::vector<Bush*> bushes;
 
 	for (int i = 0; i < 100; i++) {
 		int x = -40 + (rand() % (80 - -40 + 1));
@@ -247,6 +415,58 @@ int main(void)
 		int xLen = 2 + (rand() % (4 - 2 + 1));
 		int yLen = 2 + (rand() % (4 - 2 + 1));
 		int zLen = 2 + (rand() % (4 - 2 + 1));
+		bushes.push_back(new Bush(glm::vec3(x, 0, z), glm::vec3(xLen, yLen, zLen)));
+	}*/
+
+	for (int i = 0; i < 25; i++) {
+		int x = -((GRID_SIZE - 10) / 2) + (rand() % (((GRID_SIZE - 10) / 2) - -((GRID_SIZE - 10) / 2) + 1));
+		int z = 5 + (rand() % ((GRID_SIZE / 2) - 5 + 1));
+		int size = 3 + (rand() % (6 - 3 + 1));
+
+		if ((rand() % 100) > 50) {
+			z = -z;
+		}
+
+		trees.push_back(new Tree(glm::vec3(x, 0, z), size));
+	}
+
+	for (int i = 0; i < 25; i++) {
+		int x = 5 + (rand() % ((GRID_SIZE / 2) - 5 + 1));
+		int z = -((GRID_SIZE - 10) / 2) + (rand() % (((GRID_SIZE - 10) / 2) - -((GRID_SIZE - 10) / 2) + 1));
+		int size = 3 + (rand() % (6 - 3 + 1));
+
+		if ((rand() % 100) > 50) {
+			x = -x;
+		}
+
+		trees.push_back(new Tree(glm::vec3(x, 0, z), size));
+	}
+
+	for (int i = 0; i < 50; i++) {
+		int x = -((GRID_SIZE - 10) / 2) + (rand() % (((GRID_SIZE - 10) / 2) - -((GRID_SIZE - 10) / 2) + 1));
+		int z = 5 + (rand() % ((GRID_SIZE / 2) - 5 + 1));
+		int xLen = 2 + (rand() % (4 - 2 + 1));
+		int yLen = 2 + (rand() % (4 - 2 + 1));
+		int zLen = 2 + (rand() % (4 - 2 + 1));
+
+		if (rand() % 100 >= 50) {
+			z = -z;
+		}
+
+		bushes.push_back(new Bush(glm::vec3(x, 0, z), glm::vec3(xLen, yLen, zLen)));
+	}
+
+	for (int i = 0; i < 50; i++) {
+		int x = 5 + (rand() % ((GRID_SIZE / 2) - 5 + 1));
+		int z = -((GRID_SIZE - 10) / 2) + (rand() % (((GRID_SIZE - 10) / 2) - -((GRID_SIZE - 10) / 2) + 1));
+		int xLen = 2 + (rand() % (4 - 2 + 1));
+		int yLen = 2 + (rand() % (4 - 2 + 1));
+		int zLen = 2 + (rand() % (4 - 2 + 1));
+
+		if (rand() % 100 >= 50) {
+			x = -x;
+		}
+
 		bushes.push_back(new Bush(glm::vec3(x, 0, z), glm::vec3(xLen, yLen, zLen)));
 	}
 	
@@ -349,11 +569,25 @@ int main(void)
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		/*glm::mat4 modelU4 = glm::mat4(1.0f);
-		modelU4 = glm::translate(modelU4, glm::vec3(pairU4Pos.x + moveX, pairU4Pos.y + moveY, pairU4Pos.z + moveZ));
-		modelU4 = glm::rotate(modelU4, glm::radians(angle), glm::vec3(0.0, 1.0, 0.0));
-		modelU4 = glm::scale(modelU4, glm::vec3(scale, scale, scale));
-		modelU4 = modelU4 * shear;*/
+		glm::mat4 modelU4 = glm::mat4(1.0f);
+		modelU4 = glm::translate(modelU4, glm::vec3(pairU4Pos.x, pairU4Pos.y, pairU4Pos.z));
+		modelU4 = glm::scale(modelU4, glm::vec3(1.5, 1.5, 1.5));
+
+		glm::mat4 modelE5 = glm::mat4(1.0f);
+		modelE5 = glm::translate(modelE5, glm::vec3(pairE5Pos.x, pairE5Pos.y, pairE5Pos.z));
+		modelE5 = glm::scale(modelE5, glm::vec3(1.5, 1.5, 1.5));
+
+		glm::mat4 modelJ5 = glm::mat4(1.0f);
+		modelJ5 = glm::translate(modelJ5, glm::vec3(pairJ5Pos.x, pairJ5Pos.y, pairJ5Pos.z));
+		modelJ5 = glm::scale(modelJ5, glm::vec3(1.5, 1.5, 1.5));
+
+		glm::mat4 modelA6 = glm::mat4(1.0f);
+		modelA6 = glm::translate(modelA6, glm::vec3(pairA6Pos.x, pairA6Pos.y, pairA6Pos.z));
+		modelA6 = glm::scale(modelA6, glm::vec3(1.5, 1.5, 1.5));
+
+		glm::mat4 modelN2 = glm::mat4(1.0f);
+		modelN2 = glm::translate(modelN2, glm::vec3(pairN2Pos.x, pairN2Pos.y, pairN2Pos.z));
+		modelN2 = glm::scale(modelN2, glm::vec3(1.5, 1.5, 1.5));
 
 		//Shadow Pass 1 - Shadow Map
 		glm::mat4 lightProjection, lightView;
@@ -380,6 +614,12 @@ int main(void)
 			(*it)->draw(depthShader);
 		}
 
+		pairU4->draw(depthShader, sphereShader, modelU4);
+		pairE5->draw(depthShader, sphereShader, modelE5);
+		pairJ5->draw(depthShader, sphereShader, modelJ5);
+		pairA6->draw(depthShader, sphereShader, modelA6);
+		pairN2->draw(depthShader, sphereShader, modelN2);
+
 		// reset viewport
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glViewport(0, 0, WINDOW_LENGTH, WINDOW_WIDTH);
@@ -401,6 +641,14 @@ int main(void)
 		lightShader->setMat4("projection", projection);
 		lightShader->setMat4("view", view);
 		lightSource->draw(lightShader, lightModel);
+
+		//Generate Sphere
+		sphereShader->use();
+		sphereShader->setMat4("projection", projection);
+		sphereShader->setMat4("view", view);
+		sphereShader->setVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+		sphereShader->setVec3("lightPos", glm::vec3(0.0f, 30.0f, 0.0f));
+		sphereShader->setVec3("viewPos", cameraPos);
 
 		//Light For Texture
 		textureShader->use();
@@ -441,8 +689,11 @@ int main(void)
 			(*it)->draw(textureShader);
 		}
 
-		if (angle == 360.0f)
-			angle = 0.0f;
+		pairU4->draw(textureShader, sphereShader, modelU4, ruinTexture);
+		pairE5->draw(textureShader, sphereShader, modelE5, ruinTexture);
+		pairJ5->draw(textureShader, sphereShader, modelJ5, ruinTexture);
+		pairA6->draw(textureShader, sphereShader, modelA6, ruinTexture);
+		pairN2->draw(textureShader, sphereShader, modelN2, ruinTexture);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -456,11 +707,18 @@ int main(void)
 		delete *it;
 	}
 
+	delete pairU4;
+	delete pairE5;
+	delete pairJ5;
+	delete pairA6;
+	delete pairN2;
 	delete axis;
 	delete grid;
+	delete ruinTexture;
 	delete gridShader;
 	delete depthShader;
 	delete textureShader;
+	delete sphereShader;
 	delete lightShader;
 	delete basicShader;
 

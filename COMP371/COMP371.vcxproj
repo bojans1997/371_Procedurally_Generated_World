@@ -149,9 +149,14 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\objects\axis.cpp" />
     <ClCompile Include="src\objects\bush.cpp" />
+    <ClCompile Include="src\objects\character.cpp" />
     <ClCompile Include="src\objects\cube.cpp" />
     <ClCompile Include="src\objects\grid.cpp" />
+    <ClCompile Include="src\objects\pair.cpp" />
+    <ClCompile Include="src\objects\Sector.cpp" />
     <ClCompile Include="src\objects\shader.cpp" />
+    <ClCompile Include="src\objects\Sphere.cpp" />
+    <ClCompile Include="src\objects\Stack.cpp" />
     <ClCompile Include="src\objects\texture.cpp" />
     <ClCompile Include="src\objects\tree.cpp" />
   </ItemGroup>
@@ -166,15 +171,22 @@
     <None Include="src\shaders\shader.vs" />
     <None Include="src\shaders\gridShader.fs" />
     <None Include="src\shaders\gridShader.vs" />
+    <None Include="src\shaders\SphereShader.fs" />
+    <None Include="src\shaders\SphereShader.vs" />
     <None Include="src\shaders\texture.fs" />
     <None Include="src\shaders\texture.vs" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\objects\axis.h" />
     <ClInclude Include="src\objects\bush.h" />
+    <ClInclude Include="src\objects\character.h" />
     <ClInclude Include="src\objects\cube.h" />
     <ClInclude Include="src\objects\grid.h" />
+    <ClInclude Include="src\objects\pair.h" />
+    <ClInclude Include="src\objects\Sector.h" />
     <ClInclude Include="src\objects\shader.h" />
+    <ClInclude Include="src\objects\Sphere.h" />
+    <ClInclude Include="src\objects\Stack.h" />
     <ClInclude Include="src\objects\texture.h" />
     <ClInclude Include="src\objects\tree.h" />
     <ClInclude Include="src\stb_image.h" />
@@ -184,6 +196,7 @@
     <Image Include="src\textures\grass.jpg" />
     <Image Include="src\textures\leaves.jpg" />
     <Image Include="src\textures\bark.jpg" />
+    <Image Include="src\textures\ruin.jpg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

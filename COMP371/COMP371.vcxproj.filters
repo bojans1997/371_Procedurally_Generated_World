@@ -45,6 +45,21 @@
     <ClCompile Include="src\objects\bush.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\objects\character.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\objects\pair.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\objects\Sector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\objects\Sphere.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\objects\Stack.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\shaders\depthShader.fs">
@@ -83,6 +98,8 @@
     <None Include="src\shaders\gridShader.vs">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="src\shaders\SphereShader.fs" />
+    <None Include="src\shaders\SphereShader.vs" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\objects\grid.h">
@@ -109,6 +126,21 @@
     <ClInclude Include="src\objects\bush.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\objects\character.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\objects\pair.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\objects\Sector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\objects\Sphere.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\objects\Stack.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="src\textures\grass.jpg">
@@ -121,6 +153,9 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="src\textures\bush.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="src\textures\ruin.jpg">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

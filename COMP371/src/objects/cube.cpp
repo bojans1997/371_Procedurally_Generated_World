@@ -114,3 +114,25 @@ void Cube::draw(Shader *shader, glm::mat4 matrix, Texture *texture)
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
+
+void Cube::draw2(Shader *shader, glm::mat4 matrix)
+{
+	shader->use();
+	glBindVertexArray(VAO);
+
+	matrix = glm::translate(matrix, glm::vec3(x, y, z));
+	shader->setMat4("model", matrix);
+
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+}
+
+void Cube::draw2(Shader *shader, glm::mat4 matrix, Texture *texture)
+{
+	if (texture) {
+		glBindTexture(GL_TEXTURE_2D, texture->getTextureId());
+	}
+
+	this->draw2(shader, matrix);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+}

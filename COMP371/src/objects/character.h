@@ -1,6 +1,6 @@
 #pragma once
-#ifndef CUBE_H
-#define CUBE_H
+#ifndef CHARACTER_H
+#define CHARACTER_H
 
 #include <glad.h>
 #include <glfw3.h>
@@ -8,23 +8,20 @@
 #include <gtc/matrix_transform.hpp>
 #include <gtc/type_ptr.hpp>
 #include <iostream>
+#include <vector>
 #include "../stb_image.h"
 #include "shader.h"
 #include "texture.h"
+#include "cube.h"
 
-class Cube
+class Character
 {
 public:
-	Cube(int x, int y, int z);
-	~Cube();
-	glm::mat4 getModel();
+	Character(std::vector<Cube*> cubes);
+	~Character();
 	void draw(Shader *shader, glm::mat4 matrix);
 	void draw(Shader *shader, glm::mat4 matrix, Texture *texture);
-	void draw2(Shader *shader, glm::mat4 matrix);
-	void draw2(Shader *shader, glm::mat4 matrix, Texture *texture);
 protected:
-	int x, y, z;
-	glm::mat4 model = glm::mat4(1.0f);
-	GLuint VAO = 0, VBO = 0;
+	std::vector<Cube*> cubes;
 };
 #endif
