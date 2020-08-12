@@ -138,12 +138,10 @@ void mouse_callback_zoom(GLFWwindow* window, GLdouble xpos, GLdouble ypos)
 		fov = 90.0f;
 }
 
-bool checkBushCollision(std::vector<Bush*> bushes, glm::vec3 cameraPos) {
+bool checkTreeCollision(std::vector<Tree*> trees, glm::vec3 cameraPos) {
 	//std::cout << glm::distance(bushes.front()->position, cameraPos) << std::endl;
-	for (std::vector<Bush*>::iterator it = bushes.begin(); it != bushes.end(); ++it) {
-		if (glm::distance((*it)->position, cameraPos) <= 4.0f) {
-			std::cout << "Bush collision detected" << std::endl;
-			std::cout << "-----------------------" << std::endl;
+	for (std::vector<Tree*>::iterator it = trees.begin(); it != trees.end(); ++it) {
+		if (glm::distance((*it)->position, cameraPos) <= 2.4f) {
 			return true;
 		}
 	}
@@ -162,22 +160,22 @@ void processInput(GLFWwindow* window)
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-		if (!checkBushCollision(bushes, glm::vec3(cameraPos.x, cameraPos.y, cameraPos.z - 0.2f))) {
+		if (!checkTreeCollision(trees, glm::vec3(cameraPos.x, cameraPos.y, cameraPos.z - 0.2f))) {
 			cameraPos = glm::vec3(cameraPos.x, cameraPos.y, cameraPos.z - 0.2f);
 		}
 	}
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-		if (!checkBushCollision(bushes, glm::vec3(cameraPos.x, cameraPos.y, cameraPos.z + 0.2f))) {
+		if (!checkTreeCollision(trees, glm::vec3(cameraPos.x, cameraPos.y, cameraPos.z + 0.2f))) {
 			cameraPos = glm::vec3(cameraPos.x, cameraPos.y, cameraPos.z + 0.2f);
 		}
 	}
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-		if (!checkBushCollision(bushes, glm::vec3(cameraPos.x - 0.2f, cameraPos.y, cameraPos.z - 0.2f))) {
+		if (!checkTreeCollision(trees, glm::vec3(cameraPos.x - 0.2f, cameraPos.y, cameraPos.z - 0.2f))) {
 			cameraPos = glm::vec3(cameraPos.x - 0.2f, cameraPos.y, cameraPos.z);
 		}
 	}
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-		if (!checkBushCollision(bushes, glm::vec3(cameraPos.x + 0.2f, cameraPos.y, cameraPos.z - 0.2f))) {
+		if (!checkTreeCollision(trees, glm::vec3(cameraPos.x + 0.2f, cameraPos.y, cameraPos.z - 0.2f))) {
 			cameraPos = glm::vec3(cameraPos.x + 0.2f, cameraPos.y, cameraPos.z);
 		}
 	}

@@ -21,12 +21,12 @@ public:
 	Tree(glm::vec3 position, int size);
 	~Tree();
 	void draw(Shader *shader);
+	glm::vec3 position;
 protected:
 	// Referenced from https://freestocktextures.com/texture/bark-nature-wood,35.html
 	Texture *barkTexture = new Texture("src/textures/bark.jpg");
 	// Referenced from https://freestocktextures.com/texture/nature-bush-green,688.html
 	Texture *leavesTexture = new Texture("src/textures/leaves.jpg");
-	glm::vec3 position;
 	int size;
 	Cube* bark;
 	Cube* leaves;
