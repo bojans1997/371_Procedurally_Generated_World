@@ -26,8 +26,8 @@ int AXIS_SIZE = 5;
 
 GLFWwindow* window;
 
-glm::vec3 cameraPos = glm::vec3(0.0f, 5.0f, 20.0f);
-glm::vec3 cameraFront = glm::vec3(0.0f, 1.0f, 0.0f);
+glm::vec3 cameraPos = glm::vec3(0.0f, 2.0f, 20.0f);
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 GLfloat distance = 20.0f;
 GLfloat camX = 0;
@@ -46,6 +46,10 @@ glm::vec3 pairE5Pos = glm::vec3(-40, 0, -45);
 glm::vec3 pairJ5Pos = glm::vec3(40, 0, -45);
 glm::vec3 pairA6Pos = glm::vec3(40, 0, 45);
 glm::vec3 pairN2Pos = glm::vec3(-40, 0, 45);
+
+// Initial procedural creation of objects on terrain
+std::vector<Tree*> trees;
+std::vector<Bush*> bushes;
 
 void mouse_callback_horizontal(GLFWwindow* window, GLdouble xpos, GLdouble ypos)
 {
@@ -134,6 +138,18 @@ void mouse_callback_zoom(GLFWwindow* window, GLdouble xpos, GLdouble ypos)
 		fov = 90.0f;
 }
 
+bool checkBushCollision(std::vector<Bush*> bushes, glm::vec3 cameraPos) {
+	//std::cout << glm::distance(bushes.front()->position, cameraPos) << std::endl;
+	for (std::vector<Bush*>::iterator it = bushes.begin(); it != bushes.end(); ++it) {
+		if (glm::distance((*it)->position, cameraPos) <= 4.0f) {
+			std::cout << "Bush collision detected" << std::endl;
+			std::cout << "-----------------------" << std::endl;
+			return true;
+		}
+	}
+	return false;
+}
+
 void processInput(GLFWwindow* window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -146,16 +162,24 @@ void processInput(GLFWwindow* window)
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-		cameraPos = glm::vec3(cameraPos.x, cameraPos.y, cameraPos.z - 0.2f);
+		if (!checkBushCollision(bushes, glm::vec3(cameraPos.x, cameraPos.y, cameraPos.z - 0.2f))) {
+			cameraPos = glm::vec3(cameraPos.x, cameraPos.y, cameraPos.z - 0.2f);
+		}
 	}
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-		cameraPos = glm::vec3(cameraPos.x, cameraPos.y, cameraPos.z + 0.2f);
+		if (!checkBushCollision(bushes, glm::vec3(cameraPos.x, cameraPos.y, cameraPos.z + 0.2f))) {
+			cameraPos = glm::vec3(cameraPos.x, cameraPos.y, cameraPos.z + 0.2f);
+		}
 	}
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-		cameraPos = glm::vec3(cameraPos.x - 0.2f, cameraPos.y, cameraPos.z);
+		if (!checkBushCollision(bushes, glm::vec3(cameraPos.x - 0.2f, cameraPos.y, cameraPos.z - 0.2f))) {
+			cameraPos = glm::vec3(cameraPos.x - 0.2f, cameraPos.y, cameraPos.z);
+		}
 	}
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-		cameraPos = glm::vec3(cameraPos.x + 0.2f, cameraPos.y, cameraPos.z);
+		if (!checkBushCollision(bushes, glm::vec3(cameraPos.x + 0.2f, cameraPos.y, cameraPos.z - 0.2f))) {
+			cameraPos = glm::vec3(cameraPos.x + 0.2f, cameraPos.y, cameraPos.z);
+		}
 	}
 
 	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_RELEASE) {
@@ -396,10 +420,6 @@ int main(void)
 	};
 	Pair *pairN2 = new Pair(new Character(cubesN), new Character(cubes2), new Sphere(0, 6, 0, 5, 10, 10));
 
-	// Initial procedural creation of objects on terrain
-	std::vector<Tree*> trees;
-	std::vector<Bush*> bushes;
-
 	srand(time(NULL));
 
 	/*for (int i = 0; i < 50; i++) {
@@ -627,7 +647,7 @@ int main(void)
 
 		//Shadow Pass 2 - Normal Render
 		glm::mat4 projection = glm::perspective(glm::radians(fov), (float)WINDOW_LENGTH / (float)WINDOW_WIDTH, 0.1f, 100.0f);
-		glm::mat4 view = glm::lookAt(cameraPos, cameraFront, cameraUp);
+		glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 
 		//Draw axis
 		basicShader->use();
