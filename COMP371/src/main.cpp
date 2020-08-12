@@ -51,7 +51,11 @@ glm::vec3 pairN2Pos = glm::vec3(-40, 0, 45);
 std::vector<Tree*> trees;
 std::vector<Bush*> bushes;
 
-void mouse_callback_horizontal(GLFWwindow* window, GLdouble xpos, GLdouble ypos)
+// timing
+float deltaTime = 0.0f;	// time between current frame and last frame
+float lastFrame = 0.0f;
+
+void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
 	if (firstMouse)
 	{
@@ -60,82 +64,29 @@ void mouse_callback_horizontal(GLFWwindow* window, GLdouble xpos, GLdouble ypos)
 		firstMouse = false;
 	}
 
-	GLdouble xoffset = xpos - lastX;
-	lastX = xpos;
-
-	float sensitivity = 0.1f;
-	xoffset *= sensitivity;
-
-	yaw += xoffset;
-
-	if (pitch > 89.0f)
-		pitch = 89.0f;
-	if (pitch < -89.0f)
-		pitch = -89.0f;
-
-	glm::vec3 direction;
-	direction.x = cos(glm::radians(yaw));
-	direction.y = cameraFront.y;
-	direction.z = sin(glm::radians(yaw));
-	cameraFront.x += direction.x;
-	cameraFront.z += direction.z;
-	
-}
-
-void mouse_callback_vertical(GLFWwindow* window, GLdouble xpos, GLdouble ypos)
-{
-	if (firstMouse)
-	{
-		lastX = xpos;
-		lastY = ypos;
-		firstMouse = false;
-	}
-
-	GLdouble xoffset = xpos - lastX;
-	GLdouble yoffset = lastY - ypos;
+	float xoffset = xpos - lastX;
+	float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
 	lastX = xpos;
 	lastY = ypos;
 
-	float sensitivity = 0.1f;
+	float sensitivity = 0.1f; // change this value to your liking
 	xoffset *= sensitivity;
 	yoffset *= sensitivity;
 
 	yaw += xoffset;
 	pitch += yoffset;
 
+	// make sure that when pitch is out of bounds, screen doesn't get flipped
 	if (pitch > 89.0f)
 		pitch = 89.0f;
 	if (pitch < -89.0f)
 		pitch = -89.0f;
 
-	glm::vec3 direction;
-	direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-	direction.y = sin(glm::radians(pitch));
-	direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-	cameraFront.y += direction.y;
-}
-
-void mouse_callback_zoom(GLFWwindow* window, GLdouble xpos, GLdouble ypos)
-{
-	if (firstMouse)
-	{
-		lastX = xpos;
-		lastY = ypos;
-		firstMouse = false;
-	}
-
-	GLdouble yoffset = lastY - ypos;
-	lastY = ypos;
-
-	float sensitivity = 0.1f;
-	yoffset *= sensitivity;
-
-	fov -= yoffset;
-
-	if (fov <= 1.0f)
-		fov = 1.0f;
-	if (fov >= 90.0f)
-		fov = 90.0f;
+	glm::vec3 front;
+	front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+	front.y = sin(glm::radians(0.0f));
+	front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+	cameraFront = glm::normalize(front);
 }
 
 int randomInt(int min, int max) {
@@ -198,7 +149,8 @@ void generateObjects(int min1, int max1, int min2, int max2) {
 
 bool checkCollision(std::vector<Tree*> trees, glm::vec3 cameraPos) {
 	for (std::vector<Tree*>::iterator it = trees.begin(); it != trees.end(); ++it) {
-		if (glm::distance((*it)->position, cameraPos) <= 2.4f) {
+		glm::vec3 cubeCenter = glm::vec3((*it)->position.x + 0.5f, (*it)->position.y, (*it)->position.z + 0.5f);
+		if (glm::distance(cubeCenter, cameraPos) <= 2.2f) {
 			return true;
 		}
 	}
@@ -207,8 +159,8 @@ bool checkCollision(std::vector<Tree*> trees, glm::vec3 cameraPos) {
 		glm::vec3 pos = (*it)->position;
 		glm::vec3 size = (*it)->size;
 
-		bool collisionX = cameraPos.x + 0.01f >= pos.x && cameraPos.x - 0.01f <= pos.x + size.x;
-		bool collisionZ = cameraPos.z + 0.01f >= pos.z && cameraPos.z - 0.01f <= pos.z + size.z;
+		bool collisionX = cameraPos.x + 0.1f >= pos.x && cameraPos.x - 0.1f <= pos.x + size.x;
+		bool collisionZ = cameraPos.z + 0.1f >= pos.z && cameraPos.z - 0.1f <= pos.z + size.z;
 
 		if (collisionX && collisionZ) {
 			return true;
@@ -220,6 +172,8 @@ bool checkCollision(std::vector<Tree*> trees, glm::vec3 cameraPos) {
 
 void processInput(GLFWwindow* window)
 {
+	float cameraSpeed = 10.0 * deltaTime;
+
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 
@@ -230,49 +184,28 @@ void processInput(GLFWwindow* window)
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-		if (!checkCollision(trees, glm::vec3(cameraPos.x, cameraPos.y, cameraPos.z - 0.2f))) {
-			cameraPos = glm::vec3(cameraPos.x, cameraPos.y, cameraPos.z - 0.2f);
+		glm::vec3 newCameraPos = cameraPos + cameraSpeed * cameraFront;
+		if (!checkCollision(trees, newCameraPos)) {
+			cameraPos = newCameraPos;
 		}
 	}
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-		if (!checkCollision(trees, glm::vec3(cameraPos.x, cameraPos.y, cameraPos.z + 0.2f))) {
-			cameraPos = glm::vec3(cameraPos.x, cameraPos.y, cameraPos.z + 0.2f);
+		glm::vec3 newCameraPos = cameraPos - cameraSpeed * cameraFront;
+		if (!checkCollision(trees, newCameraPos)) {
+			cameraPos = newCameraPos;
 		}
 	}
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-		if (!checkCollision(trees, glm::vec3(cameraPos.x - 0.2f, cameraPos.y, cameraPos.z - 0.2f))) {
-			cameraPos = glm::vec3(cameraPos.x - 0.2f, cameraPos.y, cameraPos.z);
+		glm::vec3 newCameraPos = cameraPos - glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+		if (!checkCollision(trees, newCameraPos)) {
+			cameraPos = newCameraPos;
 		}
 	}
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-		if (!checkCollision(trees, glm::vec3(cameraPos.x + 0.2f, cameraPos.y, cameraPos.z - 0.2f))) {
-			cameraPos = glm::vec3(cameraPos.x + 0.2f, cameraPos.y, cameraPos.z);
+		glm::vec3 newCameraPos = cameraPos + glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+		if (!checkCollision(trees, newCameraPos)) {
+			cameraPos = newCameraPos;
 		}
-	}
-
-	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_RELEASE) {
-		glfwSetInputMode(window, GLFW_STICKY_KEYS, GLFW_FALSE);
-		glfwSetCursorPosCallback(window, NULL);
-	}
-	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_RELEASE) {
-		glfwSetInputMode(window, GLFW_STICKY_KEYS, GLFW_FALSE);
-		glfwSetCursorPosCallback(window, NULL);
-	}
-	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE) {
-		glfwSetInputMode(window, GLFW_STICKY_KEYS, GLFW_FALSE);
-		glfwSetCursorPosCallback(window, NULL);
-	}
-	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
-		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
-		glfwSetCursorPosCallback(window, mouse_callback_horizontal);
-	}
-	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS) {
-		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
-		glfwSetCursorPosCallback(window, mouse_callback_vertical);
-	}
-	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
-		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
-		glfwSetCursorPosCallback(window, mouse_callback_zoom);
 	}
 }
 
@@ -296,6 +229,9 @@ int main(void)
 
     glfwMakeContextCurrent(window);
 	glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
+	glfwSetCursorPosCallback(window, mouse_callback);
+
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
@@ -527,6 +463,10 @@ int main(void)
 
 	while (!glfwWindowShouldClose(window))
 	{
+		float currentFrame = glfwGetTime();
+		deltaTime = currentFrame - lastFrame;
+		lastFrame = currentFrame;
+
 		processInput(window);
 
 		// Procedurally grow terrain and creates objects
