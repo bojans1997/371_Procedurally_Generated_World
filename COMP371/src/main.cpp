@@ -138,7 +138,65 @@ void mouse_callback_zoom(GLFWwindow* window, GLdouble xpos, GLdouble ypos)
 		fov = 90.0f;
 }
 
-bool checkTreeCollision(std::vector<Tree*> trees, glm::vec3 cameraPos) {
+int randomInt(int min, int max) {
+	return min + (rand() % (max - min + 1));
+}
+
+void generateObjects(int min1, int max1, int min2, int max2) {
+	for (int i = 0; i < 25; i++) {
+		int x = randomInt(min1, max1);
+		int z = randomInt(min2, max2);
+		int size = randomInt(3, 6);
+
+		if ((rand() % 100) > 50) {
+			z = -z;
+		}
+
+		trees.push_back(new Tree(glm::vec3(x, 0, z), size));
+	}
+
+	for (int i = 0; i < 25; i++) {
+		int x = randomInt(min2, max2);
+		int z = randomInt(min1, max1);
+		int size = randomInt(3, 6);
+
+		if ((rand() % 100) > 50) {
+			x = -x;
+		}
+
+		trees.push_back(new Tree(glm::vec3(x, 0, z), size));
+	}
+
+	for (int i = 0; i < 50; i++) {
+		int x = randomInt(min1, max1);
+		int z = randomInt(min2, max2);
+		int xLen = randomInt(2, 4);
+		int yLen = randomInt(2, 4);
+		int zLen = randomInt(2, 4);
+
+		if (rand() % 100 >= 50) {
+			z = -z;
+		}
+
+		bushes.push_back(new Bush(glm::vec3(x, 0, z), glm::vec3(xLen, yLen, zLen)));
+	}
+
+	for (int i = 0; i < 50; i++) {
+		int x = randomInt(min2, max2);
+		int z = randomInt(min1, max1);
+		int xLen = randomInt(2, 4);
+		int yLen = randomInt(2, 4);
+		int zLen = randomInt(2, 4);
+
+		if (rand() % 100 >= 50) {
+			x = -x;
+		}
+
+		bushes.push_back(new Bush(glm::vec3(x, 0, z), glm::vec3(xLen, yLen, zLen)));
+	}
+}
+
+bool checkCollision(std::vector<Tree*> trees, glm::vec3 cameraPos) {
 	for (std::vector<Tree*>::iterator it = trees.begin(); it != trees.end(); ++it) {
 		if (glm::distance((*it)->position, cameraPos) <= 2.4f) {
 			return true;
@@ -172,22 +230,22 @@ void processInput(GLFWwindow* window)
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-		if (!checkTreeCollision(trees, glm::vec3(cameraPos.x, cameraPos.y, cameraPos.z - 0.2f))) {
+		if (!checkCollision(trees, glm::vec3(cameraPos.x, cameraPos.y, cameraPos.z - 0.2f))) {
 			cameraPos = glm::vec3(cameraPos.x, cameraPos.y, cameraPos.z - 0.2f);
 		}
 	}
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-		if (!checkTreeCollision(trees, glm::vec3(cameraPos.x, cameraPos.y, cameraPos.z + 0.2f))) {
+		if (!checkCollision(trees, glm::vec3(cameraPos.x, cameraPos.y, cameraPos.z + 0.2f))) {
 			cameraPos = glm::vec3(cameraPos.x, cameraPos.y, cameraPos.z + 0.2f);
 		}
 	}
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-		if (!checkTreeCollision(trees, glm::vec3(cameraPos.x - 0.2f, cameraPos.y, cameraPos.z - 0.2f))) {
+		if (!checkCollision(trees, glm::vec3(cameraPos.x - 0.2f, cameraPos.y, cameraPos.z - 0.2f))) {
 			cameraPos = glm::vec3(cameraPos.x - 0.2f, cameraPos.y, cameraPos.z);
 		}
 	}
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-		if (!checkTreeCollision(trees, glm::vec3(cameraPos.x + 0.2f, cameraPos.y, cameraPos.z - 0.2f))) {
+		if (!checkCollision(trees, glm::vec3(cameraPos.x + 0.2f, cameraPos.y, cameraPos.z - 0.2f))) {
 			cameraPos = glm::vec3(cameraPos.x + 0.2f, cameraPos.y, cameraPos.z);
 		}
 	}
@@ -432,73 +490,7 @@ int main(void)
 
 	srand(time(NULL));
 
-	/*for (int i = 0; i < 50; i++) {
-		int x = -(GRID_SIZE / 2) + (rand() % (GRID_SIZE - -(GRID_SIZE / 2) + 1));
-		int z = -(GRID_SIZE / 2) + (rand() % (GRID_SIZE - -(GRID_SIZE / 2) + 1));
-		int size = 3 + (rand() % (6 - 3 + 1));
-		trees.push_back(new Tree(glm::vec3(x, 0, z), size));
-	}
-
-	for (int i = 0; i < 100; i++) {
-		int x = -40 + (rand() % (80 - -40 + 1));
-		int z = -40 + (rand() % (80 - -40 + 1));
-		int xLen = 2 + (rand() % (4 - 2 + 1));
-		int yLen = 2 + (rand() % (4 - 2 + 1));
-		int zLen = 2 + (rand() % (4 - 2 + 1));
-		bushes.push_back(new Bush(glm::vec3(x, 0, z), glm::vec3(xLen, yLen, zLen)));
-	}*/
-
-	for (int i = 0; i < 25; i++) {
-		int x = -((GRID_SIZE - 10) / 2) + (rand() % (((GRID_SIZE - 10) / 2) - -((GRID_SIZE - 10) / 2) + 1));
-		int z = 10 + (rand() % ((GRID_SIZE / 2) - 10 + 1));
-		int size = 3 + (rand() % (6 - 3 + 1));
-
-		if ((rand() % 100) > 50) {
-			z = -z;
-		}
-
-		trees.push_back(new Tree(glm::vec3(x, 0, z), size));
-	}
-
-	for (int i = 0; i < 25; i++) {
-		int x = 10 + (rand() % ((GRID_SIZE / 2) - 10 + 1));
-		int z = -((GRID_SIZE - 10) / 2) + (rand() % (((GRID_SIZE - 10) / 2) - -((GRID_SIZE - 10) / 2) + 1));
-		int size = 3 + (rand() % (6 - 3 + 1));
-
-		if ((rand() % 100) > 50) {
-			x = -x;
-		}
-
-		trees.push_back(new Tree(glm::vec3(x, 0, z), size));
-	}
-
-	for (int i = 0; i < 50; i++) {
-		int x = -((GRID_SIZE - 10) / 2) + (rand() % (((GRID_SIZE - 10) / 2) - -((GRID_SIZE - 10) / 2) + 1));
-		int z = 10 + (rand() % ((GRID_SIZE / 2) - 10 + 1));
-		int xLen = 2 + (rand() % (4 - 2 + 1));
-		int yLen = 2 + (rand() % (4 - 2 + 1));
-		int zLen = 2 + (rand() % (4 - 2 + 1));
-
-		if (rand() % 100 >= 50) {
-			z = -z;
-		}
-
-		bushes.push_back(new Bush(glm::vec3(x, 0, z), glm::vec3(xLen, yLen, zLen)));
-	}
-
-	for (int i = 0; i < 50; i++) {
-		int x = 10 + (rand() % ((GRID_SIZE / 2) - 10 + 1));
-		int z = -((GRID_SIZE - 10) / 2) + (rand() % (((GRID_SIZE - 10) / 2) - -((GRID_SIZE - 10) / 2) + 1));
-		int xLen = 2 + (rand() % (4 - 2 + 1));
-		int yLen = 2 + (rand() % (4 - 2 + 1));
-		int zLen = 2 + (rand() % (4 - 2 + 1));
-
-		if (rand() % 100 >= 50) {
-			x = -x;
-		}
-
-		bushes.push_back(new Bush(glm::vec3(x, 0, z), glm::vec3(xLen, yLen, zLen)));
-	}
+	generateObjects(-(GRID_SIZE - 10) / 2, (GRID_SIZE - 10) / 2, 10, GRID_SIZE / 2);
 	
 	glEnable(GL_DEPTH_TEST);
 
@@ -543,57 +535,7 @@ int main(void)
 			GRID_SIZE += 50;
 			grid->setSize(GRID_SIZE);
 
-			for (int i = 0; i < 25; i++) {
-				int x = -(GRID_SIZE / 2) + (rand() % ((GRID_SIZE / 2) - -(GRID_SIZE / 2) + 1));
-				int z = ((GRID_SIZE - 50) / 2) + (rand() % ((GRID_SIZE / 2) - ((GRID_SIZE - 50) / 2) + 1));
-				int size = 3 + (rand() % (6 - 3 + 1));
-
-				if ((rand() % 100) > 50) {
-					z = -z;
-				}
-
-				trees.push_back(new Tree(glm::vec3(x, 0, z), size));
-			}
-
-			for (int i = 0; i < 25; i++) {
-				int x = ((GRID_SIZE - 50) / 2) + (rand() % ((GRID_SIZE / 2) - ((GRID_SIZE - 50) / 2) + 1));
-				int z = -(GRID_SIZE / 2) + (rand() % ((GRID_SIZE / 2) - -(GRID_SIZE / 2) + 1));
-				int size = 3 + (rand() % (6 - 3 + 1));
-
-				if ((rand() % 100) > 50) {
-					x = -x;
-				}
-
-				trees.push_back(new Tree(glm::vec3(x, 0, z), size));
-			}
-
-			for (int i = 0; i < 50; i++) {
-				int x = -(GRID_SIZE / 2) + (rand() % ((GRID_SIZE / 2) - -(GRID_SIZE / 2) + 1));
-				int z = ((GRID_SIZE - 50) / 2) + (rand() % ((GRID_SIZE / 2) - ((GRID_SIZE - 50) / 2) + 1));
-				int xLen = 2 + (rand() % (4 - 2 + 1));
-				int yLen = 2 + (rand() % (4 - 2 + 1));
-				int zLen = 2 + (rand() % (4 - 2 + 1));
-
-				if (rand() % 100 >= 50) {
-					z = -z;
-				}
-
-				bushes.push_back(new Bush(glm::vec3(x, 0, z), glm::vec3(xLen, yLen, zLen)));
-			}
-
-			for (int i = 0; i < 50; i++) {
-				int x = ((GRID_SIZE - 50) / 2) + (rand() % ((GRID_SIZE / 2) - ((GRID_SIZE - 50) / 2) + 1));
-				int z = -(GRID_SIZE / 2) + (rand() % ((GRID_SIZE / 2) - -(GRID_SIZE / 2) + 1));
-				int xLen = 2 + (rand() % (4 - 2 + 1));
-				int yLen = 2 + (rand() % (4 - 2 + 1));
-				int zLen = 2 + (rand() % (4 - 2 + 1));
-
-				if (rand() % 100 >= 50) {
-					x = -x;
-				}
-
-				bushes.push_back(new Bush(glm::vec3(x, 0, z), glm::vec3(xLen, yLen, zLen)));
-			}
+			generateObjects(-GRID_SIZE / 2, GRID_SIZE / 2, (GRID_SIZE - 50) / 2, GRID_SIZE / 2);
 		}
 
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
