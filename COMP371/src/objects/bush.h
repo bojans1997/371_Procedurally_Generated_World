@@ -20,12 +20,12 @@ class Bush
 public:
 	Bush(glm::vec3 position, glm::vec3 size);
 	~Bush();
+	glm::vec3 size;
 	glm::vec3 position;
 	void draw(Shader *shader);
 protected:
 	// Referenced from https://freestocktextures.com/texture/shrub-green-nature,767.html
 	Texture *bushTexture = new Texture("src/textures/bush.jpg");
-	glm::vec3 size;
 	Cube* bush;
 };
 #endif

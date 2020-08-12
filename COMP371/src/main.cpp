@@ -39,7 +39,7 @@ GLfloat yaw = -90.0f;	// yaw is initialized to -90.0 degrees since a yaw of 0.0 
 GLfloat pitch = 0.0f;
 GLdouble lastX = WINDOW_LENGTH/ 2.0;
 GLdouble lastY = WINDOW_WIDTH / 2.0;
-GLfloat fov = 60.0f;
+GLfloat fov = 50.0f;
 
 glm::vec3 pairU4Pos = glm::vec3(0, 0, 0);
 glm::vec3 pairE5Pos = glm::vec3(-40, 0, -45);
@@ -139,12 +139,24 @@ void mouse_callback_zoom(GLFWwindow* window, GLdouble xpos, GLdouble ypos)
 }
 
 bool checkTreeCollision(std::vector<Tree*> trees, glm::vec3 cameraPos) {
-	//std::cout << glm::distance(bushes.front()->position, cameraPos) << std::endl;
 	for (std::vector<Tree*>::iterator it = trees.begin(); it != trees.end(); ++it) {
 		if (glm::distance((*it)->position, cameraPos) <= 2.4f) {
 			return true;
 		}
 	}
+	
+	for (std::vector<Bush*>::iterator it = bushes.begin(); it != bushes.end(); ++it) {
+		glm::vec3 pos = (*it)->position;
+		glm::vec3 size = (*it)->size;
+
+		bool collisionX = cameraPos.x + 0.01f >= pos.x && cameraPos.x - 0.01f <= pos.x + size.x;
+		bool collisionZ = cameraPos.z + 0.01f >= pos.z && cameraPos.z - 0.01f <= pos.z + size.z;
+
+		if (collisionX && collisionZ) {
+			return true;
+		}
+	}
+
 	return false;
 }
 
@@ -154,9 +166,9 @@ void processInput(GLFWwindow* window)
         glfwSetWindowShouldClose(window, true);
 
 	if (glfwGetKey(window, GLFW_KEY_HOME) == GLFW_PRESS) {
-		cameraPos = glm::vec3(0.0f, 5.0f, 20.0f);
-		cameraFront = glm::vec3(0.0f, 1.0f, 0.0f);
-		fov = 45.0f;
+		cameraPos = glm::vec3(0.0f, 2.0f, 20.0f);
+		cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+		fov = 50.0f;
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
@@ -438,7 +450,7 @@ int main(void)
 
 	for (int i = 0; i < 25; i++) {
 		int x = -((GRID_SIZE - 10) / 2) + (rand() % (((GRID_SIZE - 10) / 2) - -((GRID_SIZE - 10) / 2) + 1));
-		int z = 5 + (rand() % ((GRID_SIZE / 2) - 5 + 1));
+		int z = 10 + (rand() % ((GRID_SIZE / 2) - 10 + 1));
 		int size = 3 + (rand() % (6 - 3 + 1));
 
 		if ((rand() % 100) > 50) {
@@ -449,7 +461,7 @@ int main(void)
 	}
 
 	for (int i = 0; i < 25; i++) {
-		int x = 5 + (rand() % ((GRID_SIZE / 2) - 5 + 1));
+		int x = 10 + (rand() % ((GRID_SIZE / 2) - 10 + 1));
 		int z = -((GRID_SIZE - 10) / 2) + (rand() % (((GRID_SIZE - 10) / 2) - -((GRID_SIZE - 10) / 2) + 1));
 		int size = 3 + (rand() % (6 - 3 + 1));
 
@@ -462,7 +474,7 @@ int main(void)
 
 	for (int i = 0; i < 50; i++) {
 		int x = -((GRID_SIZE - 10) / 2) + (rand() % (((GRID_SIZE - 10) / 2) - -((GRID_SIZE - 10) / 2) + 1));
-		int z = 5 + (rand() % ((GRID_SIZE / 2) - 5 + 1));
+		int z = 10 + (rand() % ((GRID_SIZE / 2) - 10 + 1));
 		int xLen = 2 + (rand() % (4 - 2 + 1));
 		int yLen = 2 + (rand() % (4 - 2 + 1));
 		int zLen = 2 + (rand() % (4 - 2 + 1));
@@ -475,7 +487,7 @@ int main(void)
 	}
 
 	for (int i = 0; i < 50; i++) {
-		int x = 5 + (rand() % ((GRID_SIZE / 2) - 5 + 1));
+		int x = 10 + (rand() % ((GRID_SIZE / 2) - 10 + 1));
 		int z = -((GRID_SIZE - 10) / 2) + (rand() % (((GRID_SIZE - 10) / 2) - -((GRID_SIZE - 10) / 2) + 1));
 		int xLen = 2 + (rand() % (4 - 2 + 1));
 		int yLen = 2 + (rand() % (4 - 2 + 1));
