@@ -1,6 +1,7 @@
 #include <glad.h>
 #include <glfw3.h>
 #include <glm.hpp>
+#include <irrKlang.h>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -54,6 +55,17 @@ std::vector<Bush*> bushes;
 // timing
 float deltaTime = 0.0f;	// time between current frame and last frame
 float lastFrame = 0.0f;
+
+/*
+	Using irrKlang for music and sound effects
+	Downloaded from https://www.ambiera.com/irrklang/downloads.html
+	Code reference: https://learnopengl.com/In-Practice/2D-Game/Audio
+	Music: https://www.youtube.com/watch?v=Lmi2kLH9aL8
+	Footstep: https://www.fesliyanstudios.com/play-mp3/6985
+*/
+irrklang::ISoundEngine *SoundEngine = irrklang::createIrrKlangDevice();
+irrklang::ISound *music = SoundEngine->play2D("src/resources/music.mp3", true, true);
+irrklang::ISound *footstep = SoundEngine->play2D("src/resources/footstep.mp3", true, true);
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
@@ -188,6 +200,9 @@ void processInput(GLFWwindow* window)
 		newCameraPos.y = 2.0f;
 		if (!checkCollision(trees, newCameraPos)) {
 			cameraPos = newCameraPos;
+			if (footstep->getIsPaused()) {
+				footstep->setIsPaused(false);
+			}
 		}
 	}
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
@@ -195,6 +210,9 @@ void processInput(GLFWwindow* window)
 		newCameraPos.y = 2.0f;
 		if (!checkCollision(trees, newCameraPos)) {
 			cameraPos = newCameraPos;
+			if (footstep->getIsPaused()) {
+				footstep->setIsPaused(false);
+			}
 		}
 	}
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
@@ -202,6 +220,9 @@ void processInput(GLFWwindow* window)
 		newCameraPos.y = 2.0f;
 		if (!checkCollision(trees, newCameraPos)) {
 			cameraPos = newCameraPos;
+			if (footstep->getIsPaused()) {
+				footstep->setIsPaused(false);
+			}
 		}
 	}
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
@@ -209,7 +230,17 @@ void processInput(GLFWwindow* window)
 		newCameraPos.y = 2.0f;
 		if (!checkCollision(trees, newCameraPos)) {
 			cameraPos = newCameraPos;
+			if (footstep->getIsPaused()) {
+				footstep->setIsPaused(false);
+			}
 		}
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_W) != GLFW_PRESS &&
+		glfwGetKey(window, GLFW_KEY_A) != GLFW_PRESS &&
+		glfwGetKey(window, GLFW_KEY_S) != GLFW_PRESS &&
+		glfwGetKey(window, GLFW_KEY_D) != GLFW_PRESS) {
+		footstep->setIsPaused(true);
 	}
 }
 
@@ -242,6 +273,9 @@ int main(void)
         std::cout << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
+
+	music->setIsPaused(false);
+	SoundEngine->setSoundVolume(0.5f);
 
     GLuint VBO = 0, VAO = 0;
 
