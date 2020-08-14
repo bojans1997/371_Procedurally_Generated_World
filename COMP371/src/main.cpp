@@ -467,7 +467,7 @@ int main(void)
 		new Cube(3, 2, 0),
 		new Cube(2, 2, 0)
 	};
-	Pair *pairJ5 = new Pair(new Character(cubesJ), new Character(cubes5_2), new Sphere(0, 6, 0, 5, 10, 10));
+	pairJ5 = new Pair(new Character(cubesJ), new Character(cubes5_2), new Sphere(0, 6, 0, 5, 10, 10));
 
 	// Letter A and digit 6 for Saad Ahmed
 	std::vector<Cube*> cubesA = {
