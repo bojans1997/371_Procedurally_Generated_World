@@ -168,7 +168,7 @@ void generateObjects(int min1, int max1, int min2, int max2) {
 	}
 }
 
-bool checkCharacterCollision(Character *character, glm::vec3 newCameraPos)
+bool checkCharacterCollision(Character *character, glm::vec3 pairPos, glm::vec3 newCameraPos)
 {
 	std::vector<Cube*> charCubes = character->getCubes();
 
@@ -176,8 +176,10 @@ bool checkCharacterCollision(Character *character, glm::vec3 newCameraPos)
 		glm::vec3 pos = (*it)->position;
 
 		if (pos.y <= 1) {
-			bool collisionX = newCameraPos.x + 0.1f >= pos.x * MODEL_SCALE && newCameraPos.x - 0.1f <= pos.x * MODEL_SCALE + MODEL_SCALE;
-			bool collisionZ = newCameraPos.z + 0.1f >= pos.z * MODEL_SCALE && newCameraPos.z - 0.1f <= pos.z * MODEL_SCALE + MODEL_SCALE;
+			bool collisionX = newCameraPos.x + 0.1f >= pos.x * MODEL_SCALE + pairPos.x 
+				&& newCameraPos.x - 0.1f <= pos.x * MODEL_SCALE + +pairPos.x + MODEL_SCALE;
+			bool collisionZ = newCameraPos.z + 0.1f >= pos.z * MODEL_SCALE + pairPos.z 
+				&& newCameraPos.z - 0.1f <= pos.z * MODEL_SCALE + pairPos.z + MODEL_SCALE;
 
 			if (collisionX && collisionZ) {
 				return true;
@@ -188,11 +190,11 @@ bool checkCharacterCollision(Character *character, glm::vec3 newCameraPos)
 	return false;
 }
 
-bool checkPairCollision(Pair *pair, glm::vec3 newCameraPos)
+bool checkPairCollision(Pair *pair, glm::vec3 pairPos, glm::vec3 newCameraPos)
 {
 	if (pair != NULL) {
-		return checkCharacterCollision(pair->getLetter(), newCameraPos) 
-			|| checkCharacterCollision(pair->getDigit(), newCameraPos);
+		return checkCharacterCollision(pair->getLetter(), pairPos, newCameraPos) 
+			|| checkCharacterCollision(pair->getDigit(), pairPos, newCameraPos);
 	}
 
 	return false;
@@ -219,9 +221,9 @@ bool checkCollision(glm::vec3 newCameraPos)
 		}
 	}
 
-	bool modelCollision = checkPairCollision(pairU4, newCameraPos) || checkPairCollision(pairE5, newCameraPos)
-		|| checkPairCollision(pairJ5, newCameraPos) || checkPairCollision(pairA6, newCameraPos)
-		|| checkPairCollision(pairN2, newCameraPos);
+	bool modelCollision = checkPairCollision(pairU4, pairU4Pos, newCameraPos) 
+		|| checkPairCollision(pairE5, pairE5Pos, newCameraPos) || checkPairCollision(pairJ5, pairJ5Pos, newCameraPos)
+		|| checkPairCollision(pairA6, pairA6Pos, newCameraPos) || checkPairCollision(pairN2, pairN2Pos, newCameraPos);
 
 	return modelCollision;
 }
