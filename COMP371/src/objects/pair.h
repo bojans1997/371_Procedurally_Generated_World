@@ -21,6 +21,8 @@ class Pair
 public:
 	Pair(Character *letter, Character *digit, Sphere *sphere);
 	~Pair();
+	Character* getLetter();
+	Character* getDigit();
 	void draw(Shader *shader, Shader *sphereShader, glm::mat4 matrix);
 	void draw(Shader *shader, Shader *sphereShader, glm::mat4 matrix, Texture *texture);
 protected:

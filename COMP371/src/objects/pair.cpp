@@ -9,6 +9,14 @@ Pair::~Pair()
 	delete sphere;
 }
 
+Character* Pair::getLetter() {
+	return letter;
+}
+
+Character* Pair::getDigit() {
+	return digit;
+}
+
 void Pair::draw(Shader *shader, Shader *sphereShader, glm::mat4 matrix)
 {
 	letter->draw(shader, matrix);
