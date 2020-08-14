@@ -17,6 +17,7 @@ class Cube
 public:
 	Cube(int x, int y, int z);
 	~Cube();
+	glm::vec3 position;
 	glm::mat4 getModel();
 	void draw(Shader *shader, glm::mat4 matrix);
 	void draw(Shader *shader, glm::mat4 matrix, Texture *texture);

@@ -9,6 +9,10 @@ Character::~Character()
 	}
 }
 
+std::vector<Cube*> Character::getCubes() {
+	return cubes;
+}
+
 void Character::draw(Shader *shader, glm::mat4 matrix)
 {
 	for (std::vector<Cube*>::iterator it = cubes.begin(); it != cubes.end(); ++it) {

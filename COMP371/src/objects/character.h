@@ -19,6 +19,7 @@ class Character
 public:
 	Character(std::vector<Cube*> cubes);
 	~Character();
+	std::vector<Cube*> getCubes();
 	void draw(Shader *shader, glm::mat4 matrix);
 	void draw(Shader *shader, glm::mat4 matrix, Texture *texture);
 protected:

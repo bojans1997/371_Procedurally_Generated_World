@@ -80,6 +80,7 @@ Cube::Cube(int x, int y, int z) : x(x), y(y), z(z)
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+	position = glm::vec3(x, y, z);
 	model = glm::translate(model, glm::vec3(x, y, z));
 }
 

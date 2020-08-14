@@ -25,6 +25,8 @@ const int WINDOW_WIDTH = 768;
 int GRID_SIZE = 100;
 int AXIS_SIZE = 5;
 
+int MODEL_SCALE = 2.0f;
+
 GLFWwindow* window;
 
 glm::vec3 cameraPos = glm::vec3(0.0f, 2.0f, 20.0f);
@@ -47,6 +49,12 @@ glm::vec3 pairE5Pos = glm::vec3(-40, 0, -45);
 glm::vec3 pairJ5Pos = glm::vec3(40, 0, -45);
 glm::vec3 pairA6Pos = glm::vec3(40, 0, 45);
 glm::vec3 pairN2Pos = glm::vec3(-40, 0, 45);
+
+Pair *pairU4;
+Pair *pairE5;
+Pair *pairJ5;
+Pair *pairA6;
+Pair *pairN2;
 
 // Initial procedural creation of objects on terrain
 std::vector<Tree*> trees;
@@ -101,7 +109,8 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 	cameraFront = glm::normalize(front);
 }
 
-int randomInt(int min, int max) {
+int randomInt(int min, int max)
+{
 	return min + (rand() % (max - min + 1));
 }
 
@@ -159,10 +168,43 @@ void generateObjects(int min1, int max1, int min2, int max2) {
 	}
 }
 
-bool checkCollision(std::vector<Tree*> trees, glm::vec3 cameraPos) {
+bool checkCharacterCollision(Character *character, glm::vec3 pairPos, glm::vec3 newCameraPos)
+{
+	std::vector<Cube*> charCubes = character->getCubes();
+
+	for (std::vector<Cube*>::iterator it = charCubes.begin(); it != charCubes.end(); ++it) {
+		glm::vec3 pos = (*it)->position;
+
+		if (pos.y <= 1) {
+			bool collisionX = newCameraPos.x + 0.1f >= pos.x * MODEL_SCALE + pairPos.x 
+				&& newCameraPos.x - 0.1f <= pos.x * MODEL_SCALE + +pairPos.x + MODEL_SCALE;
+			bool collisionZ = newCameraPos.z + 0.1f >= pos.z * MODEL_SCALE + pairPos.z 
+				&& newCameraPos.z - 0.1f <= pos.z * MODEL_SCALE + pairPos.z + MODEL_SCALE;
+
+			if (collisionX && collisionZ) {
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+bool checkPairCollision(Pair *pair, glm::vec3 pairPos, glm::vec3 newCameraPos)
+{
+	if (pair != NULL) {
+		return checkCharacterCollision(pair->getLetter(), pairPos, newCameraPos) 
+			|| checkCharacterCollision(pair->getDigit(), pairPos, newCameraPos);
+	}
+
+	return false;
+}
+
+bool checkCollision(glm::vec3 newCameraPos)
+{
 	for (std::vector<Tree*>::iterator it = trees.begin(); it != trees.end(); ++it) {
 		glm::vec3 cubeCenter = glm::vec3((*it)->position.x + 0.5f, (*it)->position.y, (*it)->position.z + 0.5f);
-		if (glm::distance(cubeCenter, cameraPos) <= 2.2f) {
+		if (glm::distance(cubeCenter, newCameraPos) <= 2.2f) {
 			return true;
 		}
 	}
@@ -171,15 +213,19 @@ bool checkCollision(std::vector<Tree*> trees, glm::vec3 cameraPos) {
 		glm::vec3 pos = (*it)->position;
 		glm::vec3 size = (*it)->size;
 
-		bool collisionX = cameraPos.x + 0.1f >= pos.x && cameraPos.x - 0.1f <= pos.x + size.x;
-		bool collisionZ = cameraPos.z + 0.1f >= pos.z && cameraPos.z - 0.1f <= pos.z + size.z;
+		bool collisionX = newCameraPos.x + 0.1f >= pos.x && newCameraPos.x - 0.1f <= pos.x + size.x;
+		bool collisionZ = newCameraPos.z + 0.1f >= pos.z && newCameraPos.z - 0.1f <= pos.z + size.z;
 
 		if (collisionX && collisionZ) {
 			return true;
 		}
 	}
 
-	return false;
+	bool modelCollision = checkPairCollision(pairU4, pairU4Pos, newCameraPos) 
+		|| checkPairCollision(pairE5, pairE5Pos, newCameraPos) || checkPairCollision(pairJ5, pairJ5Pos, newCameraPos)
+		|| checkPairCollision(pairA6, pairA6Pos, newCameraPos) || checkPairCollision(pairN2, pairN2Pos, newCameraPos);
+
+	return modelCollision;
 }
 
 void processInput(GLFWwindow* window)
@@ -198,7 +244,7 @@ void processInput(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
 		glm::vec3 newCameraPos = cameraPos + cameraSpeed * cameraFront;
 		newCameraPos.y = 2.0f;
-		if (!checkCollision(trees, newCameraPos)) {
+		if (!checkCollision(newCameraPos)) {
 			cameraPos = newCameraPos;
 			if (footstep->getIsPaused()) {
 				footstep->setIsPaused(false);
@@ -208,7 +254,7 @@ void processInput(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
 		glm::vec3 newCameraPos = cameraPos - cameraSpeed * cameraFront;
 		newCameraPos.y = 2.0f;
-		if (!checkCollision(trees, newCameraPos)) {
+		if (!checkCollision(newCameraPos)) {
 			cameraPos = newCameraPos;
 			if (footstep->getIsPaused()) {
 				footstep->setIsPaused(false);
@@ -218,7 +264,7 @@ void processInput(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
 		glm::vec3 newCameraPos = cameraPos - glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
 		newCameraPos.y = 2.0f;
-		if (!checkCollision(trees, newCameraPos)) {
+		if (!checkCollision(newCameraPos)) {
 			cameraPos = newCameraPos;
 			if (footstep->getIsPaused()) {
 				footstep->setIsPaused(false);
@@ -228,7 +274,7 @@ void processInput(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
 		glm::vec3 newCameraPos = cameraPos + glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
 		newCameraPos.y = 2.0f;
-		if (!checkCollision(trees, newCameraPos)) {
+		if (!checkCollision(newCameraPos)) {
 			cameraPos = newCameraPos;
 			if (footstep->getIsPaused()) {
 				footstep->setIsPaused(false);
@@ -321,7 +367,7 @@ int main(void)
 		new Cube(4, 3, 0),
 		new Cube(4, 4, 0)
 	};
-	Pair *pairU4 = new Pair(new Character(cubesU), new Character(cubes4), new Sphere(0, 6, 0, 5, 10, 10));
+	pairU4 = new Pair(new Character(cubesU), new Character(cubes4), new Sphere(0, 6, 0, 5, 10, 10));
 
 	// Letter E and digit 5 for Alexis Laurens-Renner
 	std::vector<Cube*> cubesE = {
@@ -356,7 +402,7 @@ int main(void)
 		new Cube(3, 2, 0),
 		new Cube(2, 2, 0)
 	};
-	Pair *pairE5 = new Pair(new Character(cubesE), new Character(cubes5_1), new Sphere(0, 6, 0, 5, 10, 10));
+	pairE5 = new Pair(new Character(cubesE), new Character(cubes5_1), new Sphere(0, 6, 0, 5, 10, 10));
 
 	// Letter J and digit 5 for Bojan Srbinoski
 	std::vector<Cube*> cubesJ = {
@@ -426,7 +472,7 @@ int main(void)
 		new Cube(3, 2, 0),
 		new Cube(2, 2, 0)
 	};
-	Pair *pairA6 = new Pair(new Character(cubesA), new Character(cubes6), new Sphere(0, 6, 0, 5, 10, 10));
+	pairA6 = new Pair(new Character(cubesA), new Character(cubes6), new Sphere(0, 6, 0, 5, 10, 10));
 
 	// Letter N and digit 2 for Anna Kmieciak
 	std::vector<Cube*> cubesN = {
@@ -460,7 +506,7 @@ int main(void)
 		new Cube(4, 0, 0),
 		new Cube(5, 0, 0)
 	};
-	Pair *pairN2 = new Pair(new Character(cubesN), new Character(cubes2), new Sphere(0, 6, 0, 5, 10, 10));
+	pairN2 = new Pair(new Character(cubesN), new Character(cubes2), new Sphere(0, 6, 0, 5, 10, 10));
 
 	srand(time(NULL));
 
@@ -521,23 +567,23 @@ int main(void)
 
 		glm::mat4 modelU4 = glm::mat4(1.0f);
 		modelU4 = glm::translate(modelU4, glm::vec3(pairU4Pos.x, pairU4Pos.y, pairU4Pos.z));
-		modelU4 = glm::scale(modelU4, glm::vec3(1.5, 1.5, 1.5));
+		modelU4 = glm::scale(modelU4, glm::vec3(MODEL_SCALE, MODEL_SCALE, MODEL_SCALE));
 
 		glm::mat4 modelE5 = glm::mat4(1.0f);
 		modelE5 = glm::translate(modelE5, glm::vec3(pairE5Pos.x, pairE5Pos.y, pairE5Pos.z));
-		modelE5 = glm::scale(modelE5, glm::vec3(1.5, 1.5, 1.5));
+		modelE5 = glm::scale(modelE5, glm::vec3(MODEL_SCALE, MODEL_SCALE, MODEL_SCALE));
 
 		glm::mat4 modelJ5 = glm::mat4(1.0f);
 		modelJ5 = glm::translate(modelJ5, glm::vec3(pairJ5Pos.x, pairJ5Pos.y, pairJ5Pos.z));
-		modelJ5 = glm::scale(modelJ5, glm::vec3(1.5, 1.5, 1.5));
+		modelJ5 = glm::scale(modelJ5, glm::vec3(MODEL_SCALE, MODEL_SCALE, MODEL_SCALE));
 
 		glm::mat4 modelA6 = glm::mat4(1.0f);
 		modelA6 = glm::translate(modelA6, glm::vec3(pairA6Pos.x, pairA6Pos.y, pairA6Pos.z));
-		modelA6 = glm::scale(modelA6, glm::vec3(1.5, 1.5, 1.5));
+		modelA6 = glm::scale(modelA6, glm::vec3(MODEL_SCALE, MODEL_SCALE, MODEL_SCALE));
 
 		glm::mat4 modelN2 = glm::mat4(1.0f);
 		modelN2 = glm::translate(modelN2, glm::vec3(pairN2Pos.x, pairN2Pos.y, pairN2Pos.z));
-		modelN2 = glm::scale(modelN2, glm::vec3(1.5, 1.5, 1.5));
+		modelN2 = glm::scale(modelN2, glm::vec3(MODEL_SCALE, MODEL_SCALE, MODEL_SCALE));
 
 		//Shadow Pass 1 - Shadow Map
 		glm::mat4 lightProjection, lightView;
