@@ -168,16 +168,16 @@ void generateObjects(int min1, int max1, int min2, int max2) {
 	}
 }
 
-bool checkCharacterCollision(Character *character)
+bool checkCharacterCollision(Character *character, glm::vec3 newCameraPos)
 {
 	std::vector<Cube*> charCubes = character->getCubes();
 
 	for (std::vector<Cube*>::iterator it = charCubes.begin(); it != charCubes.end(); ++it) {
 		glm::vec3 pos = (*it)->position;
 
-		if (pos.y == 0) {
-			bool collisionX = cameraPos.x + 0.1f >= pos.x * MODEL_SCALE && cameraPos.x - 0.1f <= pos.x * MODEL_SCALE + MODEL_SCALE;
-			bool collisionZ = cameraPos.z + 0.1f >= pos.z * MODEL_SCALE && cameraPos.z - 0.1f <= pos.z * MODEL_SCALE + MODEL_SCALE;
+		if (pos.y <= 1) {
+			bool collisionX = newCameraPos.x + 0.1f >= pos.x * MODEL_SCALE && newCameraPos.x - 0.1f <= pos.x * MODEL_SCALE + MODEL_SCALE;
+			bool collisionZ = newCameraPos.z + 0.1f >= pos.z * MODEL_SCALE && newCameraPos.z - 0.1f <= pos.z * MODEL_SCALE + MODEL_SCALE;
 
 			if (collisionX && collisionZ) {
 				return true;
@@ -188,20 +188,21 @@ bool checkCharacterCollision(Character *character)
 	return false;
 }
 
-bool checkPairCollision(Pair *pair)
+bool checkPairCollision(Pair *pair, glm::vec3 newCameraPos)
 {
 	if (pair != NULL) {
-		return checkCharacterCollision(pair->getLetter()) || checkCharacterCollision(pair->getDigit());
+		return checkCharacterCollision(pair->getLetter(), newCameraPos) 
+			|| checkCharacterCollision(pair->getDigit(), newCameraPos);
 	}
 
 	return false;
 }
 
-bool checkCollision()
+bool checkCollision(glm::vec3 newCameraPos)
 {
 	for (std::vector<Tree*>::iterator it = trees.begin(); it != trees.end(); ++it) {
 		glm::vec3 cubeCenter = glm::vec3((*it)->position.x + 0.5f, (*it)->position.y, (*it)->position.z + 0.5f);
-		if (glm::distance(cubeCenter, cameraPos) <= 2.2f) {
+		if (glm::distance(cubeCenter, newCameraPos) <= 2.2f) {
 			return true;
 		}
 	}
@@ -210,16 +211,17 @@ bool checkCollision()
 		glm::vec3 pos = (*it)->position;
 		glm::vec3 size = (*it)->size;
 
-		bool collisionX = cameraPos.x + 0.1f >= pos.x && cameraPos.x - 0.1f <= pos.x + size.x;
-		bool collisionZ = cameraPos.z + 0.1f >= pos.z && cameraPos.z - 0.1f <= pos.z + size.z;
+		bool collisionX = newCameraPos.x + 0.1f >= pos.x && newCameraPos.x - 0.1f <= pos.x + size.x;
+		bool collisionZ = newCameraPos.z + 0.1f >= pos.z && newCameraPos.z - 0.1f <= pos.z + size.z;
 
 		if (collisionX && collisionZ) {
 			return true;
 		}
 	}
 
-	bool modelCollision = checkPairCollision(pairU4) || checkPairCollision(pairE5) || checkPairCollision(pairJ5)
-		|| checkPairCollision(pairA6) || checkPairCollision(pairN2);
+	bool modelCollision = checkPairCollision(pairU4, newCameraPos) || checkPairCollision(pairE5, newCameraPos)
+		|| checkPairCollision(pairJ5, newCameraPos) || checkPairCollision(pairA6, newCameraPos)
+		|| checkPairCollision(pairN2, newCameraPos);
 
 	return modelCollision;
 }
@@ -240,7 +242,7 @@ void processInput(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
 		glm::vec3 newCameraPos = cameraPos + cameraSpeed * cameraFront;
 		newCameraPos.y = 2.0f;
-		if (!checkCollision()) {
+		if (!checkCollision(newCameraPos)) {
 			cameraPos = newCameraPos;
 			if (footstep->getIsPaused()) {
 				footstep->setIsPaused(false);
@@ -250,7 +252,7 @@ void processInput(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
 		glm::vec3 newCameraPos = cameraPos - cameraSpeed * cameraFront;
 		newCameraPos.y = 2.0f;
-		if (!checkCollision()) {
+		if (!checkCollision(newCameraPos)) {
 			cameraPos = newCameraPos;
 			if (footstep->getIsPaused()) {
 				footstep->setIsPaused(false);
@@ -260,7 +262,7 @@ void processInput(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
 		glm::vec3 newCameraPos = cameraPos - glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
 		newCameraPos.y = 2.0f;
-		if (!checkCollision()) {
+		if (!checkCollision(newCameraPos)) {
 			cameraPos = newCameraPos;
 			if (footstep->getIsPaused()) {
 				footstep->setIsPaused(false);
@@ -270,7 +272,7 @@ void processInput(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
 		glm::vec3 newCameraPos = cameraPos + glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
 		newCameraPos.y = 2.0f;
-		if (!checkCollision()) {
+		if (!checkCollision(newCameraPos)) {
 			cameraPos = newCameraPos;
 			if (footstep->getIsPaused()) {
 				footstep->setIsPaused(false);
