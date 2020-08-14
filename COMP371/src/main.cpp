@@ -228,6 +228,38 @@ bool checkCollision(glm::vec3 newCameraPos)
 	return modelCollision;
 }
 
+unsigned int loadCubemap(std::vector<std::string> faces)
+{
+	unsigned int textureID;
+	glGenTextures(1, &textureID);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+
+	int width, height, nrChannels;
+	for (unsigned int i = 0; i < faces.size(); i++)
+	{
+		unsigned char *data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
+		if (data)
+		{
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+				0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data
+			);
+			stbi_image_free(data);
+		}
+		else
+		{
+			std::cout << "Cubemap tex failed to load at path: " << faces[i] << std::endl;
+			stbi_image_free(data);
+		}
+	}
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+	return textureID;
+}
+
 void processInput(GLFWwindow* window)
 {
 	float cameraSpeed = 10.0 * deltaTime;
@@ -321,7 +353,8 @@ int main(void)
     }
 
 	music->setIsPaused(false);
-	SoundEngine->setSoundVolume(0.5f);
+	music->setVolume(0.6f);
+	footstep->setVolume(1.0f);
 
     GLuint VBO = 0, VAO = 0;
 
@@ -331,6 +364,7 @@ int main(void)
 	Shader *depthShader = new Shader("src/shaders/depthShader.vs", "src/shaders/depthShader.fs");
 	Shader *sphereShader = new Shader("src/shaders/SphereShader.vs", "src/shaders/SphereShader.fs");
 	Shader *gridShader = new Shader("src/shaders/gridShader.vs","src/shaders/gridShader.fs");
+	Shader *skyBoxShader = new Shader("src/shaders/skybox.vs", "src/shaders/skybox.fs");
 
 	// Referenced from https://freestocktextures.com/texture/wall-moss-brick,621.html
 	Texture *ruinTexture = new Texture("src/textures/ruin.jpg");
@@ -545,6 +579,75 @@ int main(void)
 	// lighting info
 	glm::vec3 lightPosition(0.0f, 30.0f, -5.0f);
 
+	// skybox info
+	float skyboxVertices[] = {
+		// positions          
+		-1.0f,  1.0f, -1.0f,
+		-1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+
+		-1.0f, -1.0f,  1.0f,
+		-1.0f, -1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f,  1.0f,
+		-1.0f, -1.0f,  1.0f,
+
+		 1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+
+		-1.0f, -1.0f,  1.0f,
+		-1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f, -1.0f,  1.0f,
+		-1.0f, -1.0f,  1.0f,
+
+		-1.0f,  1.0f, -1.0f,
+		 1.0f,  1.0f, -1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		-1.0f,  1.0f,  1.0f,
+		-1.0f,  1.0f, -1.0f,
+
+		-1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f,  1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f,  1.0f,
+		 1.0f, -1.0f,  1.0f
+	};
+
+	unsigned int skyboxVAO, skyboxVBO;
+	glGenVertexArrays(1, &skyboxVAO);
+	glGenBuffers(1, &skyboxVBO);
+	glBindVertexArray(skyboxVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
+	std::vector<std::string> faces
+	{
+			"src/textures/right.jpg",
+			"src/textures/left.jpg",
+			"src/textures/top.jpg",
+			"src/textures/bottom.jpg",
+			"src/textures/front.jpg",
+			"src/textures/back.jpg"
+	};
+	unsigned int cubemapTexture = loadCubemap(faces);
+
+	skyBoxShader->use();
+	skyBoxShader->setInt("skybox", 0);
+
 	while (!glfwWindowShouldClose(window))
 	{
 		float currentFrame = glfwGetTime();
@@ -622,21 +725,8 @@ int main(void)
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		//Shadow Pass 2 - Normal Render
-		glm::mat4 projection = glm::perspective(glm::radians(fov), (float)WINDOW_LENGTH / (float)WINDOW_WIDTH, 0.1f, 100.0f);
+		glm::mat4 projection = glm::perspective(glm::radians(fov), (float)WINDOW_LENGTH / (float)WINDOW_WIDTH, 0.1f, 500.0f);
 		glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
-
-		//Draw axis
-		basicShader->use();
-		basicShader->setMat4("projection", projection);
-		basicShader->setMat4("view", view);
-		axis->draw(basicShader);
-
-		//Draw light cube
-		glm::mat4 lightModel = lightSource->getModel();
-		lightShader->use();
-		lightShader->setMat4("projection", projection);
-		lightShader->setMat4("view", view);
-		lightSource->draw(lightShader, lightModel);
 
 		//Generate Sphere
 		sphereShader->use();
@@ -690,6 +780,21 @@ int main(void)
 		pairJ5->draw(textureShader, sphereShader, modelJ5, ruinTexture);
 		pairA6->draw(textureShader, sphereShader, modelA6, ruinTexture);
 		pairN2->draw(textureShader, sphereShader, modelN2, ruinTexture);
+
+		// draw skybox as last
+		glEnable(GL_DEPTH_CLAMP);
+		glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
+		skyBoxShader->use();
+		view = glm::mat4(glm::mat3(glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp))); // remove translation from the view matrix
+		skyBoxShader->setMat4("view", view);
+		skyBoxShader->setMat4("projection", projection);
+		// skybox cube
+		glBindVertexArray(skyboxVAO);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+		glBindVertexArray(0);
+		glDepthFunc(GL_LESS); // set depth function back to default
 
         glfwSwapBuffers(window);
         glfwPollEvents();
