@@ -33,6 +33,8 @@ glm::vec3 cameraPos = glm::vec3(0.0f, 2.0f, 20.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
+bool is_fs = true;
+
 
 bool is_jumping = false;
 float jumpValue = 1.0f;
@@ -341,6 +343,11 @@ void processInput(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
 			is_jumping = true;
 	}
+
+	if (glfwGetKey(window, GLFW_KEY_F11) == GLFW_PRESS) {
+		is_fs = !is_fs;
+		glfwSetWindowMonitor(window, is_fs ? glfwGetPrimaryMonitor() : NULL, 0, 0, WINDOW_LENGTH, WINDOW_WIDTH, GLFW_DONT_CARE);
+	}
 }
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height)
@@ -353,8 +360,7 @@ int main(void)
 	if (!glfwInit())
 		return -1;
 	//glfwGetPrimaryMonitor() for fullscreen
-	window = glfwCreateWindow(WINDOW_LENGTH, WINDOW_WIDTH, "COMP 371 Project - OpenGLHF", NULL, NULL);
-
+	window = glfwCreateWindow(WINDOW_LENGTH, WINDOW_WIDTH, "COMP 371 Project - OpenGLHF", glfwGetPrimaryMonitor(), NULL);
 	if (!window)
 	{
 		glfwTerminate();
