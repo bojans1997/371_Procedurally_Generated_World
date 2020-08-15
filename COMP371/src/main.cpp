@@ -19,9 +19,9 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
-const int WINDOW_LENGTH = 1024;
-const int WINDOW_WIDTH = 768;
-
+const int WINDOW_LENGTH = 1920;
+const int WINDOW_WIDTH = 1080;
+float pi = 3.14159265359f;
 int GRID_SIZE = 100;
 int AXIS_SIZE = 5;
 
@@ -32,6 +32,8 @@ GLFWwindow* window;
 glm::vec3 cameraPos = glm::vec3(0.0f, 2.0f, 20.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+float camY_Vision = 2.0f;
+
 GLfloat distance = 20.0f;
 GLfloat camX = 0;
 GLfloat camZ = 0;
@@ -40,7 +42,7 @@ GLfloat camY = 0;
 bool firstMouse = true;
 GLfloat yaw = -90.0f;	// yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we initially rotate a bit to the left.
 GLfloat pitch = 0.0f;
-GLdouble lastX = WINDOW_LENGTH/ 2.0;
+GLdouble lastX = WINDOW_LENGTH / 2.0;
 GLdouble lastY = WINDOW_WIDTH / 2.0;
 GLfloat fov = 50.0f;
 
@@ -176,9 +178,9 @@ bool checkCharacterCollision(Character *character, glm::vec3 pairPos, glm::vec3 
 		glm::vec3 pos = (*it)->position;
 
 		if (pos.y <= 1) {
-			bool collisionX = newCameraPos.x + 0.1f >= pos.x * MODEL_SCALE + pairPos.x 
+			bool collisionX = newCameraPos.x + 0.1f >= pos.x * MODEL_SCALE + pairPos.x
 				&& newCameraPos.x - 0.1f <= pos.x * MODEL_SCALE + +pairPos.x + MODEL_SCALE;
-			bool collisionZ = newCameraPos.z + 0.1f >= pos.z * MODEL_SCALE + pairPos.z 
+			bool collisionZ = newCameraPos.z + 0.1f >= pos.z * MODEL_SCALE + pairPos.z
 				&& newCameraPos.z - 0.1f <= pos.z * MODEL_SCALE + pairPos.z + MODEL_SCALE;
 
 			if (collisionX && collisionZ) {
@@ -193,7 +195,7 @@ bool checkCharacterCollision(Character *character, glm::vec3 pairPos, glm::vec3 
 bool checkPairCollision(Pair *pair, glm::vec3 pairPos, glm::vec3 newCameraPos)
 {
 	if (pair != NULL) {
-		return checkCharacterCollision(pair->getLetter(), pairPos, newCameraPos) 
+		return checkCharacterCollision(pair->getLetter(), pairPos, newCameraPos)
 			|| checkCharacterCollision(pair->getDigit(), pairPos, newCameraPos);
 	}
 
@@ -208,7 +210,7 @@ bool checkCollision(glm::vec3 newCameraPos)
 			return true;
 		}
 	}
-	
+
 	for (std::vector<Bush*>::iterator it = bushes.begin(); it != bushes.end(); ++it) {
 		glm::vec3 pos = (*it)->position;
 		glm::vec3 size = (*it)->size;
@@ -221,7 +223,7 @@ bool checkCollision(glm::vec3 newCameraPos)
 		}
 	}
 
-	bool modelCollision = checkPairCollision(pairU4, pairU4Pos, newCameraPos) 
+	bool modelCollision = checkPairCollision(pairU4, pairU4Pos, newCameraPos)
 		|| checkPairCollision(pairE5, pairE5Pos, newCameraPos) || checkPairCollision(pairJ5, pairJ5Pos, newCameraPos)
 		|| checkPairCollision(pairA6, pairA6Pos, newCameraPos) || checkPairCollision(pairN2, pairN2Pos, newCameraPos);
 
@@ -264,8 +266,14 @@ void processInput(GLFWwindow* window)
 {
 	float cameraSpeed = 10.0 * deltaTime;
 
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
+	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_RELEASE)
+		cameraSpeed = 10.0 * deltaTime;
+
+	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+		cameraSpeed = 20.0 * deltaTime;
+
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+		glfwSetWindowShouldClose(window, true);
 
 	if (glfwGetKey(window, GLFW_KEY_HOME) == GLFW_PRESS) {
 		cameraPos = glm::vec3(0.0f, 2.0f, 20.0f);
@@ -275,7 +283,7 @@ void processInput(GLFWwindow* window)
 
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
 		glm::vec3 newCameraPos = cameraPos + cameraSpeed * cameraFront;
-		newCameraPos.y = 2.0f;
+		newCameraPos.y = camY_Vision;
 		if (!checkCollision(newCameraPos)) {
 			cameraPos = newCameraPos;
 			if (footstep->getIsPaused()) {
@@ -285,7 +293,7 @@ void processInput(GLFWwindow* window)
 	}
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
 		glm::vec3 newCameraPos = cameraPos - cameraSpeed * cameraFront;
-		newCameraPos.y = 2.0f;
+		newCameraPos.y = camY_Vision;
 		if (!checkCollision(newCameraPos)) {
 			cameraPos = newCameraPos;
 			if (footstep->getIsPaused()) {
@@ -295,7 +303,6 @@ void processInput(GLFWwindow* window)
 	}
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
 		glm::vec3 newCameraPos = cameraPos - glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
-		newCameraPos.y = 2.0f;
 		if (!checkCollision(newCameraPos)) {
 			cameraPos = newCameraPos;
 			if (footstep->getIsPaused()) {
@@ -305,7 +312,6 @@ void processInput(GLFWwindow* window)
 	}
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
 		glm::vec3 newCameraPos = cameraPos + glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
-		newCameraPos.y = 2.0f;
 		if (!checkCollision(newCameraPos)) {
 			cameraPos = newCameraPos;
 			if (footstep->getIsPaused()) {
@@ -320,50 +326,58 @@ void processInput(GLFWwindow* window)
 		glfwGetKey(window, GLFW_KEY_D) != GLFW_PRESS) {
 		footstep->setIsPaused(true);
 	}
+
+	//Jump
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+		glm::vec3 newCameraPos = cameraPos + cameraSpeed * glm::vec3(0.0f, 1.0f, 0.0f);
+		if (!checkCollision(newCameraPos)) {
+			cameraPos = newCameraPos;
+		}
+	}
 }
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
-    glViewport(0, 0, width, height);
+	glViewport(0, 0, width, height);
 }
 
 int main(void)
 {
-    if (!glfwInit())
-        return -1;
+	if (!glfwInit())
+		return -1;
+	//glfwGetPrimaryMonitor() for fullscreen
+	window = glfwCreateWindow(WINDOW_LENGTH, WINDOW_WIDTH, "COMP 371 Project - OpenGLHF", NULL, NULL);
 
-    window = glfwCreateWindow(WINDOW_LENGTH, WINDOW_WIDTH, "COMP 371 Project - OpenGLHF", NULL, NULL);
+	if (!window)
+	{
+		glfwTerminate();
+		return -1;
+	}
 
-    if (!window)
-    {
-        glfwTerminate();
-        return -1;
-    }
-
-    glfwMakeContextCurrent(window);
+	glfwMakeContextCurrent(window);
 	glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
 	glfwSetCursorPosCallback(window, mouse_callback);
 
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-	
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-    {
-        std::cout << "Failed to initialize GLAD" << std::endl;
-        return -1;
-    }
+
+	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+	{
+		std::cout << "Failed to initialize GLAD" << std::endl;
+		return -1;
+	}
 
 	music->setIsPaused(false);
 	music->setVolume(0.6f);
 	footstep->setVolume(1.0f);
 
-    GLuint VBO = 0, VAO = 0;
+	GLuint VBO = 0, VAO = 0;
 
 	Shader *basicShader = new Shader("src/shaders/shader.vs", "src/shaders/shader.fs");
 	Shader *textureShader = new Shader("src/shaders/texture.vs", "src/shaders/texture.fs");
 	Shader *lightShader = new Shader("src/shaders/lightCube.vs", "src/shaders/lightCube.fs");
 	Shader *depthShader = new Shader("src/shaders/depthShader.vs", "src/shaders/depthShader.fs");
 	Shader *sphereShader = new Shader("src/shaders/SphereShader.vs", "src/shaders/SphereShader.fs");
-	Shader *gridShader = new Shader("src/shaders/gridShader.vs","src/shaders/gridShader.fs");
+	Shader *gridShader = new Shader("src/shaders/gridShader.vs", "src/shaders/gridShader.fs");
 	Shader *skyBoxShader = new Shader("src/shaders/skybox.vs", "src/shaders/skybox.fs");
 
 	// Referenced from https://freestocktextures.com/texture/wall-moss-brick,621.html
@@ -545,12 +559,12 @@ int main(void)
 	srand(time(NULL));
 
 	generateObjects(-(GRID_SIZE - 10) / 2, (GRID_SIZE - 10) / 2, 10, GRID_SIZE / 2);
-	
+
 	glEnable(GL_DEPTH_TEST);
 
 	// configure depth map FBO
 	// -----------------------
-	const unsigned int DEPTH_MAP_TEXTURE_SIZE = 1024;
+	const unsigned int DEPTH_MAP_TEXTURE_SIZE = 1920;
 	GLuint depthMapFBO;
 	glGenFramebuffers(1, &depthMapFBO);
 	// create depth texture
@@ -562,7 +576,7 @@ int main(void)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-	float bordercolor[] = {1.0, 1.0, 1.0, 1.0};
+	float bordercolor[] = { 1.0, 1.0, 1.0, 1.0 };
 	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, bordercolor);
 	// attach depth texture as FBO's depth buffer
 	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
@@ -570,7 +584,7 @@ int main(void)
 	glDrawBuffer(GL_NONE);
 	glReadBuffer(GL_NONE);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	
+
 	// shader configuration
 	gridShader->use();
 	gridShader->setInt("shadowMap", 1);
@@ -657,7 +671,7 @@ int main(void)
 		processInput(window);
 
 		// Procedurally grow terrain and creates objects
-		if (cameraPos.x < -GRID_SIZE / 2 || cameraPos.x > GRID_SIZE / 2 || 
+		if (cameraPos.x < -GRID_SIZE / 2 || cameraPos.x > GRID_SIZE / 2 ||
 			cameraPos.z < -GRID_SIZE / 2 || cameraPos.z > GRID_SIZE / 2) {
 			GRID_SIZE += 50;
 			grid->setSize(GRID_SIZE);
@@ -750,7 +764,7 @@ int main(void)
 		textureShader->setVec3("material.diffuse", glm::vec3(0.2f, 0.2f, 0.2f));
 		textureShader->setVec3("material.specular", glm::vec3(0.332741f, 0.328634f, 0.346435f));
 		textureShader->setFloat("material.shininess", 0.3f);
-		
+
 		gridShader->use();
 		gridShader->setMat4("projection", projection);
 		gridShader->setMat4("view", view);
@@ -796,9 +810,9 @@ int main(void)
 		glBindVertexArray(0);
 		glDepthFunc(GL_LESS); // set depth function back to default
 
-        glfwSwapBuffers(window);
-        glfwPollEvents();
-    }
+		glfwSwapBuffers(window);
+		glfwPollEvents();
+	}
 
 	for (std::vector<Tree*>::iterator it = trees.begin(); it != trees.end(); ++it) {
 		delete *it;
@@ -823,7 +837,7 @@ int main(void)
 	delete lightShader;
 	delete basicShader;
 
-    glfwTerminate();
+	glfwTerminate();
 
-    return 0;
+	return 0;
 }
