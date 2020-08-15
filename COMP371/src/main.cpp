@@ -32,12 +32,18 @@ GLFWwindow* window;
 glm::vec3 cameraPos = glm::vec3(0.0f, 2.0f, 20.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
-float camY_Vision = 2.0f;
 
+
+bool is_jumping = false;
+float jumpValue = 1.0f;
+bool Jumpdown = false;
+const float JUMPSPEED = 0.5f;
+const float JUMPMAXHEIGHT = 2.5f;
 GLfloat distance = 20.0f;
 GLfloat camX = 0;
 GLfloat camZ = 0;
 GLfloat camY = 0;
+
 
 bool firstMouse = true;
 GLfloat yaw = -90.0f;	// yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we initially rotate a bit to the left.
@@ -65,6 +71,7 @@ std::vector<Bush*> bushes;
 // timing
 float deltaTime = 0.0f;	// time between current frame and last frame
 float lastFrame = 0.0f;
+float cameraSpeed = 10.0 * deltaTime;
 
 /*
 	Using irrKlang for music and sound effects
@@ -264,7 +271,6 @@ unsigned int loadCubemap(std::vector<std::string> faces)
 
 void processInput(GLFWwindow* window)
 {
-	float cameraSpeed = 10.0 * deltaTime;
 
 	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_RELEASE) {
 		cameraSpeed = 10.0 * deltaTime;
@@ -287,7 +293,7 @@ void processInput(GLFWwindow* window)
 
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
 		glm::vec3 newCameraPos = cameraPos + cameraSpeed * cameraFront;
-		newCameraPos.y = camY_Vision;
+		newCameraPos.y = cameraPos.y;
 		if (!checkCollision(newCameraPos)) {
 			cameraPos = newCameraPos;
 			if (footstep->getIsPaused()) {
@@ -297,7 +303,7 @@ void processInput(GLFWwindow* window)
 	}
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
 		glm::vec3 newCameraPos = cameraPos - cameraSpeed * cameraFront;
-		newCameraPos.y = camY_Vision;
+		newCameraPos.y = cameraPos.y;
 		if (!checkCollision(newCameraPos)) {
 			cameraPos = newCameraPos;
 			if (footstep->getIsPaused()) {
@@ -333,10 +339,7 @@ void processInput(GLFWwindow* window)
 
 	//Jump
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-		glm::vec3 newCameraPos = cameraPos + cameraSpeed * glm::vec3(0.0f, 1.0f, 0.0f);
-		if (!checkCollision(newCameraPos)) {
-			cameraPos = newCameraPos;
-		}
+			is_jumping = true;
 	}
 }
 
@@ -350,7 +353,7 @@ int main(void)
 	if (!glfwInit())
 		return -1;
 	//glfwGetPrimaryMonitor() for fullscreen
-	window = glfwCreateWindow(WINDOW_LENGTH, WINDOW_WIDTH, "COMP 371 Project - OpenGLHF", glfwGetPrimaryMonitor(), NULL);
+	window = glfwCreateWindow(WINDOW_LENGTH, WINDOW_WIDTH, "COMP 371 Project - OpenGLHF", NULL, NULL);
 
 	if (!window)
 	{
@@ -674,6 +677,29 @@ int main(void)
 
 		processInput(window);
 
+		if (is_jumping) {
+			glm::vec3 newCameraPos = cameraPos + cameraSpeed * glm::vec3(0.0f, jumpValue, 0.0f);
+			if (!checkCollision(newCameraPos)) {
+				cameraPos = newCameraPos;
+			}
+
+			if (jumpValue >= JUMPMAXHEIGHT) {
+				Jumpdown = true;
+			}
+
+			if (Jumpdown) {
+				jumpValue-= JUMPSPEED;
+			}
+			else {
+				jumpValue+= JUMPSPEED;
+			}
+
+			if (cameraPos.y <= 2.0f) {
+				cameraPos.y = 2.0f;
+				is_jumping = false;
+				Jumpdown = false;
+			}
+		}
 		// Procedurally grow terrain and creates objects
 		if (cameraPos.x < -GRID_SIZE / 2 || cameraPos.x > GRID_SIZE / 2 ||
 			cameraPos.z < -GRID_SIZE / 2 || cameraPos.z > GRID_SIZE / 2) {
