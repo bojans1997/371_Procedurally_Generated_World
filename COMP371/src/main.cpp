@@ -346,7 +346,7 @@ int main(void)
 	if (!glfwInit())
 		return -1;
 	//glfwGetPrimaryMonitor() for fullscreen
-	window = glfwCreateWindow(WINDOW_LENGTH, WINDOW_WIDTH, "COMP 371 Project - OpenGLHF", NULL, NULL);
+	window = glfwCreateWindow(WINDOW_LENGTH, WINDOW_WIDTH, "COMP 371 Project - OpenGLHF", glfwGetPrimaryMonitor(), NULL);
 
 	if (!window)
 	{
