@@ -266,11 +266,15 @@ void processInput(GLFWwindow* window)
 {
 	float cameraSpeed = 10.0 * deltaTime;
 
-	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_RELEASE)
+	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_RELEASE) {
 		cameraSpeed = 10.0 * deltaTime;
+		footstep->setPlaybackSpeed(1.0f);
+	}
 
-	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
 		cameraSpeed = 20.0 * deltaTime;
+		footstep->setPlaybackSpeed(1.2f);
+	}
 
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
