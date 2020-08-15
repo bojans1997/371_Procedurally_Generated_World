@@ -5,6 +5,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <map>
 #include "objects/shader.h"
 #include "objects/grid.h"
 #include "objects/axis.h"
@@ -15,13 +16,14 @@
 #include "objects/Sphere.h"
 #include "objects/tree.h"
 #include "objects/bush.h"
+#include "objects/FastNoise.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
-const int WINDOW_LENGTH = 1920;
-const int WINDOW_WIDTH = 1080;
-float pi = 3.14159265359f;
+const int WINDOW_LENGTH = 1024;
+const int WINDOW_WIDTH = 768;
+
 int GRID_SIZE = 100;
 int AXIS_SIZE = 5;
 
@@ -32,8 +34,6 @@ GLFWwindow* window;
 glm::vec3 cameraPos = glm::vec3(0.0f, 2.0f, 20.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
-float camY_Vision = 2.0f;
-
 GLfloat distance = 20.0f;
 GLfloat camX = 0;
 GLfloat camZ = 0;
@@ -61,6 +61,11 @@ Pair *pairN2;
 // Initial procedural creation of objects on terrain
 std::vector<Tree*> trees;
 std::vector<Bush*> bushes;
+
+std::vector<Cube*> terrainCubes;
+std::map<std::pair<int, int>, int> terrainCoords;
+
+auto noise = FastNoise(50);
 
 // timing
 float deltaTime = 0.0f;	// time between current frame and last frame
@@ -117,6 +122,15 @@ int randomInt(int min, int max)
 }
 
 void generateObjects(int min1, int max1, int min2, int max2) {
+	for (int x = min1; x <= max1; x++) {
+		for (int z = min2 - 50; z <= max2 + 40; z++) {
+			float tempHeight = noise.GetNoise(x, 0, z);
+			int height = round(tempHeight * 5);
+			terrainCubes.push_back(new Cube(x, height, z));
+			terrainCoords[std::make_pair(x, z)] = height;
+		}
+	}
+
 	for (int i = 0; i < 25; i++) {
 		int x = randomInt(min1, max1);
 		int z = randomInt(min2, max2);
@@ -126,7 +140,7 @@ void generateObjects(int min1, int max1, int min2, int max2) {
 			z = -z;
 		}
 
-		trees.push_back(new Tree(glm::vec3(x, 0, z), size));
+		trees.push_back(new Tree(glm::vec3(x, terrainCoords[std::make_pair(x, z)], z), size));
 	}
 
 	for (int i = 0; i < 25; i++) {
@@ -138,7 +152,7 @@ void generateObjects(int min1, int max1, int min2, int max2) {
 			x = -x;
 		}
 
-		trees.push_back(new Tree(glm::vec3(x, 0, z), size));
+		trees.push_back(new Tree(glm::vec3(x, terrainCoords[std::make_pair(x, z)], z), size));
 	}
 
 	for (int i = 0; i < 50; i++) {
@@ -152,7 +166,7 @@ void generateObjects(int min1, int max1, int min2, int max2) {
 			z = -z;
 		}
 
-		bushes.push_back(new Bush(glm::vec3(x, 0, z), glm::vec3(xLen, yLen, zLen)));
+		bushes.push_back(new Bush(glm::vec3(x, terrainCoords[std::make_pair(x, z)], z), glm::vec3(xLen, yLen, zLen)));
 	}
 
 	for (int i = 0; i < 50; i++) {
@@ -166,7 +180,7 @@ void generateObjects(int min1, int max1, int min2, int max2) {
 			x = -x;
 		}
 
-		bushes.push_back(new Bush(glm::vec3(x, 0, z), glm::vec3(xLen, yLen, zLen)));
+		bushes.push_back(new Bush(glm::vec3(x, terrainCoords[std::make_pair(x, z)], z), glm::vec3(xLen, yLen, zLen)));
 	}
 }
 
@@ -205,8 +219,8 @@ bool checkPairCollision(Pair *pair, glm::vec3 pairPos, glm::vec3 newCameraPos)
 bool checkCollision(glm::vec3 newCameraPos)
 {
 	for (std::vector<Tree*>::iterator it = trees.begin(); it != trees.end(); ++it) {
-		glm::vec3 cubeCenter = glm::vec3((*it)->position.x + 0.5f, (*it)->position.y, (*it)->position.z + 0.5f);
-		if (glm::distance(cubeCenter, newCameraPos) <= 2.2f) {
+		glm::vec3 cubeCenter = glm::vec3((*it)->position.x + 0.5f, cameraPos.y, (*it)->position.z + 0.5f);
+		if (glm::distance(cubeCenter, newCameraPos) <= 1.0f) {
 			return true;
 		}
 	}
@@ -266,12 +280,6 @@ void processInput(GLFWwindow* window)
 {
 	float cameraSpeed = 10.0 * deltaTime;
 
-	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_RELEASE)
-		cameraSpeed = 10.0 * deltaTime;
-
-	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-		cameraSpeed = 20.0 * deltaTime;
-
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
 
@@ -283,7 +291,7 @@ void processInput(GLFWwindow* window)
 
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
 		glm::vec3 newCameraPos = cameraPos + cameraSpeed * cameraFront;
-		newCameraPos.y = camY_Vision;
+		//newCameraPos.y = 2.0f;
 		if (!checkCollision(newCameraPos)) {
 			cameraPos = newCameraPos;
 			if (footstep->getIsPaused()) {
@@ -293,7 +301,7 @@ void processInput(GLFWwindow* window)
 	}
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
 		glm::vec3 newCameraPos = cameraPos - cameraSpeed * cameraFront;
-		newCameraPos.y = camY_Vision;
+		//newCameraPos.y = 2.0f;
 		if (!checkCollision(newCameraPos)) {
 			cameraPos = newCameraPos;
 			if (footstep->getIsPaused()) {
@@ -303,6 +311,7 @@ void processInput(GLFWwindow* window)
 	}
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
 		glm::vec3 newCameraPos = cameraPos - glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+		//newCameraPos.y = 2.0f;
 		if (!checkCollision(newCameraPos)) {
 			cameraPos = newCameraPos;
 			if (footstep->getIsPaused()) {
@@ -312,6 +321,7 @@ void processInput(GLFWwindow* window)
 	}
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
 		glm::vec3 newCameraPos = cameraPos + glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+		//newCameraPos.y = 2.0f;
 		if (!checkCollision(newCameraPos)) {
 			cameraPos = newCameraPos;
 			if (footstep->getIsPaused()) {
@@ -326,14 +336,6 @@ void processInput(GLFWwindow* window)
 		glfwGetKey(window, GLFW_KEY_D) != GLFW_PRESS) {
 		footstep->setIsPaused(true);
 	}
-
-	//Jump
-	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-		glm::vec3 newCameraPos = cameraPos + cameraSpeed * glm::vec3(0.0f, 1.0f, 0.0f);
-		if (!checkCollision(newCameraPos)) {
-			cameraPos = newCameraPos;
-		}
-	}
 }
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height)
@@ -345,8 +347,8 @@ int main(void)
 {
 	if (!glfwInit())
 		return -1;
-	//glfwGetPrimaryMonitor() for fullscreen
-	window = glfwCreateWindow(WINDOW_LENGTH, WINDOW_WIDTH, "COMP 371 Project - OpenGLHF", glfwGetPrimaryMonitor(), NULL);
+
+	window = glfwCreateWindow(WINDOW_LENGTH, WINDOW_WIDTH, "COMP 371 Project - OpenGLHF", NULL, NULL);
 
 	if (!window)
 	{
@@ -379,6 +381,7 @@ int main(void)
 	Shader *sphereShader = new Shader("src/shaders/SphereShader.vs", "src/shaders/SphereShader.fs");
 	Shader *gridShader = new Shader("src/shaders/gridShader.vs", "src/shaders/gridShader.fs");
 	Shader *skyBoxShader = new Shader("src/shaders/skybox.vs", "src/shaders/skybox.fs");
+	Texture *grassTexture = new Texture("src/textures/grass.jpg");
 
 	// Referenced from https://freestocktextures.com/texture/wall-moss-brick,621.html
 	Texture *ruinTexture = new Texture("src/textures/ruin.jpg");
@@ -387,6 +390,9 @@ int main(void)
 	Axis *axis = new Axis(AXIS_SIZE);
 
 	Cube *lightSource = new Cube(0, 30, 0);
+
+	noise = FastNoise(randomInt(1, 1000));
+	noise.SetNoiseType(FastNoise::Simplex);
 
 	// Letter U and digit 4 for Giuseppe Campanelli
 	std::vector<Cube*> cubesU = {
@@ -564,7 +570,7 @@ int main(void)
 
 	// configure depth map FBO
 	// -----------------------
-	const unsigned int DEPTH_MAP_TEXTURE_SIZE = 1920;
+	const unsigned int DEPTH_MAP_TEXTURE_SIZE = 1024;
 	GLuint depthMapFBO;
 	glGenFramebuffers(1, &depthMapFBO);
 	// create depth texture
@@ -717,7 +723,7 @@ int main(void)
 		glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
 		glClear(GL_DEPTH_BUFFER_BIT);
 
-		grid->draw(depthShader);
+		//grid->draw(depthShader);
 
 		for (std::vector<Tree*>::iterator it = trees.begin(); it != trees.end(); ++it) {
 			(*it)->draw(depthShader);
@@ -775,10 +781,19 @@ int main(void)
 		gridShader->setMat4("lightSpaceMatrix", lightSpaceMatrix);
 
 		//Draw Grid
-		grid->draw(gridShader, depthMap);
+		//grid->draw(gridShader, depthMap);
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, depthMap);
+
+		glm::mat4 lightModel = lightSource->getModel();
+		lightShader->use();
+		lightShader->setMat4("projection", projection);
+		lightShader->setMat4("view", view);
+
+		for (std::vector<Cube*>::iterator it = terrainCubes.begin(); it != terrainCubes.end(); ++it) {
+			(*it)->draw(textureShader, (*it)->getModel(), grassTexture);
+		}
 
 		//Draw Models with Texture
 		for (std::vector<Tree*>::iterator it = trees.begin(); it != trees.end(); ++it) {
