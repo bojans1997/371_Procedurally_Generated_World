@@ -690,7 +690,6 @@ int main(void)
 			if (!checkCollision(newCameraPos)) {
 				cameraPos = newCameraPos;
 			}
-
 			if (jumpValue >= JUMPMAXHEIGHT) {
 				Jumpdown = true;
 			}
@@ -702,10 +701,11 @@ int main(void)
 				jumpValue+= JUMPSPEED;
 			}
 
-			if (cameraPos.y <= 2.0f) {
+			if (cameraPos.y <= 2.0f && Jumpdown) {
 				cameraPos.y = 2.0f;
 				is_jumping = false;
 				Jumpdown = false;
+				jumpValue = 0.0f;
 			}
 		}
 		// Procedurally grow terrain and creates objects
