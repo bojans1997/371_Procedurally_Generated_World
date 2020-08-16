@@ -20,8 +20,13 @@
 #include "stb_image.h"
 
 const int WINDOW_LENGTH = 1920;
-const int WINDOW_WIDTH = 1080;
-float pi = 3.14159265359f;
+const int WINDOW_HEIGHT = 1080;
+
+int user_win_length = 1600;
+int user_win_height = 900;
+int user_win_xpos = 150;
+int user_win_ypos = 100;
+
 int GRID_SIZE = 100;
 int AXIS_SIZE = 5;
 
@@ -33,7 +38,7 @@ glm::vec3 cameraPos = glm::vec3(0.0f, 2.0f, 20.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
-bool is_fs = true;
+bool is_fs = false;
 
 
 bool is_jumping = false;
@@ -51,7 +56,7 @@ bool firstMouse = true;
 GLfloat yaw = -90.0f;	// yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we initially rotate a bit to the left.
 GLfloat pitch = 0.0f;
 GLdouble lastX = WINDOW_LENGTH / 2.0;
-GLdouble lastY = WINDOW_WIDTH / 2.0;
+GLdouble lastY = WINDOW_HEIGHT / 2.0;
 GLfloat fov = 50.0f;
 
 glm::vec3 pairU4Pos = glm::vec3(0, 0, 0);
@@ -346,7 +351,7 @@ void processInput(GLFWwindow* window)
 
 	if (glfwGetKey(window, GLFW_KEY_F11) == GLFW_PRESS) {
 		is_fs = !is_fs;
-		glfwSetWindowMonitor(window, is_fs ? glfwGetPrimaryMonitor() : NULL, 0, 0, WINDOW_LENGTH, WINDOW_WIDTH, GLFW_DONT_CARE);
+		glfwSetWindowMonitor(window, is_fs ? glfwGetPrimaryMonitor() : NULL, is_fs ? 0 : user_win_xpos, is_fs ? 0 : user_win_ypos, is_fs ? WINDOW_LENGTH : user_win_length, is_fs ? WINDOW_HEIGHT : user_win_height, GLFW_DONT_CARE);
 	}
 }
 
@@ -360,7 +365,9 @@ int main(void)
 	if (!glfwInit())
 		return -1;
 	//glfwGetPrimaryMonitor() for fullscreen
-	window = glfwCreateWindow(WINDOW_LENGTH, WINDOW_WIDTH, "COMP 371 Project - OpenGLHF", glfwGetPrimaryMonitor(), NULL);
+	window = glfwCreateWindow(user_win_length, user_win_height, "COMP 371 Project - OpenGLHF", NULL, NULL);
+	glfwSetWindowPos(window, user_win_xpos, user_win_ypos);
+
 	if (!window)
 	{
 		glfwTerminate();
@@ -685,6 +692,7 @@ int main(void)
 
 		processInput(window);
 
+		//Jump Animation
 		if (is_jumping) {
 			glm::vec3 newCameraPos = cameraPos + cameraSpeed * glm::vec3(0.0f, jumpValue, 0.0f);
 			if (!checkCollision(newCameraPos)) {
@@ -708,6 +716,13 @@ int main(void)
 				jumpValue = 0.0f;
 			}
 		}
+
+		//Get User Window Size and Postion
+		if (!is_fs) {
+			glfwGetWindowSize(window, &user_win_length, &user_win_height);
+			glfwGetWindowPos(window, &user_win_xpos, &user_win_ypos);
+		}
+
 		// Procedurally grow terrain and creates objects
 		if (cameraPos.x < -GRID_SIZE / 2 || cameraPos.x > GRID_SIZE / 2 ||
 			cameraPos.z < -GRID_SIZE / 2 || cameraPos.z > GRID_SIZE / 2) {
@@ -773,11 +788,11 @@ int main(void)
 
 		// reset viewport
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		glViewport(0, 0, WINDOW_LENGTH, WINDOW_WIDTH);
+		glViewport(0, 0, WINDOW_LENGTH, WINDOW_HEIGHT);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		//Shadow Pass 2 - Normal Render
-		glm::mat4 projection = glm::perspective(glm::radians(fov), (float)WINDOW_LENGTH / (float)WINDOW_WIDTH, 0.1f, 500.0f);
+		glm::mat4 projection = glm::perspective(glm::radians(fov), (float)WINDOW_LENGTH / (float)WINDOW_HEIGHT, 0.1f, 500.0f);
 		glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 
 		//Generate Sphere
