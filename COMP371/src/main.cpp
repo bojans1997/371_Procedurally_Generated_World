@@ -22,11 +22,6 @@
 const int WINDOW_LENGTH = 1920;
 const int WINDOW_HEIGHT = 1080;
 
-int user_win_length = 1600;
-int user_win_height = 900;
-int user_win_xpos = 150;
-int user_win_ypos = 100;
-
 int GRID_SIZE = 100;
 int AXIS_SIZE = 5;
 
@@ -38,7 +33,7 @@ glm::vec3 cameraPos = glm::vec3(0.0f, 2.0f, 20.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
-bool is_fs = false;
+bool is_fs = true;
 
 
 bool is_jumping = false;
@@ -351,7 +346,7 @@ void processInput(GLFWwindow* window)
 
 	if (glfwGetKey(window, GLFW_KEY_F11) == GLFW_PRESS) {
 		is_fs = !is_fs;
-		glfwSetWindowMonitor(window, is_fs ? glfwGetPrimaryMonitor() : NULL, is_fs ? 0 : user_win_xpos, is_fs ? 0 : user_win_ypos, is_fs ? WINDOW_LENGTH : user_win_length, is_fs ? WINDOW_HEIGHT : user_win_height, GLFW_DONT_CARE);
+		glfwSetWindowMonitor(window, is_fs ? glfwGetPrimaryMonitor() : NULL, 0, 0, WINDOW_LENGTH, WINDOW_HEIGHT, GLFW_DONT_CARE);
 	}
 }
 
@@ -365,8 +360,7 @@ int main(void)
 	if (!glfwInit())
 		return -1;
 	//glfwGetPrimaryMonitor() for fullscreen
-	window = glfwCreateWindow(user_win_length, user_win_height, "COMP 371 Project - OpenGLHF", NULL, NULL);
-	glfwSetWindowPos(window, user_win_xpos, user_win_ypos);
+	window = glfwCreateWindow(WINDOW_LENGTH, WINDOW_HEIGHT, "COMP 371 Project - OpenGLHF", glfwGetPrimaryMonitor(), NULL);
 
 	if (!window)
 	{
@@ -715,12 +709,6 @@ int main(void)
 				Jumpdown = false;
 				jumpValue = 0.0f;
 			}
-		}
-
-		//Get User Window Size and Postion
-		if (!is_fs) {
-			glfwGetWindowSize(window, &user_win_length, &user_win_height);
-			glfwGetWindowPos(window, &user_win_xpos, &user_win_ypos);
 		}
 
 		// Procedurally grow terrain and creates objects
