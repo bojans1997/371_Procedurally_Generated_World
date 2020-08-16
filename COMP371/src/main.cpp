@@ -397,10 +397,7 @@ int main(void)
 	Texture *ruinTexture = new Texture("src/textures/ruin.jpg");
 
 	Grid *grid = new Grid(GRID_SIZE);
-	Axis *axis = new Axis(AXIS_SIZE);
-
-	Cube *lightSource = new Cube(0, 30, 0);
-
+	
 	// Letter U and digit 4 for Giuseppe Campanelli
 	std::vector<Cube*> cubesU = {
 		new Cube(-5, 0, 0),
@@ -603,8 +600,13 @@ int main(void)
 	gridShader->setInt("shadowMap", 1);
 	gridShader->setInt("diffuseTexture", 0);
 
+	textureShader->use();
+	textureShader->setInt("shadowMap", 1);
+
+
 	// lighting info
 	glm::vec3 lightPosition(0.0f, 30.0f, -5.0f);
+	glm::vec3 lightColor = glm::vec3(1.0f);
 
 	// skybox info
 	float skyboxVertices[] = {
@@ -741,8 +743,8 @@ int main(void)
 		//Shadow Pass 1 - Shadow Map
 		glm::mat4 lightProjection, lightView;
 		glm::mat4 lightSpaceMatrix;
-		float near_plane = 1.0f, far_plane = 30.5f;
-		lightProjection = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, near_plane, far_plane);
+		float near_plane = 0.1f, far_plane = 40.5f;
+		lightProjection = glm::ortho(-GRID_SIZE/(float)2.0, GRID_SIZE/(float)2.0, -GRID_SIZE/(float)2.0, GRID_SIZE/(float)2.0, near_plane, far_plane);
 		lightView = glm::lookAt(lightPosition, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
 		lightSpaceMatrix = lightProjection * lightView;
 		// render scene from light's point of view
@@ -782,8 +784,8 @@ int main(void)
 		sphereShader->use();
 		sphereShader->setMat4("projection", projection);
 		sphereShader->setMat4("view", view);
-		sphereShader->setVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
-		sphereShader->setVec3("lightPos", glm::vec3(0.0f, 30.0f, 0.0f));
+		sphereShader->setVec3("lightColor", lightColor);
+		sphereShader->setVec3("lightPos", lightPosition);
 		sphereShader->setVec3("viewPos", cameraPos);
 
 		//Light For Texture
@@ -791,21 +793,16 @@ int main(void)
 		textureShader->setMat4("projection", projection);
 		textureShader->setMat4("view", view);
 		// set light uniforms
-		textureShader->setVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+		textureShader->setVec3("lightColor", lightColor);
 		textureShader->setVec3("lightPos", lightPosition);
 		textureShader->setVec3("viewPos", cameraPos);
 		textureShader->setMat4("lightSpaceMatrix", lightSpaceMatrix);
-
-		textureShader->setVec3("material.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
-		textureShader->setVec3("material.diffuse", glm::vec3(0.2f, 0.2f, 0.2f));
-		textureShader->setVec3("material.specular", glm::vec3(0.332741f, 0.328634f, 0.346435f));
-		textureShader->setFloat("material.shininess", 0.3f);
 
 		gridShader->use();
 		gridShader->setMat4("projection", projection);
 		gridShader->setMat4("view", view);
 		// set light uniforms
-		gridShader->setVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+		gridShader->setVec3("lightColor", lightColor);
 		gridShader->setVec3("lightPos", lightPosition);
 		gridShader->setVec3("viewPos", cameraPos);
 		gridShader->setMat4("lightSpaceMatrix", lightSpaceMatrix);
@@ -863,7 +860,6 @@ int main(void)
 	delete pairJ5;
 	delete pairA6;
 	delete pairN2;
-	delete axis;
 	delete grid;
 	delete ruinTexture;
 	delete gridShader;
