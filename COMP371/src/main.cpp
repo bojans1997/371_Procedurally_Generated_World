@@ -75,6 +75,10 @@ float deltaTime = 0.0f;	// time between current frame and last frame
 float lastFrame = 0.0f;
 float cameraSpeed = 10.0 * deltaTime;
 
+float dayspeed = 5.0f;
+float lightDistance = 30.0f;
+float light = 0.0f;
+
 /*
 	Using irrKlang for music and sound effects
 	Downloaded from https://www.ambiera.com/irrklang/downloads.html
@@ -573,6 +577,8 @@ int main(void)
 	};
 	pairN2 = new Pair(new Character(cubesN), new Character(cubes2), new Sphere(0, 6, 0, 5, 10, 10));
 
+	Cube *sun = new Cube(0, 0, 0);
+
 	srand(time(NULL));
 
 	generateObjects(-(GRID_SIZE - 10) / 2, (GRID_SIZE - 10) / 2, 10, GRID_SIZE / 2);
@@ -612,9 +618,7 @@ int main(void)
 	textureShader->setInt("diffuseTexture", 0);
 
 
-	// lighting info
-	glm::vec3 lightPosition(0.0f, 30.0f, -5.0f);
-	glm::vec3 lightColor = glm::vec3(1.0f);
+	
 
 	// skybox info
 	float skyboxVertices[] = {
@@ -687,6 +691,17 @@ int main(void)
 
 	while (!glfwWindowShouldClose(window))
 	{
+		// lighting info
+		glm::vec3 lightPosition(sin(glfwGetTime()/dayspeed) * lightDistance, cos(glfwGetTime()/dayspeed) * lightDistance, 0.0f);
+		glm::vec3 lightColor = glm::vec3(1.0f);
+
+		if (lightPosition.y <= 0) {
+			light = 0.0f;
+		}
+		else {
+			light = 1.0f;
+		}
+
 		float currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
@@ -750,6 +765,10 @@ int main(void)
 		modelN2 = glm::translate(modelN2, glm::vec3(pairN2Pos.x, pairN2Pos.y, pairN2Pos.z));
 		modelN2 = glm::scale(modelN2, glm::vec3(MODEL_SCALE, MODEL_SCALE, MODEL_SCALE));
 
+		glm::mat4 modelSun = glm::mat4(1.0f);
+		modelSun = glm::translate(modelSun, glm::vec3(sin(glfwGetTime() / dayspeed) * lightDistance + cameraPos.x, cos(glfwGetTime() / dayspeed) * lightDistance + cameraPos.y, cameraPos.z));
+		modelSun = glm::scale(modelSun, glm::vec3(1, 1, 1));
+
 		//Shadow Pass 1 - Shadow Map
 		glm::mat4 lightProjection, lightView;
 		glm::mat4 lightSpaceMatrix;
@@ -794,6 +813,7 @@ int main(void)
 		sphereShader->use();
 		sphereShader->setMat4("projection", projection);
 		sphereShader->setMat4("view", view);
+		sphereShader->setFloat("light", light);
 		sphereShader->setVec3("lightColor", lightColor);
 		sphereShader->setVec3("lightPos", lightPosition);
 		sphereShader->setVec3("viewPos", cameraPos);
@@ -803,6 +823,7 @@ int main(void)
 		textureShader->setMat4("projection", projection);
 		textureShader->setMat4("view", view);
 		// set light uniforms
+		textureShader->setFloat("light", light);
 		textureShader->setVec3("lightColor", lightColor);
 		textureShader->setVec3("lightPos", lightPosition);
 		textureShader->setVec3("viewPos", cameraPos);
@@ -812,10 +833,18 @@ int main(void)
 		gridShader->setMat4("projection", projection);
 		gridShader->setMat4("view", view);
 		// set light uniforms
+		gridShader->setFloat("light", light);
 		gridShader->setVec3("lightColor", lightColor);
 		gridShader->setVec3("lightPos", lightPosition);
 		gridShader->setVec3("viewPos", cameraPos);
 		gridShader->setMat4("lightSpaceMatrix", lightSpaceMatrix);
+
+		//Sun
+		lightShader->use();
+		lightShader->setMat4("projection", projection);
+		lightShader->setMat4("view", view);
+		
+		sun->draw(lightShader, modelSun);
 
 		//Draw Grid
 		grid->draw(gridShader, depthMap);
@@ -845,6 +874,8 @@ int main(void)
 		view = glm::mat4(glm::mat3(glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp))); // remove translation from the view matrix
 		skyBoxShader->setMat4("view", view);
 		skyBoxShader->setMat4("projection", projection);
+		skyBoxShader->setFloat("light", light);
+		skyBoxShader->setVec3("lightColor", lightColor);
 		// skybox cube
 		glBindVertexArray(skyboxVAO);
 		glActiveTexture(GL_TEXTURE0);

@@ -19,6 +19,7 @@ uniform vec3 lightColor;
 uniform vec3 viewPos;
 uniform sampler2D ourTexture;
 
+uniform float light;
 
 uniform sampler2D diffuseTexture;
 uniform sampler2D shadowMap;
@@ -55,7 +56,7 @@ void main()
     vec3 diffuse = lightColor * (diff * material.diffuse);
 
     // specular
-    float specularStrength = 0.2;
+    float specularStrength = 0.0;
     vec3 viewDir = normalize(viewPos - fragPos);
     vec3 reflectDir = reflect(-lightDir, norm);  
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
@@ -63,7 +64,7 @@ void main()
 
 	float shadow = ShadowCalculation(fragPosLightSpace);
 
-    vec3 result = (ambient + (1.0 - shadow) * (diffuse + specular))* vec3(texture(ourTexture, textCoord)) * texture(diffuseTexture, textCoord).rgb;
+    vec3 result = (ambient + ((1.0 - shadow) * (diffuse + specular)) * light)* vec3(texture(ourTexture, textCoord)) * texture(diffuseTexture, textCoord).rgb;
     FragColor = vec4(result, 1.0);
 
     //FragColor = texture(ourTexture, textCoord);
