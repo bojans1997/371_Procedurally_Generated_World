@@ -37,10 +37,10 @@ bool is_fs = true;
 
 bool mute = false;
 bool is_jumping = false;
-float jumpValue = 1.0f;
+float jumpValue = 2.0f;
 bool Jumpdown = false;
-const float JUMPSPEED = 0.5f;
-const float JUMPMAXHEIGHT = 2.5f;
+const float JUMPSPEED = 10.0f;
+const float JUMPMAXHEIGHT = 5.0f;
 GLfloat distance = 20.0f;
 GLfloat camX = 0;
 GLfloat camZ = 0;
@@ -717,7 +717,9 @@ int main(void)
 
 		//Jump Animation
 		if (is_jumping) {
-			glm::vec3 newCameraPos = cameraPos + cameraSpeed * glm::vec3(0.0f, jumpValue, 0.0f);
+			footstep->setIsPaused(true);
+			glm::vec3 newCameraPos = cameraPos;
+			newCameraPos.y = jumpValue;
 			if (!checkCollision(newCameraPos)) {
 				cameraPos = newCameraPos;
 			}
@@ -726,17 +728,17 @@ int main(void)
 			}
 
 			if (Jumpdown) {
-				jumpValue-= JUMPSPEED;
+				jumpValue -= JUMPSPEED * deltaTime;
 			}
 			else {
-				jumpValue+= JUMPSPEED;
+				jumpValue += JUMPSPEED * deltaTime;
 			}
 
 			if (cameraPos.y <= 2.0f && Jumpdown) {
 				cameraPos.y = 2.0f;
 				is_jumping = false;
 				Jumpdown = false;
-				jumpValue = 0.0f;
+				jumpValue = 2.0f;
 			}
 		}
 
