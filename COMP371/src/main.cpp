@@ -689,14 +689,18 @@ int main(void)
 	skyBoxShader->use();
 	skyBoxShader->setInt("skybox", 0);
 
+	glm::vec3 lightPosition(sin(glfwGetTime()/dayspeed) * lightDistance, cos(glfwGetTime()/dayspeed) * lightDistance, 0.0f);
+	glm::vec3 lightColor = glm::vec3(1.0f);
+
 	while (!glfwWindowShouldClose(window))
 	{
 		// lighting info
-		glm::vec3 lightPosition(sin(glfwGetTime()/dayspeed) * lightDistance, cos(glfwGetTime()/dayspeed) * lightDistance, 0.0f);
-		glm::vec3 lightColor = glm::vec3(1.0f);
+		lightPosition = glm::vec3(sin(glfwGetTime() / dayspeed) * lightDistance, cos(glfwGetTime() / dayspeed) * lightDistance, 0.0);
+		
 		//std::cout << lightPosition.y << " " << lightColor.r << lightColor.g << lightColor.b << std::endl;
 		if (lightPosition.y <= 0) {
 			light = 0.0f;
+			lightColor = glm::vec3(1.0f);
 		}
 		else {
 			light = 1.0f;
