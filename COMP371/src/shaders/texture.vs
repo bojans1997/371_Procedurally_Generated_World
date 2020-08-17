@@ -8,10 +8,12 @@ out vec3 ourColor;
 out vec3 normal;
 out vec2 textCoord;
 out vec3 fragPos;
+out vec4 fragPosLightSpace;
 
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
+uniform mat4 lightSpaceMatrix;
 
 void main()
 {
@@ -20,4 +22,5 @@ void main()
     ourColor = aColor;
 	textCoord = aTextCoord;
 	normal = mat3(model)* aNormal;
+	fragPosLightSpace = lightSpaceMatrix * vec4(fragPos, 1.0);
 } 

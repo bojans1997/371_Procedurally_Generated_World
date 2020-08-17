@@ -35,7 +35,7 @@ glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
 bool is_fs = true;
 
-
+bool mute = false;
 bool is_jumping = false;
 float jumpValue = 1.0f;
 bool Jumpdown = false;
@@ -348,6 +348,11 @@ void processInput(GLFWwindow* window)
 		is_fs = !is_fs;
 		glfwSetWindowMonitor(window, is_fs ? glfwGetPrimaryMonitor() : NULL, 0, 0, WINDOW_LENGTH, WINDOW_HEIGHT, GLFW_DONT_CARE);
 	}
+
+	if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS) {
+		mute = !mute;
+		mute ? music->setVolume(0.0f) : music->setVolume(0.6f);
+	}
 }
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height)
@@ -362,6 +367,7 @@ int main(void)
 	//glfwGetPrimaryMonitor() for fullscreen
 	window = glfwCreateWindow(WINDOW_LENGTH, WINDOW_HEIGHT, "COMP 371 Project - OpenGLHF", glfwGetPrimaryMonitor(), NULL);
 
+	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 	if (!window)
 	{
 		glfwTerminate();
@@ -603,6 +609,7 @@ int main(void)
 
 	textureShader->use();
 	textureShader->setInt("shadowMap", 1);
+	textureShader->setInt("diffuseTexture", 0);
 
 
 	// lighting info
