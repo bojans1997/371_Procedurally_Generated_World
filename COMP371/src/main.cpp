@@ -75,7 +75,7 @@ float deltaTime = 0.0f;	// time between current frame and last frame
 float lastFrame = 0.0f;
 float cameraSpeed = 10.0 * deltaTime;
 
-float dayspeed = 5.0f;
+float dayspeed = 20.0f;
 float lightDistance = 30.0f;
 float light = 0.0f;
 
@@ -694,12 +694,15 @@ int main(void)
 		// lighting info
 		glm::vec3 lightPosition(sin(glfwGetTime()/dayspeed) * lightDistance, cos(glfwGetTime()/dayspeed) * lightDistance, 0.0f);
 		glm::vec3 lightColor = glm::vec3(1.0f);
-
+		//std::cout << lightPosition.y << " " << lightColor.r << lightColor.g << lightColor.b << std::endl;
 		if (lightPosition.y <= 0) {
 			light = 0.0f;
 		}
 		else {
 			light = 1.0f;
+			if (lightPosition.y <= 10) {
+				lightColor = glm::vec3(1.0f, 0.5f + (0.5f/10) * lightPosition.y, 0.5 + (2 * (0.5f/10) * lightPosition.y));
+			}
 		}
 
 		float currentFrame = glfwGetTime();
@@ -766,7 +769,7 @@ int main(void)
 		modelN2 = glm::scale(modelN2, glm::vec3(MODEL_SCALE, MODEL_SCALE, MODEL_SCALE));
 
 		glm::mat4 modelSun = glm::mat4(1.0f);
-		modelSun = glm::translate(modelSun, glm::vec3(sin(glfwGetTime() / dayspeed) * lightDistance + cameraPos.x, cos(glfwGetTime() / dayspeed) * lightDistance + cameraPos.y, cameraPos.z));
+		modelSun = glm::translate(modelSun, glm::vec3(sin(glfwGetTime() / dayspeed) * (lightDistance + 20) + cameraPos.x, cos(glfwGetTime() / dayspeed) * (lightDistance + 20) + cameraPos.y, cameraPos.z));
 		modelSun = glm::scale(modelSun, glm::vec3(1, 1, 1));
 
 		//Shadow Pass 1 - Shadow Map

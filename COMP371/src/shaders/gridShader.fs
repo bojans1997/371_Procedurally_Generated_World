@@ -15,6 +15,7 @@ uniform vec3 lightPos;
 uniform vec3 viewPos;
 
 uniform float light;
+uniform vec3 lightColor;
 
 float ShadowCalculation(vec4 fragPosLightSpace)
 {
@@ -40,9 +41,9 @@ void main()
 {           
     vec3 color = texture(diffuseTexture, fs_in.TexCoords).rgb;
     vec3 normal = normalize(fs_in.Normal);
-    vec3 lightColor = vec3(1.0f);
+    
     // ambient
-    vec3 ambient = vec3(0.11f, 0.64f, 0.15f) * color;
+    vec3 ambient = vec3(0.11f, 0.64f, 0.15f) * color * lightColor;
     // diffuse
     vec3 lightDir = normalize(lightPos - fs_in.FragPos);
     float diff = max(dot(lightDir, normal), 0.0);
