@@ -430,7 +430,6 @@ int main(void)
 
 	// Referenced from https://freestocktextures.com/texture/wall-moss-brick,621.html
 	Texture *ruinTexture = new Texture("src/textures/ruin.jpg");
-
 	Grid *grid = new Grid(GRID_SIZE);
 	
 	// Letter U and digit 4 for Giuseppe Campanelli
@@ -602,6 +601,7 @@ int main(void)
 	pairN2 = new Pair(new Character(cubesN), new Character(cubes2), new Sphere(0, 6, 0, 5, 10, 10));
 
 	Cube *sun = new Cube(0, 0, 0);
+	Cube *moon = new Cube(0, 0, 0);
 
 	srand(time(NULL));
 
@@ -802,6 +802,10 @@ int main(void)
 		modelSun = glm::translate(modelSun, glm::vec3(sin(glfwGetTime() / dayspeed) * (lightDistance + 20) + cameraPos.x, cos(glfwGetTime() / dayspeed) * (lightDistance + 20) + cameraPos.y, cameraPos.z));
 		modelSun = glm::scale(modelSun, glm::vec3(1, 1, 1));
 
+		glm::mat4 modelMoon = glm::mat4(1.0f);
+		modelMoon = glm::translate(modelMoon, glm::vec3(-1 * (sin(glfwGetTime() / dayspeed) * (lightDistance + 20) + cameraPos.x), -1 * (cos(glfwGetTime() / dayspeed) * (lightDistance + 20) + cameraPos.y), cameraPos.z));
+		modelMoon = glm::scale(modelMoon, glm::vec3(1, 1, 1));
+
 		//Shadow Pass 1 - Shadow Map
 		glm::mat4 lightProjection, lightView;
 		glm::mat4 lightSpaceMatrix;
@@ -876,8 +880,14 @@ int main(void)
 		lightShader->use();
 		lightShader->setMat4("projection", projection);
 		lightShader->setMat4("view", view);
+		lightShader->setVec3("color", glm::vec3(1.0f, 0.9f, 0.0f));
 		
 		sun->draw(lightShader, modelSun);
+
+		lightShader->setVec3("color", glm::vec3(0.6f, 0.9f, 1.0f));
+
+		moon->draw(lightShader, modelMoon);
+
 
 		//Draw Grid
 		grid->draw(gridShader, depthMap);
