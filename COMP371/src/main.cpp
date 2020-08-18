@@ -135,10 +135,17 @@ void generateObjects(int min1, int max1, int min2, int max2) {
 		int z = randomInt(min2, max2);
 		int size = randomInt(3, 6);
 
+		// prevent objects from spawning inside the player spawn
+		while (x < 5 && x > -5 && z < 25 && z > 15) {
+			std::cout << "test" << std::endl;
+			x = randomInt(min1, max1);
+			z = randomInt(min2, max2);
+		}
+
 		if ((rand() % 100) > 50) {
 			z = -z;
 		}
-
+		
 		trees.push_back(new Tree(glm::vec3(x, 0, z), size));
 	}
 
@@ -146,6 +153,13 @@ void generateObjects(int min1, int max1, int min2, int max2) {
 		int x = randomInt(min2, max2);
 		int z = randomInt(min1, max1);
 		int size = randomInt(3, 6);
+
+		// prevent objects from spawning inside the player spawn
+		while (x < 5 && x > -5 && z < 25 && z > 15) {
+			std::cout << "test" << std::endl;
+			x = randomInt(min1, max1);
+			z = randomInt(min2, max2);
+		}
 
 		if ((rand() % 100) > 50) {
 			x = -x;
@@ -161,6 +175,13 @@ void generateObjects(int min1, int max1, int min2, int max2) {
 		int yLen = randomInt(2, 4);
 		int zLen = randomInt(2, 4);
 
+		// prevent objects from spawning inside the player spawn
+		while (x < 5 && x > -5 && z < 25 && z > 15) {
+			std::cout << "test" << std::endl;
+			x = randomInt(min1, max1);
+			z = randomInt(min2, max2);
+		}
+
 		if (rand() % 100 >= 50) {
 			z = -z;
 		}
@@ -174,6 +195,13 @@ void generateObjects(int min1, int max1, int min2, int max2) {
 		int xLen = randomInt(2, 4);
 		int yLen = randomInt(2, 4);
 		int zLen = randomInt(2, 4);
+
+		// prevent objects from spawning inside the player spawn
+		while (x < 5 && x > -5 && z < 25 && z > 15) {
+			std::cout << "test" << std::endl;
+			x = randomInt(min1, max1);
+			z = randomInt(min2, max2);
+		}
 
 		if (rand() % 100 >= 50) {
 			x = -x;
@@ -617,9 +645,6 @@ int main(void)
 	textureShader->setInt("shadowMap", 1);
 	textureShader->setInt("diffuseTexture", 0);
 
-
-	
-
 	// skybox info
 	float skyboxVertices[] = {
 		// positions          
@@ -675,6 +700,9 @@ int main(void)
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
+	/*
+		Skybox images taken from https://learnopengl.com/img/textures/skybox.zip
+	*/
 	std::vector<std::string> faces
 	{
 			"src/textures/right.jpg",
