@@ -137,7 +137,6 @@ void generateObjects(int min1, int max1, int min2, int max2) {
 
 		// prevent objects from spawning inside the player spawn
 		while (x < 5 && x > -5 && z < 25 && z > 15) {
-			std::cout << "test" << std::endl;
 			x = randomInt(min1, max1);
 			z = randomInt(min2, max2);
 		}
@@ -156,7 +155,6 @@ void generateObjects(int min1, int max1, int min2, int max2) {
 
 		// prevent objects from spawning inside the player spawn
 		while (x < 5 && x > -5 && z < 25 && z > 15) {
-			std::cout << "test" << std::endl;
 			x = randomInt(min1, max1);
 			z = randomInt(min2, max2);
 		}
@@ -177,7 +175,6 @@ void generateObjects(int min1, int max1, int min2, int max2) {
 
 		// prevent objects from spawning inside the player spawn
 		while (x < 5 && x > -5 && z < 25 && z > 15) {
-			std::cout << "test" << std::endl;
 			x = randomInt(min1, max1);
 			z = randomInt(min2, max2);
 		}
@@ -198,7 +195,6 @@ void generateObjects(int min1, int max1, int min2, int max2) {
 
 		// prevent objects from spawning inside the player spawn
 		while (x < 5 && x > -5 && z < 25 && z > 15) {
-			std::cout << "test" << std::endl;
 			x = randomInt(min1, max1);
 			z = randomInt(min2, max2);
 		}
