@@ -60,6 +60,9 @@
     <ClCompile Include="src\objects\Stack.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\objects\apple.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\shaders\depthShader.fs">
@@ -208,6 +211,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="dependencies\glad\glad.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\objects\apple.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
