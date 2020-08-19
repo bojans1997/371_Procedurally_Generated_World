@@ -15,6 +15,7 @@
 #include "objects/Sphere.h"
 #include "objects/tree.h"
 #include "objects/bush.h"
+#include "objects/apple.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -34,7 +35,7 @@ glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
 bool is_fs = true;
-
+bool create_apple = true;
 bool mute = false;
 bool is_jumping = false;
 float jumpValue = 2.0f;
@@ -69,6 +70,7 @@ Pair *pairN2;
 // Initial procedural creation of objects on terrain
 std::vector<Tree*> trees;
 std::vector<Bush*> bushes;
+std::vector<Apple*> apples;
 
 // timing
 float deltaTime = 0.0f;	// time between current frame and last frame
@@ -127,84 +129,6 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 int randomInt(int min, int max)
 {
 	return min + (rand() % (max - min + 1));
-}
-
-void generateObjects(int min1, int max1, int min2, int max2) {
-	for (int i = 0; i < 25; i++) {
-		int x = randomInt(min1, max1);
-		int z = randomInt(min2, max2);
-		int size = randomInt(3, 6);
-
-		// prevent objects from spawning inside the player spawn
-		while (x < 5 && x > -5 && z < 25 && z > 15) {
-			x = randomInt(min1, max1);
-			z = randomInt(min2, max2);
-		}
-
-		if ((rand() % 100) > 50) {
-			z = -z;
-		}
-		
-		trees.push_back(new Tree(glm::vec3(x, 0, z), size));
-	}
-
-	for (int i = 0; i < 25; i++) {
-		int x = randomInt(min2, max2);
-		int z = randomInt(min1, max1);
-		int size = randomInt(3, 6);
-
-		// prevent objects from spawning inside the player spawn
-		while (x < 5 && x > -5 && z < 25 && z > 15) {
-			x = randomInt(min1, max1);
-			z = randomInt(min2, max2);
-		}
-
-		if ((rand() % 100) > 50) {
-			x = -x;
-		}
-
-		trees.push_back(new Tree(glm::vec3(x, 0, z), size));
-	}
-
-	for (int i = 0; i < 50; i++) {
-		int x = randomInt(min1, max1);
-		int z = randomInt(min2, max2);
-		int xLen = randomInt(2, 4);
-		int yLen = randomInt(2, 4);
-		int zLen = randomInt(2, 4);
-
-		// prevent objects from spawning inside the player spawn
-		while (x < 5 && x > -5 && z < 25 && z > 15) {
-			x = randomInt(min1, max1);
-			z = randomInt(min2, max2);
-		}
-
-		if (rand() % 100 >= 50) {
-			z = -z;
-		}
-
-		bushes.push_back(new Bush(glm::vec3(x, 0, z), glm::vec3(xLen, yLen, zLen)));
-	}
-
-	for (int i = 0; i < 50; i++) {
-		int x = randomInt(min2, max2);
-		int z = randomInt(min1, max1);
-		int xLen = randomInt(2, 4);
-		int yLen = randomInt(2, 4);
-		int zLen = randomInt(2, 4);
-
-		// prevent objects from spawning inside the player spawn
-		while (x < 5 && x > -5 && z < 25 && z > 15) {
-			x = randomInt(min1, max1);
-			z = randomInt(min2, max2);
-		}
-
-		if (rand() % 100 >= 50) {
-			x = -x;
-		}
-
-		bushes.push_back(new Bush(glm::vec3(x, 0, z), glm::vec3(xLen, yLen, zLen)));
-	}
 }
 
 bool checkCharacterCollision(Character *character, glm::vec3 pairPos, glm::vec3 newCameraPos)
@@ -267,6 +191,118 @@ bool checkCollision(glm::vec3 newCameraPos)
 	return modelCollision;
 }
 
+bool checkAppleCollision(glm::vec3 newCameraPos) {
+	for (std::vector<Apple*>::iterator it = apples.begin(); it != apples.end(); ++it) {
+		glm::vec3 pos = (*it)->position;
+		glm::vec3 size = (*it)->size;
+
+		bool collisionX = newCameraPos.x + 0.7f >= pos.x && newCameraPos.x - 0.7f <= pos.x + size.x;
+		bool collisionZ = newCameraPos.z + 0.7f >= pos.z && newCameraPos.z - 0.7f <= pos.z + size.z;
+
+		if (collisionX && collisionZ) {
+			return true;
+		}
+	}
+	return false;
+}
+
+void generateObjects(int min1, int max1, int min2, int max2) {
+	for (int i = 0; i < 25; i++) {
+		int x = randomInt(min1, max1);
+		int z = randomInt(min2, max2);
+		int size = randomInt(3, 6);
+
+		// prevent objects from spawning inside the player spawn
+		while (x < 5 && x > -5 && z < 25 && z > 15) {
+			x = randomInt(min1, max1);
+			z = randomInt(min2, max2);
+		}
+
+		if ((rand() % 100) > 50) {
+			z = -z;
+		}
+
+		trees.push_back(new Tree(glm::vec3(x, 0, z), size));
+	}
+
+	for (int i = 0; i < 25; i++) {
+		int x = randomInt(min2, max2);
+		int z = randomInt(min1, max1);
+		int size = randomInt(3, 6);
+
+		// prevent objects from spawning inside the player spawn
+		while (x < 5 && x > -5 && z < 25 && z > 15) {
+			x = randomInt(min1, max1);
+			z = randomInt(min2, max2);
+		}
+
+		if ((rand() % 100) > 50) {
+			x = -x;
+		}
+
+		trees.push_back(new Tree(glm::vec3(x, 0, z), size));
+	}
+
+	for (int i = 0; i < 50; i++) {
+		int x = randomInt(min1, max1);
+		int z = randomInt(min2, max2);
+		int xLen = randomInt(2, 4);
+		int yLen = randomInt(2, 4);
+		int zLen = randomInt(2, 4);
+
+		// prevent objects from spawning inside the player spawn
+		while (x < 5 && x > -5 && z < 25 && z > 15) {
+			x = randomInt(min1, max1);
+			z = randomInt(min2, max2);
+		}
+
+		if (rand() % 100 >= 50) {
+			z = -z;
+		}
+
+		bushes.push_back(new Bush(glm::vec3(x, 0, z), glm::vec3(xLen, yLen, zLen)));
+	}
+
+	for (int i = 0; i < 50; i++) {
+		int x = randomInt(min2, max2);
+		int z = randomInt(min1, max1);
+		int xLen = randomInt(2, 4);
+		int yLen = randomInt(2, 4);
+		int zLen = randomInt(2, 4);
+
+		// prevent objects from spawning inside the player spawn
+		while (x < 5 && x > -5 && z < 25 && z > 15) {
+			x = randomInt(min1, max1);
+			z = randomInt(min2, max2);
+		}
+
+		if (rand() % 100 >= 50) {
+			x = -x;
+		}
+
+		bushes.push_back(new Bush(glm::vec3(x, 0, z), glm::vec3(xLen, yLen, zLen)));
+	}
+
+	if (create_apple) {
+		for (int i = 0; i < 5; i++) {
+			int x = randomInt(min1, max1);
+			int z = randomInt(min2, max2);
+
+			while (checkCollision(glm::vec3(x, 2, z))) {
+				x = randomInt(min1, max1);
+				z = randomInt(min2, max2);
+			}
+			
+			std::cout << "apple pos.x: " << x << std::endl;
+			std::cout << "apple pos.z: " << z << std::endl;
+
+			apples.push_back(new Apple(glm::vec3(x, 0, z), glm::vec3(1, 1, 1)));
+		}
+		create_apple = false;
+	}
+
+}
+
 unsigned int loadCubemap(std::vector<std::string> faces)
 {
 	unsigned int textureID;
@@ -324,7 +360,7 @@ void processInput(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
 		glm::vec3 newCameraPos = cameraPos + cameraSpeed * cameraFront;
 		newCameraPos.y = cameraPos.y;
-		if (!checkCollision(newCameraPos)) {
+		if (!checkCollision(newCameraPos) && !checkAppleCollision(newCameraPos)) {
 			cameraPos = newCameraPos;
 			if (footstep->getIsPaused()) {
 				footstep->setIsPaused(false);
@@ -334,7 +370,7 @@ void processInput(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
 		glm::vec3 newCameraPos = cameraPos - cameraSpeed * cameraFront;
 		newCameraPos.y = cameraPos.y;
-		if (!checkCollision(newCameraPos)) {
+		if (!checkCollision(newCameraPos) && !checkAppleCollision(newCameraPos)) {
 			cameraPos = newCameraPos;
 			if (footstep->getIsPaused()) {
 				footstep->setIsPaused(false);
@@ -343,7 +379,7 @@ void processInput(GLFWwindow* window)
 	}
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
 		glm::vec3 newCameraPos = cameraPos - glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
-		if (!checkCollision(newCameraPos)) {
+		if (!checkCollision(newCameraPos) && !checkAppleCollision(newCameraPos)) {
 			cameraPos = newCameraPos;
 			if (footstep->getIsPaused()) {
 				footstep->setIsPaused(false);
@@ -352,10 +388,49 @@ void processInput(GLFWwindow* window)
 	}
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
 		glm::vec3 newCameraPos = cameraPos + glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
-		if (!checkCollision(newCameraPos)) {
+		if (!checkCollision(newCameraPos) && !checkAppleCollision(newCameraPos)) {
 			cameraPos = newCameraPos;
 			if (footstep->getIsPaused()) {
 				footstep->setIsPaused(false);
+			}
+		}
+		
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_RELEASE) {
+		glm::vec3 newCameraPos = cameraPos + glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+		
+		for (std::vector<Apple*>::iterator it = apples.begin(); it != apples.end(); ++it) {
+			glm::vec3 pos = (*it)->position;
+			glm::vec3 size = (*it)->size;
+
+			bool appleCollisionX = newCameraPos.x + 1.5f >= pos.x && newCameraPos.x - 1.5f <= pos.x + size.x;
+			bool appleCollisionZ = newCameraPos.z + 1.5f >= pos.z && newCameraPos.z - 1.5f <= pos.z + size.z;
+
+			if (appleCollisionX && appleCollisionZ) {
+				std::cout << "Press E to collect the apple" << std::endl;
+			}
+		}
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
+		glm::vec3 newCameraPos = cameraPos + glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+
+		for (std::vector<Apple*>::iterator it = apples.begin(); it != apples.end(); ++it) {
+			glm::vec3 pos = (*it)->position;
+			glm::vec3 size = (*it)->size;
+
+			bool appleCollisionX = newCameraPos.x + 1.5f >= pos.x && newCameraPos.x - 1.5f <= pos.x + size.x;
+			bool appleCollisionZ = newCameraPos.z + 1.5f >= pos.z && newCameraPos.z - 1.5f <= pos.z + size.z;
+
+			if (appleCollisionX && appleCollisionZ) {
+				Shader *appleShader = new Shader("src/shaders/texture.vs", "src/shaders/texture.fs");
+				(*it)->position.x = 100000.0f;
+				(*it)->position.y = -10.0f;
+				(*it)->position.z = 100000.0f;
+				(*it)->~Apple();
+				//create another apple
+				//(*it)->moveApple(appleShader, (*it)->position);
 			}
 		}
 	}
@@ -831,6 +906,10 @@ int main(void)
 			(*it)->draw(depthShader);
 		}
 
+		for (std::vector<Apple*>::iterator it = apples.begin(); it != apples.end(); ++it) {
+			(*it)->draw(depthShader);
+		}
+
 		pairU4->draw(depthShader, sphereShader, modelU4);
 		pairE5->draw(depthShader, sphereShader, modelE5);
 		pairJ5->draw(depthShader, sphereShader, modelJ5);
@@ -904,6 +983,10 @@ int main(void)
 			(*it)->draw(textureShader);
 		}
 
+		for (std::vector<Apple*>::iterator it = apples.begin(); it != apples.end(); ++it) {
+			(*it)->draw(textureShader);
+		}
+
 		pairU4->draw(textureShader, sphereShader, modelU4, ruinTexture);
 		pairE5->draw(textureShader, sphereShader, modelE5, ruinTexture);
 		pairJ5->draw(textureShader, sphereShader, modelJ5, ruinTexture);
@@ -938,6 +1021,10 @@ int main(void)
 	for (std::vector<Bush*>::iterator it = bushes.begin(); it != bushes.end(); ++it) {
 		delete *it;
 	}
+
+	/*for (std::vector<Apple*>::iterator it = apples.begin(); it != apples.end(); ++it) {
+		delete *it;
+	}*/
 
 	delete pairU4;
 	delete pairE5;
