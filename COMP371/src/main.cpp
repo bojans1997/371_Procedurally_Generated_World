@@ -3,6 +3,7 @@
 #include <glm.hpp>
 #include <irrKlang.h>
 #include <iostream>
+#include <map>
 #include <string>
 #include <vector>
 #include "objects/shader.h"
@@ -16,6 +17,8 @@
 #include "objects/tree.h"
 #include "objects/bush.h"
 #include "objects/apple.h"
+#include <ft2build.h>
+#include FT_FREETYPE_H
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -36,6 +39,9 @@ glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
 bool is_fs = true;
 bool create_apple = true;
+bool near_apple = false;
+int apple_collected = 0;
+
 bool mute = false;
 bool is_jumping = false;
 float jumpValue = 2.0f;
@@ -46,6 +52,7 @@ GLfloat distance = 20.0f;
 GLfloat camX = 0;
 GLfloat camZ = 0;
 GLfloat camY = 0;
+
 
 
 bool firstMouse = true;
@@ -292,11 +299,8 @@ void generateObjects(int min1, int max1, int min2, int max2) {
 				x = randomInt(min1, max1);
 				z = randomInt(min2, max2);
 			}
-			
-			std::cout << "apple pos.x: " << x << std::endl;
-			std::cout << "apple pos.z: " << z << std::endl;
 
-			apples.push_back(new Apple(glm::vec3(x, 0, z), glm::vec3(1, 1, 1)));
+			apples.push_back(new Apple(glm::vec3(x, 0, z), glm::vec3(0.25f, 0.25f, 0.25f)));
 		}
 		create_apple = false;
 	}
@@ -333,6 +337,63 @@ unsigned int loadCubemap(std::vector<std::string> faces)
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
 	return textureID;
+}
+
+// Holds all state information relevant to a text character as loaded using FreeType. References from https://learnopengl.com/In-Practice/Text-Rendering
+struct Text {
+	unsigned int TextureID; // ID handle of the glyph texture
+	glm::ivec2   Size;      // Size of glyph
+	glm::ivec2   Bearing;   // Offset from baseline to left/top of glyph
+	unsigned int Advance;   // Horizontal offset to advance to next glyph
+};
+
+std::map<GLchar, Text> Texts;
+unsigned int textVAO, textVBO;
+
+//To render Text. References from https://learnopengl.com/In-Practice/Text-Rendering
+void RenderText(Shader *shader, std::string text, float x, float y, float scale, glm::vec3 color)
+{
+	// activate corresponding render state	
+	shader->use();
+	shader->setVec3("textColor", color);
+	glActiveTexture(GL_TEXTURE0);
+	glBindVertexArray(textVAO);
+
+	// iterate through all characters
+	std::string::const_iterator c;
+	for (c = text.begin(); c != text.end(); c++)
+	{
+		Text ch = Texts[*c];
+
+		float xpos = x + ch.Bearing.x * scale;
+		float ypos = y - (ch.Size.y - ch.Bearing.y) * scale;
+
+		float w = ch.Size.x * scale;
+		float h = ch.Size.y * scale;
+		// update VBO for each character
+		float vertices[6][4] = {
+			{ xpos,     ypos + h,   0.0f, 0.0f },
+			{ xpos,     ypos,       0.0f, 1.0f },
+			{ xpos + w, ypos,       1.0f, 1.0f },
+
+			{ xpos,     ypos + h,   0.0f, 0.0f },
+			{ xpos + w, ypos,       1.0f, 1.0f },
+			{ xpos + w, ypos + h,   1.0f, 0.0f }
+		};
+		// render glyph texture over quad
+		glBindTexture(GL_TEXTURE_2D, ch.TextureID);
+		// update content of VBO memory
+		glBindBuffer(GL_ARRAY_BUFFER, textVBO);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices); // be sure to use glBufferSubData and not glBufferData
+
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		// render quad
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+		// now advance cursors for next glyph (note that advance is number of 1/64 pixels)
+		x += (ch.Advance >> 6) * scale; // bitshift by 6 to get value in pixels (2^6 = 64 (divide amount of 1/64th pixels by 64 to get amount of pixels))
+	}
+	glBindVertexArray(0);
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void processInput(GLFWwindow* window)
@@ -399,7 +460,7 @@ void processInput(GLFWwindow* window)
 
 	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_RELEASE) {
 		glm::vec3 newCameraPos = cameraPos + glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
-		
+		near_apple = false;
 		for (std::vector<Apple*>::iterator it = apples.begin(); it != apples.end(); ++it) {
 			glm::vec3 pos = (*it)->position;
 			glm::vec3 size = (*it)->size;
@@ -408,7 +469,7 @@ void processInput(GLFWwindow* window)
 			bool appleCollisionZ = newCameraPos.z + 1.5f >= pos.z && newCameraPos.z - 1.5f <= pos.z + size.z;
 
 			if (appleCollisionX && appleCollisionZ) {
-				std::cout << "Press E to collect the apple" << std::endl;
+				near_apple = true;
 			}
 		}
 	}
@@ -424,13 +485,11 @@ void processInput(GLFWwindow* window)
 			bool appleCollisionZ = newCameraPos.z + 1.5f >= pos.z && newCameraPos.z - 1.5f <= pos.z + size.z;
 
 			if (appleCollisionX && appleCollisionZ) {
-				Shader *appleShader = new Shader("src/shaders/texture.vs", "src/shaders/texture.fs");
 				(*it)->position.x = 100000.0f;
 				(*it)->position.y = -10.0f;
 				(*it)->position.z = 100000.0f;
 				(*it)->~Apple();
-				//create another apple
-				//(*it)->moveApple(appleShader, (*it)->position);
+				apple_collected++;
 			}
 		}
 	}
@@ -502,6 +561,90 @@ int main(void)
 	Shader *sphereShader = new Shader("src/shaders/SphereShader.vs", "src/shaders/SphereShader.fs");
 	Shader *gridShader = new Shader("src/shaders/gridShader.vs", "src/shaders/gridShader.fs");
 	Shader *skyBoxShader = new Shader("src/shaders/skybox.vs", "src/shaders/skybox.fs");
+	Shader *textShader = new Shader("src/shaders/text.vs", "src/shaders/text.fs");
+
+	//Text Setup. References from https://learnopengl.com/In-Practice/Text-Rendering
+	glm::mat4 textProjection = glm::ortho(0.0f, static_cast<float>(WINDOW_LENGTH), 0.0f, static_cast<float>(WINDOW_HEIGHT));
+	textShader->use();
+	textShader->setMat4("projection", textProjection);
+
+	//FreeType
+	FT_Library ft;
+	if (FT_Init_FreeType(&ft))
+	{
+		std::cout << "ERROR::FREETYPE: Could not init FreeType Library" << std::endl;
+		return -1;
+	}
+
+	FT_Face face;
+	if (FT_New_Face(ft, "src/resources/manaspc.ttf", 0, &face))
+	{
+		std::cout << "ERROR::FREETYPE: Failed to load font" << std::endl;
+		return -1;
+	}
+	else
+	{
+		// set size to load glyphs as
+		FT_Set_Pixel_Sizes(face, 0, 48);
+
+		// disable byte-alignment restriction
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+		// load first 128 characters of ASCII set
+		for (unsigned char c = 0; c < 128; c++)
+		{
+			// Load character glyph 
+			if (FT_Load_Char(face, c, FT_LOAD_RENDER))
+			{
+				std::cout << "ERROR::FREETYTPE: Failed to load Glyph" << std::endl;
+				continue;
+			}
+
+			// generate texture
+			unsigned int texture;
+			glGenTextures(1, &texture);
+			glBindTexture(GL_TEXTURE_2D, texture);
+			glTexImage2D(
+				GL_TEXTURE_2D,
+				0,
+				GL_RED,
+				face->glyph->bitmap.width,
+				face->glyph->bitmap.rows,
+				0,
+				GL_RED,
+				GL_UNSIGNED_BYTE,
+				face->glyph->bitmap.buffer
+			);
+			// set texture options
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			// now store character for later use
+			Text text = {
+				texture,
+				glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
+				glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
+				static_cast<unsigned int>(face->glyph->advance.x)
+			};
+			Texts.insert(std::pair<char, Text>(c, text));
+		}
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+	// destroy FreeType once we're finished
+	FT_Done_Face(face);
+	FT_Done_FreeType(ft);
+
+	// configure textVAO/textVBO for texture quads
+	glGenVertexArrays(1, &textVAO);
+	glGenBuffers(1, &textVBO);
+	glBindVertexArray(textVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, textVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 4, NULL, GL_DYNAMIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
 
 	// Referenced from https://freestocktextures.com/texture/wall-moss-brick,621.html
 	Texture *ruinTexture = new Texture("src/textures/ruin.jpg");
@@ -796,7 +939,6 @@ int main(void)
 		// lighting info
 		lightPosition = glm::vec3(sin(glfwGetTime() / dayspeed) * lightDistance, cos(glfwGetTime() / dayspeed) * lightDistance, 0.0);
 		
-		//std::cout << lightPosition.y << " " << lightColor.r << lightColor.g << lightColor.b << std::endl;
 		if (lightPosition.y <= 0) {
 			light = 0.0f;
 			lightColor = glm::vec3(1.0f);
@@ -850,9 +992,9 @@ int main(void)
 			generateObjects(-GRID_SIZE / 2, GRID_SIZE / 2, (GRID_SIZE - 50) / 2, GRID_SIZE / 2);
 		}
 
-		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+		
 		glm::mat4 modelU4 = glm::mat4(1.0f);
 		modelU4 = glm::translate(modelU4, glm::vec3(pairU4Pos.x, pairU4Pos.y, pairU4Pos.z));
 		modelU4 = glm::scale(modelU4, glm::vec3(MODEL_SCALE, MODEL_SCALE, MODEL_SCALE));
@@ -920,6 +1062,23 @@ int main(void)
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glViewport(0, 0, WINDOW_LENGTH, WINDOW_HEIGHT);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		//Render Text. References from https://learnopengl.com/In-Practice/Text-Rendering
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		if (apple_collected == 5) {
+			RenderText(textShader, "You have collected all the apples.", 25.0f, 75.0f, 1.0f, glm::vec3(1.0f, 0.0f, 0.0f));
+			RenderText(textShader, "You can continue to play or press ESC to exit the game.", 25.0f, 25.0f, 1.0f, glm::vec3(1.0f, 0.0f, 0.0f));
+		}
+		else {
+			RenderText(textShader, "Apples Collected:" + std::to_string(apple_collected) + "/5", 25.0f, 25.0f, 1.0f, glm::vec3(1.0f, 0.0f, 0.0f));
+		}
+
+		if (near_apple) {
+			RenderText(textShader, "Press E to collect the apple", 550.0f, 800.0f, 1.0f, glm::vec3(1.0f, 0.0f, 0.0f));
+		}
+		glDisable(GL_BLEND);
 
 		//Shadow Pass 2 - Normal Render
 		glm::mat4 projection = glm::perspective(glm::radians(fov), (float)WINDOW_LENGTH / (float)WINDOW_HEIGHT, 0.1f, 500.0f);
@@ -1021,11 +1180,7 @@ int main(void)
 	for (std::vector<Bush*>::iterator it = bushes.begin(); it != bushes.end(); ++it) {
 		delete *it;
 	}
-
-	/*for (std::vector<Apple*>::iterator it = apples.begin(); it != apples.end(); ++it) {
-		delete *it;
-	}*/
-
+	
 	delete pairU4;
 	delete pairE5;
 	delete pairJ5;

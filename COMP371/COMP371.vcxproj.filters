@@ -106,6 +106,12 @@
     <None Include="ikpFlac.dll" />
     <None Include="ikpMP3.dll" />
     <None Include="irrKlang.dll" />
+    <None Include="src\shaders\text.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="src\shaders\text.fs">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\objects\grid.h">

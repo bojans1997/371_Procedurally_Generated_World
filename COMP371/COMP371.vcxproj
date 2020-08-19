@@ -79,6 +79,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <TargetName>COMP371Test</TargetName>
+    <IncludePath>$(ProjectDir)src\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -117,13 +118,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)dependencies\irrKlang;$(ProjectDir)dependencies\glm;$(ProjectDir)dependencies\glfw;$(ProjectDir)dependencies\khr;$(ProjectDir)dependencies\glad</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)dependencies\freeType;$(ProjectDir)dependencies\irrKlang;$(ProjectDir)dependencies\glm;$(ProjectDir)dependencies\glfw;$(ProjectDir)dependencies\khr;$(ProjectDir)dependencies\glad</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(ProjectDir)dependencies\irrKlang;$(ProjectDir)dependencies\glm;$(ProjectDir)dependencies\glfw;$(ProjectDir)dependencies\khr;$(ProjectDir)dependencies\glad</AdditionalLibraryDirectories>
-      <AdditionalDependencies>irrKlang.lib;glfw3.lib;opengl32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)dependencies\freeType;$(ProjectDir)dependencies\irrKlang;$(ProjectDir)dependencies\glm;$(ProjectDir)dependencies\glfw;$(ProjectDir)dependencies\khr;$(ProjectDir)dependencies\glad</AdditionalLibraryDirectories>
+      <AdditionalDependencies>irrKlang.lib;glfw3.lib;opengl32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -178,6 +179,8 @@
     <None Include="src\shaders\gridShader.vs" />
     <None Include="src\shaders\SphereShader.fs" />
     <None Include="src\shaders\SphereShader.vs" />
+    <None Include="src\shaders\text.fs" />
+    <None Include="src\shaders\text.vs" />
     <None Include="src\shaders\texture.fs" />
     <None Include="src\shaders\texture.vs" />
   </ItemGroup>
