@@ -25,7 +25,7 @@ public:
 	void draw(Shader *shader);
 	void moveApple(Shader *shader, glm::vec3 vector);
 protected:
-	// Referenced from https://www.pinterest.ca/pin/114067803031545333/
+	// Referenced from https://www.dreamstime.com/light-red-marble-background-texture-light-red-canvas-marble-background-texture-image151066971
 	Texture *appleTexture = new Texture("src/textures/apple.jpg");
 	Cube* apple;
 };

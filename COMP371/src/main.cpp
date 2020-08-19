@@ -299,11 +299,8 @@ void generateObjects(int min1, int max1, int min2, int max2) {
 				x = randomInt(min1, max1);
 				z = randomInt(min2, max2);
 			}
-			
-			std::cout << "apple pos.x: " << x << std::endl;
-			std::cout << "apple pos.z: " << z << std::endl;
 
-			apples.push_back(new Apple(glm::vec3(x, 0, z), glm::vec3(1, 1, 1)));
+			apples.push_back(new Apple(glm::vec3(x, 0, z), glm::vec3(0.25f, 0.25f, 0.25f)));
 		}
 		create_apple = false;
 	}
@@ -342,7 +339,7 @@ unsigned int loadCubemap(std::vector<std::string> faces)
 	return textureID;
 }
 
-// Holds all state information relevant to a text character as loaded using FreeType
+// Holds all state information relevant to a text character as loaded using FreeType. References from https://learnopengl.com/In-Practice/Text-Rendering
 struct Text {
 	unsigned int TextureID; // ID handle of the glyph texture
 	glm::ivec2   Size;      // Size of glyph
@@ -353,6 +350,7 @@ struct Text {
 std::map<GLchar, Text> Texts;
 unsigned int textVAO, textVBO;
 
+//To render Text. References from https://learnopengl.com/In-Practice/Text-Rendering
 void RenderText(Shader *shader, std::string text, float x, float y, float scale, glm::vec3 color)
 {
 	// activate corresponding render state	
@@ -586,7 +584,6 @@ int main(void)
 	}
 	else
 	{
-		
 		// set size to load glyphs as
 		FT_Set_Pixel_Sizes(face, 0, 48);
 
@@ -942,7 +939,6 @@ int main(void)
 		// lighting info
 		lightPosition = glm::vec3(sin(glfwGetTime() / dayspeed) * lightDistance, cos(glfwGetTime() / dayspeed) * lightDistance, 0.0);
 		
-		//std::cout << lightPosition.y << " " << lightColor.r << lightColor.g << lightColor.b << std::endl;
 		if (lightPosition.y <= 0) {
 			light = 0.0f;
 			lightColor = glm::vec3(1.0f);
@@ -1067,7 +1063,7 @@ int main(void)
 		glViewport(0, 0, WINDOW_LENGTH, WINDOW_HEIGHT);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		//Render Text
+		//Render Text. References from https://learnopengl.com/In-Practice/Text-Rendering
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -1184,11 +1180,7 @@ int main(void)
 	for (std::vector<Bush*>::iterator it = bushes.begin(); it != bushes.end(); ++it) {
 		delete *it;
 	}
-
-	/*for (std::vector<Apple*>::iterator it = apples.begin(); it != apples.end(); ++it) {
-		delete *it;
-	}*/
-
+	
 	delete pairU4;
 	delete pairE5;
 	delete pairJ5;
