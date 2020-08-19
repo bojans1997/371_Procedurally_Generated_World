@@ -428,7 +428,9 @@ void processInput(GLFWwindow* window)
 				(*it)->position.x = 100000.0f;
 				(*it)->position.y = -10.0f;
 				(*it)->position.z = 100000.0f;
-				(*it)->moveApple(appleShader, (*it)->position);
+				(*it)->~Apple();
+				//create another apple
+				//(*it)->moveApple(appleShader, (*it)->position);
 			}
 		}
 	}
