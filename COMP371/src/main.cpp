@@ -1012,9 +1012,9 @@ int main(void)
 		delete *it;
 	}
 
-	for (std::vector<Apple*>::iterator it = apples.begin(); it != apples.end(); ++it) {
+	/*for (std::vector<Apple*>::iterator it = apples.begin(); it != apples.end(); ++it) {
 		delete *it;
-	}
+	}*/
 
 	delete pairU4;
 	delete pairE5;
