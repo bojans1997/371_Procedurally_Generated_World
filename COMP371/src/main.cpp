@@ -1020,7 +1020,7 @@ int main(void)
 		modelSun = glm::scale(modelSun, glm::vec3(1, 1, 1));
 
 		glm::mat4 modelMoon = glm::mat4(1.0f);
-		modelMoon = glm::translate(modelMoon, glm::vec3(-1 * (sin(glfwGetTime() / dayspeed) * (lightDistance + 20) + cameraPos.x), -1 * (cos(glfwGetTime() / dayspeed) * (lightDistance + 20) + cameraPos.y), cameraPos.z));
+		modelMoon = glm::translate(modelMoon, glm::vec3((sin(glfwGetTime() / dayspeed + glm::radians(180.0f)) * (lightDistance + 20) + cameraPos.x), (cos(glfwGetTime() / dayspeed + glm::radians(180.0f)) * (lightDistance + 20) + cameraPos.y), cameraPos.z));
 		modelMoon = glm::scale(modelMoon, glm::vec3(1, 1, 1));
 
 		//Shadow Pass 1 - Shadow Map
