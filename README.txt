@@ -65,3 +65,17 @@ CONTROLS
 - Movements
 	- 't' -> move model backwards
 	- 'g' -> move model forward
+
+>>> Assignment 3 <<<
+
+	- "SHIFT" -> run
+	- "ESCAPE" -> exit the window
+	- "HOME" -> reset position
+	- "w" -> walk forward
+	- "a" -> walk left
+	- "s" -> walk backward
+	- "d" -> walk right
+	- "e" -> pickup apple
+ 	- "SPACE" -> jump
+	- "F11" -> Toggle fullscreen
+	- "m" -> toggle mute music
